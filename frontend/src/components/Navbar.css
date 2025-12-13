@@ -1,0 +1,318 @@
+/* ===============================
+   NAVBAR SHELL (PILL + GLOW)
+================================ */
+.navbar {
+  position: sticky;
+  top: 16px;
+  z-index: 100;
+  padding: 0 24px;
+}
+
+.nav-shell {
+  max-width: 1200px;
+  margin: auto;
+  padding: 14px 22px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  backdrop-filter: blur(12px);
+  transition: all 0.3s ease;
+}
+
+/* LIGHT THEME */
+.navbar.light .nav-shell {
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow:
+    0 12px 30px rgba(0, 0, 0, 0.08),
+    0 0 0 1px rgba(255, 255, 255, 0.6);
+}
+
+/* DARK THEME */
+.navbar.dark .nav-shell {
+  background: rgba(2, 6, 23, 0.92);
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  box-shadow:
+    0 20px 50px rgba(0, 0, 0, 0.6),
+    0 0 40px rgba(59, 130, 246, 0.12);
+}
+
+/* ===============================
+   LEFT
+================================ */
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-box {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #38bdf8, #2563eb);
+  display: grid;
+  place-items: center;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.4),
+    0 8px 20px rgba(37, 99, 235, 0.45);
+}
+
+
+.logo-box img {
+  width: 26px;
+  height: 26px;
+}
+
+.brand {
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+/* ===============================
+   CENTER LINKS
+================================ */
+.nav-center {
+  display: flex;
+  gap: 28px;
+}
+
+.nav-center a {
+  text-decoration: none;
+  font-weight: 500;
+  color: inherit;
+  opacity: 0.75;
+  position: relative;
+}
+
+.nav-center a.active,
+.nav-center a:hover {
+  opacity: 1;
+}
+
+/* underline like your screenshot */
+.nav-center a.active::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -10px;
+  width: 100%;
+  height: 3px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #38bdf8, #2563eb);
+}
+
+/* ===============================
+   RIGHT
+================================ */
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Buttons */
+.btn {
+  padding: 6px 16px;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  border: none;
+}
+
+.btn.outline {
+  background: transparent;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+}
+
+.btn.filled {
+  background: linear-gradient(90deg, #38bdf8, #2563eb);
+  color: white;
+  box-shadow:
+    0 10px 30px rgba(37, 99, 235, 0.45),
+    0 0 20px rgba(56, 189, 248, 0.55);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn.filled:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 14px 40px rgba(37, 99, 235, 0.6),
+    0 0 28px rgba(56, 189, 248, 0.75);
+}
+
+/* Theme toggle */
+/* ===============================
+   THEME TOGGLE (SLIDER)
+================================ */
+.theme-toggle {
+  width: 52px;
+  height: 28px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  background: rgba(148, 163, 184, 0.15);
+  display: flex;
+  align-items: center;
+  padding: 3px;
+  cursor: pointer;
+  transition: background 0.25s ease, border-color 0.25s ease;
+}
+
+/* Dark mode background */
+.navbar.dark .theme-toggle {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+/* Toggle knob */
+.toggle-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  transition: transform 0.25s ease, background 0.25s ease;
+}
+
+/* Position when DARK */
+.theme-toggle.dark .toggle-thumb {
+  transform: translateX(24px);
+  background: #facc15;
+}
+
+/* Position when LIGHT */
+.theme-toggle.light .toggle-thumb {
+  transform: translateX(0);
+  background: #0f172a;
+  color: white;
+}
+
+
+/* ===============================
+   HAMBURGER (MOBILE ONLY)
+================================ */
+.hamburger {
+  display: none;
+  font-size: 22px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+/* ===============================
+   MOBILE
+================================ */
+@media (max-width: 768px) {
+
+  .hamburger {
+    display: block;
+  }
+
+  .nav-center {
+    display: none;
+  }
+
+  .nav-center.open {
+    display: flex;
+    position: absolute;
+    top: 90px;
+    left: 50%;
+    transform: translateX(-50%);
+    flex-direction: column;
+    gap: 18px;
+    padding: 18px 24px;
+    border-radius: 20px;
+    background: inherit;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+  }
+}
+/* Ensure readability in dark mode */
+.navbar.dark {
+  color: #ffffff;
+}
+
+.navbar.dark .nav-center a,
+.navbar.dark .brand,
+.navbar.dark .btn.outline {
+  color: #ffffff;
+  opacity: 0.9;
+}
+
+.navbar.dark .nav-center a:hover,
+.navbar.dark .nav-center a.active {
+  opacity: 1;
+}/* ===============================
+   HAMBURGER
+================================ */
+.hamburger {
+  display: none;
+  font-size: 22px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+/* ===============================
+   DESKTOP / MOBILE VISIBILITY
+================================ */
+.desktop-only {
+  display: flex;
+}
+
+/* ===============================
+   MOBILE MENU (HIDDEN BY DEFAULT)
+================================ */
+.mobile-menu {
+  display: none;
+}
+
+/* ===============================
+   MOBILE STYLES
+================================ */
+@media (max-width: 768px) {
+
+  .hamburger {
+    display: block;
+  }
+
+  .desktop-only {
+    display: none;
+  }
+
+  .mobile-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin: 12px auto 0;
+    padding: 18px 22px;
+    max-width: 90%;
+    border-radius: 20px;
+    background: inherit;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+    opacity: 0;
+    transform: translateY(-10px);
+    pointer-events: none;
+    transition: all 0.25s ease;
+  }
+
+  .mobile-menu.open {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  .mobile-menu a {
+    text-decoration: none;
+    color: inherit;
+    font-size: 1.05rem;
+  }
+
+  .btn.full {
+    width: 100%;
+    justify-content: center;
+  }
+}
