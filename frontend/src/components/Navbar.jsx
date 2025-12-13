@@ -51,17 +51,16 @@ export default function Navbar({ theme, onToggleTheme, onLogin, onSignup }) {
 
       {/* MOBILE MENU (SEPARATE FROM DESKTOP) */}
       <nav className={`mobile-menu ${mobileOpen ? "open" : ""}`}>
-        <a href="#">Home</a>
-        <a href="#">Browse</a>
-        <a href="#">About Us</a>
+  <a href="#">Home</a>
+  <a href="#">Browse</a>
+  <a href="#">About Us</a>
 
-        <button className="btn outline full" onClick={onSignup}>
-          Sign In
-        </button>
-        <button className="btn filled full" onClick={onLogin}>
-          Log In
-        </button>
-      </nav>
+  <div className="mobile-auth">
+    <button className="btn outline full">Sign In</button>
+    <button className="btn filled full">Log In</button>
+  </div>
+</nav>
+
     </header>
   );
 }
