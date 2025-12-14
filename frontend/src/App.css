@@ -1,0 +1,29 @@
+/* Global reset */
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+/* App wrapper */
+.app {
+  min-height: 100vh;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+/* Light theme */
+.app.light {
+  background: #f8fafc;
+  color: #0f172a;
+}
+
+/* Dark theme */
+.app.dark {
+  background: #020617;
+  color: #f8fafc;
+}

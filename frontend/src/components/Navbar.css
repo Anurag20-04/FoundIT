@@ -1,0 +1,349 @@
+/* =========================================================
+   NAVBAR WRAPPER
+   - Sticky pill-style navbar with glow
+   - Theme-aware (light / dark)
+========================================================= */
+
+.navbar {
+  position: sticky;
+  top: 16px;
+  z-index: 100;
+  padding: 0 24px;
+}
+
+/* Main pill container */
+.nav-shell {
+  max-width: 1200px;
+  margin: auto;
+  padding: 14px 22px;
+  border-radius: 999px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  backdrop-filter: blur(12px);
+  transition: all 0.3s ease;
+}
+
+/* ---------- Light Theme ---------- */
+.navbar.light .nav-shell {
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow:
+    0 12px 30px rgba(0, 0, 0, 0.08),
+    0 0 0 1px rgba(255, 255, 255, 0.6);
+}
+
+/* ---------- Dark Theme ---------- */
+.navbar.dark .nav-shell {
+  background: rgba(2, 6, 23, 0.92);
+  border: 1px solid rgba(148, 163, 184, 0.18);
+
+  box-shadow:
+    /* main elevation */
+    0 20px 50px rgba(0, 0, 0, 0.6),
+
+    /* soft inner glow */
+    inset 0 0 0 1px rgba(59, 130, 246, 0.15),
+
+    /* outer blue glow ring */
+    0 0 0 1px rgba(59, 130, 246, 0.35),
+    0 0 28px rgba(59, 130, 246, 0.25);
+}
+
+
+/* Ensure text is readable in dark mode */
+.navbar.dark {
+  color: #ffffff;
+}
+
+.navbar.dark .nav-center a,
+.navbar.dark .brand,
+.navbar.dark .btn.outline {
+  color: #ffffff;
+  opacity: 0.9;
+}
+
+.navbar.dark .nav-center a:hover,
+.navbar.dark .nav-center a.active {
+  opacity: 1;
+}
+
+/* =========================================================
+   LEFT SECTION (Logo + Brand)
+========================================================= */
+
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Circular logo container */
+.logo-box {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+
+  background: linear-gradient(135deg, #38bdf8, #2563eb);
+
+  display: grid;
+  place-items: center;
+
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.4),
+    0 8px 20px rgba(37, 99, 235, 0.45);
+}
+
+.logo-box img {
+  width: 26px;
+  height: 26px;
+}
+
+.brand {
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+/* =========================================================
+   CENTER NAVIGATION LINKS
+========================================================= */
+
+.nav-center {
+  display: flex;
+  gap: 28px;
+}
+
+.nav-center a {
+  text-decoration: none;
+  font-weight: 500;
+  color: inherit;
+  opacity: 0.75;
+  position: relative;
+}
+
+.nav-center a:hover,
+.nav-center a.active {
+  opacity: 1;
+}
+
+/* Active underline indicator */
+.nav-center a.active::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -10px;
+
+  width: 100%;
+  height: 3px;
+  border-radius: 999px;
+
+  background: linear-gradient(90deg, #38bdf8, #2563eb);
+}
+
+/* =========================================================
+   RIGHT SECTION (Buttons + Theme Toggle)
+========================================================= */
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ---------- Buttons ---------- */
+.btn {
+  padding: 6px 16px;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  border: none;
+}
+
+.btn.outline {
+  background: transparent;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+}
+
+.btn.filled {
+  background: linear-gradient(90deg, #38bdf8, #2563eb);
+  color: white;
+
+  box-shadow:
+    0 10px 30px rgba(37, 99, 235, 0.45),
+    0 0 20px rgba(56, 189, 248, 0.55);
+
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn.filled:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 14px 40px rgba(37, 99, 235, 0.6),
+    0 0 28px rgba(56, 189, 248, 0.75);
+}
+
+/* =========================================================
+   THEME TOGGLE (SLIDER)
+========================================================= */
+
+.theme-toggle {
+  width: 52px;
+  height: 28px;
+  padding: 3px;
+
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  background: rgba(148, 163, 184, 0.15);
+
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+
+  transition: background 0.25s ease, border-color 0.25s ease;
+}
+
+/* Dark mode track */
+.navbar.dark .theme-toggle {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+/* Toggle knob */
+.toggle-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 13px;
+  transition: transform 0.25s ease, background 0.25s ease;
+}
+
+/* Knob position states */
+.theme-toggle.light .toggle-thumb {
+  transform: translateX(0);
+  background: #0f172a;
+  color: white;
+}
+
+.theme-toggle.dark .toggle-thumb {
+  transform: translateX(24px);
+  background: #facc15;
+}
+
+/* =========================================================
+   HAMBURGER (MOBILE ONLY)
+========================================================= */
+
+.hamburger {
+  display: none;
+  font-size: 22px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+/* =========================================================
+   MOBILE MENU
+========================================================= */
+
+.mobile-menu {
+  display: none;
+}
+
+/* Hide auth buttons in mobile menu by default */
+.mobile-auth {
+  display: none;
+}
+
+/* =========================================================
+   RESPONSIVE BREAKPOINTS
+========================================================= */
+
+/* ---------- Tablets & Phones ---------- */
+@media (max-width: 768px) {
+
+  .hamburger {
+    display: block;
+  }
+
+  .nav-center {
+    display: none;
+  }
+
+  .mobile-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    margin: 12px auto 0;
+    padding: 18px 22px;
+    max-width: 90%;
+
+    border-radius: 20px;
+    background: inherit;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+
+    opacity: 0;
+    transform: translateY(-10px);
+    pointer-events: none;
+
+    transition: all 0.25s ease;
+  }
+
+  .mobile-menu.open {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  .mobile-menu a {
+    text-decoration: none;
+    color: inherit;
+    font-size: 1.05rem;
+  }
+
+  .btn.full {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* ---------- Small Phones (iPhone SE) ---------- */
+@media (max-width: 480px) {
+
+  .brand {
+    display: none;
+  }
+
+  .nav-right .btn {
+    display: none;
+  }
+
+  .nav-shell {
+    padding: 10px 14px;
+  }
+
+  .logo-box {
+    width: 38px;
+    height: 38px;
+  }
+
+  .logo-box img {
+    width: 22px;
+    height: 22px;
+  }
+
+  .mobile-auth {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 12px;
+  }
+}
