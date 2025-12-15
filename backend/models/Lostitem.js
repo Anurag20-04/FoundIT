@@ -47,5 +47,5 @@ const LostitemSchema = new mongoose.Schema({
   }
 }, { timestamps: true });
 
-const Lostitem = mongoose.model(Lostitem,LostitemSchema);
-module.export = Lostitem;
+const Lostitem = mongoose.model("Lostitem",LostitemSchema);
+module.exports = Lostitem;
