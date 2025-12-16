@@ -1,0 +1,205 @@
+/* ===== OVERLAY ===== */
+.login-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ===== MODAL ===== */
+.login-modal {
+  width: 900px;
+  max-width: 95%;
+  height: 520px;
+  display: flex;
+  border-radius: 22px;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+.login-modal.dark {
+  background: #0b1220;
+  color: white;
+}
+
+/* ===== LEFT IMAGE ===== */
+.login-left {
+  width: 45%;
+  background-size: cover;
+  background-position: center;
+}
+
+/* ===== RIGHT ===== */
+.login-right {
+  width: 55%;
+  padding: 40px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.login-right h2 {
+  margin-bottom: 24px;
+  font-size: 1.8rem;
+}
+
+/* CLOSE */
+.close-btn {
+  position: absolute;
+  top: 14px;
+  right: 18px;
+  font-size: 26px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+}
+
+/* ===== FORM ===== */
+.login-right form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.field {
+  position: relative;
+}
+
+.login-right input {
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  font-size: 0.95rem;
+  background: rgba(148, 163, 184, 0.08);
+  color: inherit;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.login-modal.dark input {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.login-right input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+}
+
+/* PASSWORD */
+.password-field .eye {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  font-size: 14px;
+  opacity: 0.7;
+}
+
+/* ERROR */
+.error-text {
+  color: #ef4444;
+  font-size: 0.85rem;
+  margin-top: -4px;
+}
+
+/* BUTTON */
+.login-btn {
+  margin-top: 10px;
+  padding: 14px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  background: linear-gradient(90deg, #38bdf8, #2563eb);
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 12px 30px rgba(37, 99, 235, 0.5);
+}
+
+/* SWITCH */
+.switch-text {
+  margin-top: 18px;
+  font-size: 0.9rem;
+}
+
+.switch-text span {
+  margin-left: 6px;
+  color: #3b82f6;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+/* ===== MOBILE ===== */
+@media (max-width: 768px) {
+  .login-modal {
+    flex-direction: column;
+    height: auto;
+  }
+
+  .login-left {
+    height: 180px;
+    width: 100%;
+  }
+
+  .login-right {
+    width: 100%;
+    padding: 28px 24px;
+  }
+}
+
+@media (max-width: 420px) {
+  .login-left {
+    display: none;
+  }
+}
+/* ===============================
+   PASSWORD FIELD + ICON
+================================ */
+.password-field {
+  position: relative;
+  width: 100%;
+}
+
+.password-field input {
+  width: 100%;
+  padding-right: 44px; /* space for eye icon */
+}
+
+/* Eye icon (PNG) */
+.eye-icon {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;       /* 🔑 CONTROL SIZE HERE */
+  height: 16px;
+  object-fit: contain;
+  cursor: pointer;
+  opacity: 0.65;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.eye-icon:hover {
+  opacity: 1;
+  transform: translateY(-50%) scale(1.05);
+}
+
+/* Slightly smaller on very small phones */
+@media (max-width: 480px) {
+  .eye-icon {
+    width: 14px;
+    height: 14px;
+    right: 12px;
+  }
+
+  .password-field input {
+    padding-right: 40px;
+  }
+}

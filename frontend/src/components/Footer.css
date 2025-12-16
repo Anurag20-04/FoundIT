@@ -1,0 +1,62 @@
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.footer {
+  width: 100%;
+  padding: 28px 24px;
+  border-top: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.footer-container {
+  max-width: 1200px;
+  margin: auto;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+/* Left */
+.footer-left p {
+  font-size: 0.9rem;
+  opacity: 0.75;
+}
+
+/* Right */
+.footer-right {
+  display: flex;
+  gap: 18px;
+}
+
+.footer-right a {
+  text-decoration: none;
+  font-size: 0.9rem;
+  opacity: 0.75;
+  color: inherit;
+}
+
+.footer-right a:hover {
+  opacity: 1;
+}
+
+/* Theme awareness */
+.app.light .footer {
+  background: #ffffff;
+  color: #0f172a;
+}
+
+.app.dark .footer {
+  background: #020617;
+  color: #e5e7eb;
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .footer-container {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

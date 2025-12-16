@@ -1,0 +1,141 @@
+/* ===============================
+   BASE LANDING STYLES
+================================ */
+.landing {
+  min-height: calc(100vh - 140px); /* navbar + footer safe */
+  padding: 48px 24px;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+/* ===============================
+   THEMES
+================================ */
+.landing.light {
+  background-color: #f8fafc;
+  color: #0f172a;
+}
+
+.landing.dark {
+  background-color: #020617;
+  color: #ffffff;
+}
+
+/* ===============================
+   HERO SECTION
+================================ */
+.hero {
+  max-width: 900px;
+  margin: 0 auto;
+  text-align: center;
+  padding: 64px 0;
+}
+
+.hero h1 {
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+/* Gradient text (safe + no crash) */
+.hero h1 span {
+  background: linear-gradient(90deg, #38bdf8, #2563eb);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+.hero p {
+  margin-top: 18px;
+  font-size: 1.05rem;
+  opacity: 0.8;
+  max-width: 620px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ===============================
+   HERO BUTTONS
+================================ */
+.hero-actions {
+  margin-top: 32px;
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.primary-btn {
+  padding: 12px 24px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  color: white;
+  background: linear-gradient(90deg, #38bdf8, #2563eb);
+  box-shadow:
+    0 10px 30px rgba(37, 99, 235, 0.45),
+    0 0 20px rgba(56, 189, 248, 0.4);
+}
+
+.secondary-btn {
+  padding: 12px 24px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+/* ===============================
+   FEATURES
+================================ */
+.features {
+  max-width: 1000px;
+  margin: 80px auto 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+}
+
+.feature-card {
+  padding: 28px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.landing.light .feature-card {
+  background: #ffffff;
+}
+
+/* ===============================
+   SLIDE-IN ANIMATION
+================================ */
+.slide {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.landing.show .slide {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.slide.delay {
+  transition-delay: 0.2s;
+}
+
+/* ===============================
+   RESPONSIVE
+================================ */
+@media (max-width: 768px) {
+  .features {
+    grid-template-columns: 1fr;
+  }
+
+  .hero {
+    padding: 40px 0;
+  }
+}

@@ -271,7 +271,6 @@
 
   .hamburger {
     display: block;
-    color: #636568;
   }
 
   .nav-center {
@@ -346,5 +345,28 @@
     flex-direction: column;
     gap: 12px;
     margin-top: 12px;
+  }
+}
+/* HAMBURGER BUTTON */
+.hamburger {
+  display: none;
+  font-size: 22px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: inherit; /* 🔑 important */
+}
+
+/* FORCE COLOR BASED ON THEME */
+.navbar.light .hamburger {
+  color: #0f172a; /* dark icon on light bg */
+}
+
+.navbar.dark .hamburger {
+  color: #ffffff; /* white icon on dark bg */
+}
+@media (max-width: 768px) {
+  .hamburger {
+    display: block;
   }
 }

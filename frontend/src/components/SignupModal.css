@@ -1,0 +1,175 @@
+/* ===== OVERLAY ===== */
+.signup-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ===== MODAL ===== */
+.signup-modal {
+  width: 900px;
+  max-width: 95%;
+  max-height: 90vh;               /* 🔑 allow scroll if needed */
+  border-radius: 22px;
+  display: flex;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+/* DARK MODE */
+.signup-modal.dark {
+  background: #0b1220;
+  color: white;
+}
+
+/* ===== LEFT IMAGE ===== */
+.signup-left {
+  width: 45%;
+  background-size: cover;
+  background-position: center;
+}
+
+/* ===== RIGHT FORM ===== */
+.signup-right {
+  width: 55%;
+  padding: 36px 40px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;               /* 🔑 enables scroll */
+}
+
+.signup-right h2 {
+  margin-bottom: 22px;
+  font-size: 1.8rem;
+}
+
+/* CLOSE BUTTON */
+.close-btn {
+  position: absolute;
+  top: 14px;
+  right: 18px;
+  font-size: 26px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+}
+
+/* FORM */
+.signup-right form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.signup-right input {
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  font-size: 0.95rem;
+  background: transparent;
+  color: inherit;
+}
+
+/* ===== PASSWORD FIELD ===== */
+.password-field {
+  position: relative;
+  width: 100%;
+}
+
+.password-field input {
+  width: 100%;
+  padding-right: 44px; /* space for eye icon */
+}
+
+/* Eye icon */
+.eye-icon {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+  cursor: pointer;
+  opacity: 0.65;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.eye-icon:hover {
+  opacity: 1;
+  transform: translateY(-50%) scale(1.05);
+}
+
+/* ERROR */
+.error-text {
+  color: #ef4444;
+  font-size: 0.85rem;
+  margin-top: -6px;
+}
+
+/* BUTTON */
+.signup-btn {
+  margin-top: 10px;
+  padding: 12px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  background: linear-gradient(90deg, #38bdf8, #2563eb);
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 12px 30px rgba(37, 99, 235, 0.5);
+}
+
+/* SWITCH */
+.switch-text {
+  margin-top: 18px;
+  font-size: 0.9rem;
+}
+
+.switch-text span {
+  margin-left: 6px;
+  color: #3b82f6;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+/* ===== MOBILE ===== */
+@media (max-width: 768px) {
+  .signup-modal {
+    flex-direction: column;
+  }
+
+  .signup-left {
+    height: 180px;
+    width: 100%;
+  }
+
+  .signup-right {
+    width: 100%;
+    padding: 28px 24px;
+  }
+}
+
+/* EXTRA SMALL */
+@media (max-width: 480px) {
+  .signup-left {
+    display: none;
+  }
+
+  .eye-icon {
+    width: 14px;
+    height: 14px;
+    right: 12px;
+  }
+
+  .password-field input {
+    padding-right: 40px;
+  }
+}

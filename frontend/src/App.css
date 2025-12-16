@@ -27,3 +27,11 @@ body {
   background: #020617;
   color: #f8fafc;
 }
+
+
+.app-content.blurred {
+  filter: blur(6px);
+  pointer-events: none;
+  user-select: none;
+}
+
