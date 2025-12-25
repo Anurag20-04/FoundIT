@@ -3,6 +3,16 @@
    - Sticky pill-style navbar with glow
    - Theme-aware (light / dark)
 ========================================================= */
+.nav-profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.nav-username {
+  font-weight: 600;
+  color: var(--text-primary);
+}
 
 .navbar {
   position: sticky;
@@ -370,3 +380,4 @@
     display: block;
   }
 }
+

@@ -1,7 +1,5 @@
-import { useState } from "react";
-
+import { useState, useEffect } from "react";
 import Navbar from "./components/Navbar";
-
 import Footer from "./components/Footer";
 import LoginModal from "./components/LoginModal";
 import SignupModal from "./components/SignupModal";
@@ -9,10 +7,13 @@ import Landing from "./components/Landing";
 import "./App.css";
 
 function App() {
-  const [theme, setTheme] = useState("light");
-
+  const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
   const [showLogin, setShowLogin] = useState(false);
   const [showSignup, setShowSignup] = useState(false);
+
+  useEffect(() => {
+    localStorage.setItem("theme", theme);
+  }, [theme]);
 
   const openLogin = () => {
     setShowSignup(false);
@@ -31,8 +32,6 @@ function App() {
 
   return (
     <div className={`app ${theme}`}>
-
-      {/* BACKGROUND (BLURRED WHEN MODAL OPEN) */}
       <div className={`app-content ${(showLogin || showSignup) ? "blurred" : ""}`}>
         <Navbar
           theme={theme}
@@ -43,36 +42,32 @@ function App() {
           onSignup={openSignup}
         />
 
-        
         <Landing theme={theme} />
-
         <Footer />
       </div>
 
-      {/* MODALS (OUTSIDE BLUR) */}
       {showSignup && (
         <SignupModal
           theme={theme}
           onClose={closeAll}
           forceLogin={openLogin}
-           switchToLogin={() => {
-      setShowSignup(false);
-      setShowLogin(true);
-    }}
+          switchToLogin={() => {
+            setShowSignup(false);
+            setShowLogin(true);
+          }}
         />
       )}
 
       {showLogin && (
         <LoginModal
           theme={theme}
-         onClose={() => setShowLogin(false)}
-    switchToSignup={() => {
-      setShowLogin(false);
-      setShowSignup(true);
-    }}
-  />
+          onClose={() => setShowLogin(false)}
+          switchToSignup={() => {
+            setShowLogin(false);
+            setShowSignup(true);
+          }}
+        />
       )}
-
     </div>
   );
 }

@@ -16,11 +16,16 @@ export default function LoginModal({ theme = "light", onClose, switchToSignup })
     setError("");
 
     try {
-      await axios.post("http://localhost:5000/api/login", {
+      const res = await axios.post("http://localhost:5000/api/login", {
         email,
         password,
       });
+
+      // Save auth data globally
+    localStorage.setItem("token", res.data.token);
+    localStorage.setItem("user", JSON.stringify(res.data.user));
       onClose();
+      window.location.reload(); // refresh navbar with profile
     } catch (err) {
       console.error(err);
       setError("User does not exist or password is incorrect.");

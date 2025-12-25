@@ -1,21 +1,45 @@
 const Founditem = require("../models/Founditem");
-const Additemfound = async(req,res)=>{
-    try{
-        const itemData = req.body;
-        const newItem = new Founditem(itemData);
-        const savedItem = await newItem.save();
+const Lostitem = require("../models/Lostitem");
+const Notification = require("../models/Notification");
+const matchItems = require("../utils/matcher");
 
-        res.status(201).json({
-            message:"Found item created",
-            data:savedItem
+const Additemfound = async (req, res) => {
+  try {
+    const itemData = req.body;
+    const newItem = new Founditem(itemData);
+    const savedItem = await newItem.save();
+
+    // AUTO MATCH ENGINE
+    const lostItems = await Lostitem.find({ isResolved: false });
+
+    for (let lost of lostItems) {
+      if (matchItems(lost, savedItem)) {
+        lost.matchedFoundItem = savedItem._id;
+        lost.isResolved = true;
+        lost.status = "matched";
+        await lost.save();
+
+        // NOTIFY OWNER
+        await Notification.create({
+          user: lost.owner,
+          lostItem: lost._id,
+          foundItem: savedItem._id,
+          message: `Your lost item "${lost.title}" has a possible match.`
         });
-
-    }catch(error){
-        console.log(error);
-        res.status(500).json({error:error.message});
-
+      }
     }
+
+    res.status(201).json({
+      message: "Found item created and auto-matching executed",
+      data: savedItem
+    });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message });
+  }
 };
+
 //find all items
 const GetAllFoundItems =async(req,res)=>{
     try{

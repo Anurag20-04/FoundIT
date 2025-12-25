@@ -1,4 +1,4 @@
-const mongoose  = require("mongoose");
+const mongoose = require("mongoose");
 const LostitemSchema = new mongoose.Schema({
   title: {
     type: String,
@@ -39,7 +39,15 @@ const LostitemSchema = new mongoose.Schema({
     ref: "User",
     required: true
   },
-
+  matchedFoundItem: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Founditem",
+    default: null
+  },
+  isResolved: {
+    type: Boolean,
+    default: false
+  },
   status: {
     type: String,
     enum: ["active", "matched", "resolved"],
@@ -47,5 +55,5 @@ const LostitemSchema = new mongoose.Schema({
   }
 }, { timestamps: true });
 
-const Lostitem = mongoose.model("Lostitem",LostitemSchema);
+const Lostitem = mongoose.model("Lostitem", LostitemSchema);
 module.exports = Lostitem;

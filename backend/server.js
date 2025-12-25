@@ -3,9 +3,9 @@ const mongoose = require( "mongoose");
 const cors = require( "cors");
 const dotenv = require( "dotenv");
 const connectDB = require( "./config/dbconn.js");
-const Loginrouter = require( "./router/Loginrouter.js");
-const Signuprouter = require( "./router/Signuprouter.js");
-dotenv.config();              // 🔴 MUST COME FIRST
+const Loginrouter = require( "./router/Loginrouter");
+const Signuprouter = require( "./router/Signuprouter");
+dotenv.config();            
 connectDB();                  // connects MongoDB
 
 const app = express();
@@ -13,8 +13,19 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.use("/api", Loginrouter);
-app.use("/api", Signuprouter);
+// Signup & Login
+app.use("/api/login", Loginrouter);
+app.use("/api/signup", Signuprouter);
+
+// FoundItem CRUD
+app.use("/found-items", require("./router/Founditemrouter"));
+
+// LostItem CRUD
+app.use("/lost-items", require("./router/Lostitemrouter"));
+
+//notification router
+const notificationRoutes = require("./router/notificationRouters");
+app.use("/api/notifications", notificationRoutes);
 
 const PORT = process.env.PORT || 5000;
 
