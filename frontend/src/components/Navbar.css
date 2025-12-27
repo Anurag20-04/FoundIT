@@ -1,8 +1,7 @@
 /* =========================================================
    NAVBAR WRAPPER
-   - Sticky pill-style navbar with glow
-   - Theme-aware (light / dark)
 ========================================================= */
+
 .nav-profile {
   display: flex;
   align-items: center;
@@ -49,21 +48,14 @@
 .navbar.dark .nav-shell {
   background: rgba(2, 6, 23, 0.92);
   border: 1px solid rgba(148, 163, 184, 0.18);
-
   box-shadow:
-    /* main elevation */
     0 20px 50px rgba(0, 0, 0, 0.6),
-
-    /* soft inner glow */
     inset 0 0 0 1px rgba(59, 130, 246, 0.15),
-
-    /* outer blue glow ring */
     0 0 0 1px rgba(59, 130, 246, 0.35),
     0 0 28px rgba(59, 130, 246, 0.25);
 }
 
-
-/* Ensure text is readable in dark mode */
+/* Dark text safety */
 .navbar.dark {
   color: #ffffff;
 }
@@ -76,12 +68,12 @@
 }
 
 .navbar.dark .nav-center a:hover,
-.navbar.dark .nav-center a.active {
+.navbar.dark .nav-center a.active-link {
   opacity: 1;
 }
 
 /* =========================================================
-   LEFT SECTION (Logo + Brand)
+   LEFT SECTION
 ========================================================= */
 
 .nav-left {
@@ -90,17 +82,13 @@
   gap: 10px;
 }
 
-/* Circular logo container */
 .logo-box {
   width: 44px;
   height: 44px;
   border-radius: 50%;
-
   background: linear-gradient(135deg, #38bdf8, #2563eb);
-
   display: grid;
   place-items: center;
-
   box-shadow:
     0 0 0 1px rgba(255, 255, 255, 0.4),
     0 8px 20px rgba(37, 99, 235, 0.45);
@@ -117,7 +105,7 @@
 }
 
 /* =========================================================
-   CENTER NAVIGATION LINKS
+   CENTER NAVIGATION LINKS (NavLink-ready)
 ========================================================= */
 
 .nav-center {
@@ -126,34 +114,38 @@
 }
 
 .nav-center a {
+  position: relative;
   text-decoration: none;
   font-weight: 500;
   color: inherit;
   opacity: 0.75;
-  position: relative;
+  transition: opacity 0.25s ease;
 }
 
 .nav-center a:hover,
-.nav-center a.active {
+.nav-center a.active-link {
   opacity: 1;
 }
 
-/* Active underline indicator */
-.nav-center a.active::after {
+/* Animated underline (ported from .nav-links) */
+.nav-center a::after {
   content: "";
   position: absolute;
   left: 0;
   bottom: -10px;
-
-  width: 100%;
+  width: 0;
   height: 3px;
   border-radius: 999px;
-
   background: linear-gradient(90deg, #38bdf8, #2563eb);
+  transition: width 0.3s ease;
+}
+
+.nav-center a.active-link::after {
+  width: 100%;
 }
 
 /* =========================================================
-   RIGHT SECTION (Buttons + Theme Toggle)
+   RIGHT SECTION
 ========================================================= */
 
 .nav-right {
@@ -162,7 +154,7 @@
   gap: 10px;
 }
 
-/* ---------- Buttons ---------- */
+/* Buttons */
 .btn {
   padding: 6px 16px;
   border-radius: 999px;
@@ -179,11 +171,9 @@
 .btn.filled {
   background: linear-gradient(90deg, #38bdf8, #2563eb);
   color: white;
-
   box-shadow:
     0 10px 30px rgba(37, 99, 235, 0.45),
     0 0 20px rgba(56, 189, 248, 0.55);
-
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -195,47 +185,38 @@
 }
 
 /* =========================================================
-   THEME TOGGLE (SLIDER)
+   THEME TOGGLE
 ========================================================= */
 
 .theme-toggle {
   width: 52px;
   height: 28px;
   padding: 3px;
-
   border-radius: 999px;
   border: 1px solid rgba(148, 163, 184, 0.4);
   background: rgba(148, 163, 184, 0.15);
-
   display: flex;
   align-items: center;
   cursor: pointer;
-
-  transition: background 0.25s ease, border-color 0.25s ease;
 }
 
-/* Dark mode track */
 .navbar.dark .theme-toggle {
   background: rgba(255, 255, 255, 0.08);
   border-color: rgba(255, 255, 255, 0.25);
 }
 
-/* Toggle knob */
 .toggle-thumb {
   width: 22px;
   height: 22px;
   border-radius: 50%;
-
   background: white;
   display: flex;
   align-items: center;
   justify-content: center;
-
   font-size: 13px;
   transition: transform 0.25s ease, background 0.25s ease;
 }
 
-/* Knob position states */
 .theme-toggle.light .toggle-thumb {
   transform: translateX(0);
   background: #0f172a;
@@ -248,7 +229,7 @@
 }
 
 /* =========================================================
-   HAMBURGER (MOBILE ONLY)
+   HAMBURGER
 ========================================================= */
 
 .hamburger {
@@ -257,6 +238,15 @@
   background: none;
   border: none;
   cursor: pointer;
+  color: inherit;
+}
+
+.navbar.light .hamburger {
+  color: #0f172a;
+}
+
+.navbar.dark .hamburger {
+  color: #ffffff;
 }
 
 /* =========================================================
@@ -267,18 +257,15 @@
   display: none;
 }
 
-/* Hide auth buttons in mobile menu by default */
 .mobile-auth {
   display: none;
 }
 
 /* =========================================================
-   RESPONSIVE BREAKPOINTS
+   RESPONSIVE
 ========================================================= */
 
-/* ---------- Tablets & Phones ---------- */
 @media (max-width: 768px) {
-
   .hamburger {
     display: block;
   }
@@ -291,19 +278,15 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
-
     margin: 12px auto 0;
     padding: 18px 22px;
     max-width: 90%;
-
     border-radius: 20px;
     background: inherit;
     box-shadow: 0 20px 40px rgba(0,0,0,0.25);
-
     opacity: 0;
     transform: translateY(-10px);
     pointer-events: none;
-
     transition: all 0.25s ease;
   }
 
@@ -314,9 +297,26 @@
   }
 
   .mobile-menu a {
+    position: relative;
     text-decoration: none;
     color: inherit;
     font-size: 1.05rem;
+  }
+
+  /* Mobile underline animation */
+  .mobile-menu a::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -6px;
+    width: 0;
+    height: 2px;
+    background-color: #38bdf8;
+    transition: width 0.3s ease;
+  }
+
+  .mobile-menu a.active-link::after {
+    width: 100%;
   }
 
   .btn.full {
@@ -325,9 +325,7 @@
   }
 }
 
-/* ---------- Small Phones (iPhone SE) ---------- */
 @media (max-width: 480px) {
-
   .brand {
     display: none;
   }
@@ -357,27 +355,3 @@
     margin-top: 12px;
   }
 }
-/* HAMBURGER BUTTON */
-.hamburger {
-  display: none;
-  font-size: 22px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: inherit; /* 🔑 important */
-}
-
-/* FORCE COLOR BASED ON THEME */
-.navbar.light .hamburger {
-  color: #0f172a; /* dark icon on light bg */
-}
-
-.navbar.dark .hamburger {
-  color: #ffffff; /* white icon on dark bg */
-}
-@media (max-width: 768px) {
-  .hamburger {
-    display: block;
-  }
-}
-

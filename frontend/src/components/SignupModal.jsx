@@ -30,15 +30,18 @@ export default function SignupModal({ theme = "light", onClose, switchToLogin })
     setLoading(true);
 
     try {
+      // ✅ Adjust URL to your production/backend endpoint if needed
       await axios.post("http://localhost:5000/api/signup", form);
+      
+      // Successfully signed up, now switch to login modal
       switchToLogin();
     } catch (err) {
-  console.log("SIGNUP ERROR:", err.response || err);
-  setError(
-    err?.response?.data?.message ||
-    "Signup failed. Please try again."
-  );
-}finally {
+      console.log("SIGNUP ERROR:", err.response || err);
+      setError(
+        err?.response?.data?.message ||
+        "Signup failed. Please try again."
+      );
+    } finally {
       setLoading(false);
     }
   };

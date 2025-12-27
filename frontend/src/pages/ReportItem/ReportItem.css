@@ -1,0 +1,209 @@
+/* --- Theme Variable Definitions --- */
+.report-page-wrapper.dark {
+  --page-bg: #0a0c10;
+  --bg-gradient: radial-gradient(circle at 50% -20%, #1e1b4b, #0a0c10);
+  --card-bg: rgba(15, 23, 42, 0.75);
+  --card-border: rgba(255, 255, 255, 0.08);
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --input-bg: rgba(255, 255, 255, 0.03);
+  --stepper-inactive: rgba(255, 255, 255, 0.1);
+  --shadow-color: rgba(0, 0, 0, 0.6);
+}
+
+.report-page-wrapper.light {
+  --page-bg: #f8fafc;
+  --bg-gradient: radial-gradient(circle at 50% -20%, #e0e7ff, #f8fafc);
+  --card-bg: rgba(255, 255, 255, 0.9);
+  --card-border: rgba(0, 0, 0, 0.06);
+  --text-primary: #0f172a;
+  --text-secondary: #64748b;
+  --input-bg: rgba(0, 0, 0, 0.02);
+  --stepper-inactive: rgba(0, 0, 0, 0.05);
+  --shadow-color: rgba(0, 0, 0, 0.08);
+}
+
+/* --- Layout: Compact & Centered --- */
+.report-page-wrapper {
+  min-height: 100vh;
+  background: var(--bg-gradient);
+  background-color: var(--page-bg);
+  color: var(--text-primary);
+  display: flex;
+  align-items: center; /* Centered vertically */
+  justify-content: center; /* Centered horizontally */
+  padding: 40px 20px; /* Reduced vertical padding */
+  transition: all 0.4s ease;
+  overflow-x: hidden;
+}
+
+.report-container {
+  width: 100%;
+  max-width: 850px; /* Tighter container */
+  display: flex;
+  flex-direction: column;
+}
+
+/* --- Compact Header --- */
+.report-header {
+  text-align: center;
+  margin-bottom: 28px; /* Tighter spacing to card */
+}
+
+.report-header h1 {
+  font-size: 2.4rem; /* Slightly smaller for premium feel */
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.report-header .highlight {
+  background: linear-gradient(135deg, #6366f1, #a855f7);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.report-header p {
+  color: var(--text-secondary);
+  font-size: 1rem;
+  margin-top: 6px;
+}
+
+/* --- Tight Stepper --- */
+.stepper-container {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.stepper-bar {
+  height: 6px;
+  width: 35px;
+  border-radius: 10px;
+  background: var(--stepper-inactive);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.stepper-bar.completed {
+  background: linear-gradient(90deg, #6366f1, #a855f7);
+}
+
+.stepper-bar.active {
+  background: #22d3ee;
+  width: 55px;
+  box-shadow: 0 0 15px rgba(34, 211, 238, 0.4);
+}
+
+/* --- The Focused Premium Card --- */
+.report-card {
+  background: var(--card-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--card-border);
+  border-radius: 28px;
+  padding: 40px; /* Reduced from 60px for better density */
+  box-shadow: 0 30px 60px -12px var(--shadow-color);
+  position: relative;
+  min-height: 480px; /* Stable height to prevent jumping */
+  display: flex;
+  flex-direction: column;
+}
+
+/* --- Content Animation --- */
+.step-content-animator {
+  animation: premiumFadeIn 0.4s ease-out;
+  flex: 1; /* Allows footer to stick to bottom */
+  display: flex;
+  flex-direction: column;
+}
+
+@keyframes premiumFadeIn {
+  from { opacity: 0; transform: translateY(10px) scale(0.99); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* --- Step Footer Navigation --- */
+.step-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 30px;
+  padding-top: 24px;
+  border-top: 1px solid var(--card-border);
+}
+
+/* --- Buttons --- */
+.btn-back-text {
+  background: var(--input-bg);
+  color: var(--text-primary);
+  border: 1px solid var(--card-border);
+  padding: 10px 22px;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-back-text:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateX(-3px);
+}
+
+.btn-premium-continue {
+  background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+  color: white;
+  padding: 12px 30px;
+  border-radius: 50px;
+  border: none;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+  box-shadow: 0 8px 20px -5px rgba(99, 102, 241, 0.4);
+}
+
+.btn-premium-continue:not(:disabled):hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 25px -5px rgba(168, 85, 247, 0.5);
+  filter: brightness(1.05);
+}
+
+.btn-premium-continue:disabled {
+  background: var(--stepper-inactive);
+  color: var(--text-secondary);
+  box-shadow: none;
+  cursor: not-allowed;
+  filter: grayscale(1);
+  opacity: 0.6;
+}
+
+.arrow { transition: transform 0.3s ease; }
+.btn-premium-continue:hover .arrow { transform: translateX(4px); }
+
+/* --- Selection Grid Helpers --- */
+.premium-selection-box {
+  border: 1px solid var(--card-border);
+  background: var(--input-bg);
+  border-radius: 18px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.premium-selection-box.selected {
+  border: 2px solid #ef4444; /* Standard Red for Lost */
+  background: rgba(239, 68, 68, 0.05);
+}
+
+/* --- Responsive --- */
+@media (max-width: 768px) {
+  .report-page-wrapper { padding: 20px 10px; }
+  .report-card { padding: 25px 20px; border-radius: 0; min-height: auto; }
+  .report-header h1 { font-size: 1.8rem; }
+  .stepper-bar { width: 25px; }
+}

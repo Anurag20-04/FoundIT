@@ -1,0 +1,227 @@
+/* =========================================================
+   MAP WRAPPER
+========================================================= */
+
+.map-wrapper-premium {
+  width: 100%;
+  height: 240px;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1.5px solid var(--card-border);
+  position: relative;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.leaflet-container-actual {
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.map-hint-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: #6366f1;
+  color: #ffffff;
+  padding: 6px 12px;
+  border-radius: 100px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  z-index: 1000;
+  pointer-events: none;
+}
+
+/* =========================================================
+   RESPONSIVE GRID
+========================================================= */
+
+.location-grid-row {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 1.25rem;
+}
+
+/* =========================================================
+   DATE INPUT — FINAL FIX (ICON ALWAYS VISIBLE)
+========================================================= */
+
+.date-input-premium {
+  width: 100%;
+  background: transparent;
+  border: none;
+  font-family: inherit;
+  font-size: 0.95rem;
+  padding: 12px 14px;
+  cursor: pointer;
+
+  /* Forces browser native UI to adapt */
+  color-scheme: light dark;
+}
+
+/* Base calendar icon reset */
+.date-input-premium::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.85;
+  padding: 4px;
+  border-radius: 6px;
+}
+
+/* -------- DARK MODE -------- */
+.report-page-wrapper.dark .date-input-premium {
+  color: #f8fafc;
+}
+
+.report-page-wrapper.dark
+.date-input-premium::-webkit-calendar-picker-indicator {
+  filter: invert(1) brightness(1.2);
+}
+
+/* -------- LIGHT MODE -------- */
+.report-page-wrapper.light .date-input-premium {
+  color: #0f172a;
+}
+
+.report-page-wrapper.light
+.date-input-premium::-webkit-calendar-picker-indicator {
+  filter: invert(0) brightness(0.55);
+}
+
+/* Firefox fallback */
+.date-input-premium::-moz-focus-inner {
+  border: 0;
+}
+
+/* =========================================================
+   LEAFLET GEOSEARCH BAR (LIGHT + DARK SAFE)
+========================================================= */
+
+.leaflet-geosearch-bar {
+  position: absolute;
+  top: 10px;
+  left: 50px;
+  z-index: 1000;
+  width: calc(100% - 150px);
+}
+
+/* Search container */
+.leaflet-geosearch-bar form {
+  backdrop-filter: blur(12px);
+  border-radius: 12px !important;
+  padding: 6px 12px !important;
+  border: 1px solid var(--card-border) !important;
+}
+
+/* -------- DARK MODE -------- */
+.report-page-wrapper.dark .leaflet-geosearch-bar form {
+  background: rgba(15, 23, 42, 0.85) !important;
+}
+
+.report-page-wrapper.dark .leaflet-geosearch-bar input {
+  color: #f8fafc !important;
+}
+
+.report-page-wrapper.dark .leaflet-geosearch-bar input::placeholder {
+  color: #94a3b8 !important;
+  opacity: 0.8;
+}
+
+/* -------- LIGHT MODE -------- */
+.report-page-wrapper.light .leaflet-geosearch-bar form {
+  background: #ffffff !important;
+}
+
+.report-page-wrapper.light .leaflet-geosearch-bar input {
+  color: #0f172a !important;
+}
+
+.report-page-wrapper.light .leaflet-geosearch-bar input::placeholder {
+  color: #64748b !important;
+  opacity: 0.8;
+}
+
+/* Shared input reset */
+.leaflet-geosearch-bar input {
+  background: transparent !important;
+  border: none !important;
+  font-size: 0.9rem !important;
+  outline: none !important;
+}
+
+/* Autofill fix */
+.leaflet-geosearch-bar input:-webkit-autofill {
+  -webkit-text-fill-color: inherit !important;
+  box-shadow: 0 0 0px 1000px transparent inset !important;
+}
+
+/* Remove default reset button */
+.leaflet-geosearch-bar .reset {
+  display: none !important;
+}
+
+/* =========================================================
+   SEARCH RESULTS (LIGHT + DARK SAFE)
+========================================================= */
+
+.leaflet-control-geosearch .results,
+.leaflet-control-geosearch form .results {
+  border-radius: 12px !important;
+  margin-top: 8px !important;
+  padding: 5px 0 !important;
+  z-index: 9999 !important;
+}
+
+/* Dark */
+.report-page-wrapper.dark .leaflet-control-geosearch .results {
+  background-color: #020617 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Light */
+.report-page-wrapper.light .leaflet-control-geosearch .results {
+  background-color: #ffffff !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Result items */
+.leaflet-control-geosearch .results > div {
+  padding: 12px 16px !important;
+  font-size: 0.9rem !important;
+  cursor: pointer !important;
+}
+
+/* Text colors */
+.report-page-wrapper.dark .leaflet-control-geosearch .results > div {
+  color: #f8fafc !important;
+}
+
+.report-page-wrapper.light .leaflet-control-geosearch .results > div {
+  color: #0f172a !important;
+}
+
+/* Hover */
+.leaflet-control-geosearch .results > div:hover,
+.leaflet-control-geosearch form .results > div.active {
+  background: linear-gradient(135deg, #6366f1, #a855f7) !important;
+  color: #ffffff !important;
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 600px) {
+  .location-grid-row {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .map-wrapper-premium {
+    height: 180px;
+  }
+
+  .leaflet-geosearch-bar {
+    width: calc(100% - 100px);
+    left: 45px;
+  }
+}

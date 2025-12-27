@@ -1,26 +1,27 @@
 import { useState } from "react";
+import { NavLink } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import "./Navbar.css";
 import logo from "../assets/foundit-logo.png";
 
 export default function Navbar({ theme, onToggleTheme, onLogin, onSignup }) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { user, logout } = useAuth();
 
-  const user = JSON.parse(localStorage.getItem("user"));
+  const closeMobile = () => setMobileOpen(false);
 
   const handleLogin = () => {
-    setMobileOpen(false);
-    setTimeout(onLogin, 0);
+    closeMobile();
+    onLogin();
   };
 
   const handleSignup = () => {
-    setMobileOpen(false);
-    setTimeout(onSignup, 0);
+    closeMobile();
+    onSignup();
   };
 
-  const logout = () => {
-    localStorage.clear();
-    window.location.reload();
-  };
+  const navLinkClass = ({ isActive }) =>
+    isActive ? "nav-link active-link" : "nav-link";
 
   return (
     <nav className={`navbar ${theme}`}>
@@ -33,49 +34,68 @@ export default function Navbar({ theme, onToggleTheme, onLogin, onSignup }) {
           <span className="brand">FindIT</span>
         </div>
 
-        {/* CENTER */}
+        {/* CENTER – DESKTOP */}
         <div className="nav-center desktop-only">
-          <a href="#" className="active">Home</a>
-          <a href="#">Browse</a>
-          <a href="#">About</a>
+          <NavLink to="/" className={navLinkClass}>Home</NavLink>
+          <NavLink to="/browse" className={navLinkClass}>Browse</NavLink>
+          <NavLink to="/about" className={navLinkClass}>About</NavLink>
         </div>
 
-        {/* RIGHT DESKTOP */}
+        {/* RIGHT – DESKTOP */}
         <div className="nav-right desktop-only">
           {user ? (
             <div className="nav-profile">
               <span className="nav-username">{user.name}</span>
-              <button className="btn outline" onClick={logout}>Logout</button>
+              <button className="btn outline" onClick={logout}>
+                Logout
+              </button>
             </div>
           ) : (
             <>
-              <button className="btn outline" onClick={handleSignup}>Sign up</button>
-              <button className="btn filled" onClick={handleLogin}>Log in</button>
+              <button className="btn outline" onClick={handleSignup}>
+                Sign up
+              </button>
+              <button className="btn filled" onClick={handleLogin}>
+                Log in
+              </button>
             </>
           )}
 
           <div className={`theme-toggle ${theme}`} onClick={onToggleTheme}>
-            <div className="toggle-thumb">{theme === "dark" ? "🌙" : "☀️"}</div>
+            <div className="toggle-thumb">
+              {theme === "dark" ? "🌙" : "☀️"}
+            </div>
           </div>
         </div>
 
         {/* HAMBURGER */}
-        <button className="hamburger" onClick={() => setMobileOpen(o => !o)}>☰</button>
+        <button
+          className="hamburger"
+          onClick={() => setMobileOpen(o => !o)}
+        >
+          ☰
+        </button>
       </div>
 
       {/* MOBILE MENU */}
       <div className={`mobile-menu ${mobileOpen ? "open" : ""}`}>
-        <a href="#">Home</a>
-        <a href="#">Browse</a>
-        <a href="#">About</a>
+        <NavLink to="/" className={navLinkClass} onClick={closeMobile}>Home</NavLink>
+        <NavLink to="/browse" className={navLinkClass} onClick={closeMobile}>Browse</NavLink>
+        <NavLink to="/about" className={navLinkClass} onClick={closeMobile}>About</NavLink>
 
         <div className="mobile-auth">
           {user ? (
-            <button className="btn outline full" onClick={logout}>Logout</button>
+            <button className="btn outline full" onClick={logout}>
+              Logout
+            </button>
           ) : (
             <>
-              <button className="btn outline full" onClick={handleSignup}>Sign up</button>
-              <button className="btn filled full" onClick={handleLogin}>Log in</button>
+              <button className="btn outline full" onClick={handleSignup}>
+                Sign up
+              </button>
+              <button className="btn filled full" onClick={handleLogin}>
+                Log in
+              </button>
             </>
           )}
         </div>

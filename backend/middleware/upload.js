@@ -1,15 +1,40 @@
 const multer = require("multer");
+const path = require("path");
+const fs = require("fs");
 
+// Ensure uploads directory exists
+const uploadDir = path.join(__dirname, "../uploads");
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+// Storage engine
 const storage = multer.diskStorage({
-  destination: "uploads/",
+  destination: (req, file, cb) => {
+    cb(null, uploadDir);
+  },
   filename: (req, file, cb) => {
-    cb(null, Date.now() + "-" + file.originalname);
-  }
+    const unique =
+      Date.now() + "-" + Math.round(Math.random() * 1e9);
+    cb(null, unique + path.extname(file.originalname));
+  },
 });
 
+// Only images allowed
 const fileFilter = (req, file, cb) => {
-  if (file.mimetype.startsWith("image/")) cb(null, true);
-  else cb(new Error("Only images allowed"), false);
+  if (file.mimetype.startsWith("image/")) {
+    cb(null, true);
+  } else {
+    cb(new Error("Only image files are allowed"), false);
+  }
 };
 
-module.exports = multer({ storage, fileFilter });
+const upload = multer({
+  storage,
+  fileFilter,
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB
+  },
+});
+
+module.exports = upload;

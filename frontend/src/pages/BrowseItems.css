@@ -1,0 +1,292 @@
+/* =========================================================
+   THEME VARIABLES (Strictly Enforced)
+========================================================= */
+
+/* DARK MODE */
+.browse-page-wrapper.dark {
+  --page-bg: #0a0c10;
+  --bg-gradient: radial-gradient(circle at 50% -20%, #1e1b4b, #0a0c10);
+  --card-bg: rgba(30, 41, 59, 0.7); /* Darker, slightly transparent */
+  --card-border: rgba(255, 255, 255, 0.1);
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --input-bg: rgba(0, 0, 0, 0.3);
+  --shadow-color: rgba(0, 0, 0, 0.5);
+  --highlight: #818cf8;
+}
+
+/* LIGHT MODE */
+.browse-page-wrapper.light {
+  --page-bg: #f8fafc;
+  --bg-gradient: radial-gradient(circle at 50% -20%, #e0e7ff, #f8fafc);
+  --card-bg: #ffffff;
+  --card-border: #e2e8f0;
+  --text-primary: #1e293b; /* Dark Slate for readability */
+  --text-secondary: #64748b;
+  --input-bg: #f1f5f9; /* Light Grey for inputs */
+  --shadow-color: rgba(0, 0, 0, 0.05);
+  --highlight: #4f46e5;
+}
+
+/* =========================================================
+   LAYOUT & STRUCTURE
+========================================================= */
+.browse-page-wrapper {
+  min-height: 100vh;
+  background: var(--bg-gradient);
+  background-color: var(--page-bg);
+  color: var(--text-primary);
+  padding: 40px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.browse-shell {
+  width: 100%;
+  max-width: 1100px;
+}
+
+/* Header */
+.browse-header { text-align: center; margin-bottom: 30px; }
+.browse-header h1 { font-size: 2.5rem; margin: 0; font-weight: 800; color: var(--text-primary); }
+.browse-header p { color: var(--text-secondary); margin-top: 5px; }
+.browse-header .highlight { color: var(--highlight); }
+
+/* Filter Bar */
+.filter-bar {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  padding: 15px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 25px;
+  box-shadow: 0 4px 20px var(--shadow-color);
+}
+
+.search-wrapper {
+  flex: 1;
+  min-width: 250px;
+  background: var(--input-bg);
+  border-radius: 10px;
+  padding: 10px 15px;
+  display: flex;
+  align-items: center;
+}
+
+.search-wrapper input {
+  background: transparent;
+  border: none;
+  outline: none;
+  width: 100%;
+  color: var(--text-primary); /* Adapts to theme */
+  font-size: 1rem;
+}
+
+.search-icon { margin-right: 10px; font-size: 1.2rem; }
+.clear-btn { background: none; border: none; color: var(--text-secondary); cursor: pointer; }
+
+/* Status Filter Buttons */
+.status-filter { display: flex; gap: 8px; }
+.status-filter button {
+  padding: 8px 20px;
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  background: var(--input-bg);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: 0.3s;
+}
+.status-filter button.active {
+  background: var(--highlight);
+  color: white;
+  border-color: var(--highlight);
+}
+
+/* Category Scroll */
+.category-scroll {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 15px;
+  margin-bottom: 20px;
+}
+.category-scroll button {
+  white-space: nowrap;
+  padding: 8px 18px;
+  border-radius: 20px;
+  background: var(--input-bg);
+  color: var(--text-secondary);
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+.category-scroll button.cat-active {
+  background: var(--text-primary);
+  color: var(--page-bg); /* Inverts text color */
+}
+
+/* =========================================================
+   CARDS (PREMIUM & VISIBLE)
+========================================================= */
+.items-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 25px;
+}
+
+.item-card-premium {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px -10px var(--shadow-color);
+  transition: transform 0.2s;
+  display: flex;
+  flex-direction: column;
+}
+
+.item-card-premium:hover { transform: translateY(-5px); }
+
+/* IMAGE CONTAINER FIX */
+.card-img-wrapper {
+  position: relative;
+  width: 100%;
+  padding-top: 60%; /* 16:9 Aspect Ratio */
+  background: #333; /* Fallback color while loading */
+  overflow: hidden;
+}
+
+.card-img-wrapper img {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.status-pill {
+  position: absolute;
+  top: 10px; left: 10px;
+  padding: 5px 12px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  color: white;
+  text-transform: uppercase;
+  z-index: 2;
+}
+.status-pill.lost { background: #ef4444; }
+.status-pill.found { background: #22c55e; }
+
+/* Content */
+.card-content { padding: 15px 20px; display: flex; flex-direction: column; gap: 8px; }
+
+.card-top {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: var(--highlight);
+  font-weight: 700;
+}
+.card-date { color: var(--text-secondary); font-weight: normal; }
+
+.card-content h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-loc {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.card-reward {
+  margin-top: 5px;
+  padding-top: 10px;
+  border-top: 1px solid var(--card-border);
+  color: #22c55e; /* Green for money */
+  font-weight: bold;
+  font-size: 0.95rem;
+}
+
+/* Empty State */
+.empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 50px;
+  color: var(--text-secondary);
+}
+.btn-reset {
+  margin-top: 15px;
+  padding: 10px 20px;
+  background: var(--highlight);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+/* =========================================================
+   📱 MOBILE & TABLET RESPONSIVENESS
+========================================================= */
+
+@media (max-width: 768px) {
+  /* 1. Adjust Page Padding */
+  .browse-page-wrapper {
+    padding: 20px 15px; /* Less padding on mobile */
+  }
+
+  /* 2. Header Adjustment */
+  .browse-header h1 {
+    font-size: 1.8rem; /* Smaller title */
+  }
+  .browse-header p {
+    font-size: 0.9rem;
+  }
+
+  /* 3. Filter Bar Stacking */
+  .filter-bar {
+    flex-direction: column; /* Stack items vertically */
+    align-items: stretch;   /* Stretch to full width */
+    padding: 15px;
+    gap: 15px;
+  }
+
+  .search-wrapper {
+    min-width: 100%; /* Search bar takes full width */
+  }
+
+  .status-filter {
+    width: 100%;
+    justify-content: space-between; /* Spread buttons evenly */
+  }
+
+  .status-filter button {
+    flex: 1; /* Make buttons equal width */
+    text-align: center;
+    padding: 10px 0;
+  }
+
+  /* 4. Grid becomes Single Column */
+  .items-grid {
+    grid-template-columns: 1fr; /* 1 card per row */
+    gap: 20px;
+  }
+
+  /* 5. Card Adjustments */
+  .item-card-premium {
+    border-radius: 16px; /* Slightly less rounded on mobile */
+  }
+  
+  .card-img-wrapper {
+    padding-top: 56.25%; /* Standard 16:9 Youtube ratio for mobile */
+  }
+}

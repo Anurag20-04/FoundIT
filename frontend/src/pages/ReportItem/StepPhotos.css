@@ -1,0 +1,157 @@
+/* StepPhotos.css */
+
+.photo-upload-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 16px;
+  width: 100%;
+}
+
+/* Empty state styling to make it look prominent */
+.photo-upload-grid.empty {
+  display: block;
+}
+
+/* Premium Image Card */
+.photo-premium-card {
+  position: relative;
+  aspect-ratio: 1/1;
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid var(--card-border);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  animation: scaleUp 0.3s ease-out;
+}
+
+@keyframes scaleUp {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.photo-premium-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.photo-premium-card:hover img {
+  transform: scale(1.1);
+}
+
+/* Delete Hover Overlay */
+.delete-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(239, 68, 68, 0.4);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+}
+
+.photo-premium-card:hover .delete-overlay {
+  opacity: 1;
+}
+
+.trash-icon {
+  font-size: 1.5rem;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+
+/* Dropzone / Add Button */
+.upload-dropzone {
+  aspect-ratio: 1/1;
+  border: 2px dashed var(--card-border);
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background: var(--input-bg);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.photo-upload-grid.empty .upload-dropzone {
+  aspect-ratio: auto;
+  height: 180px;
+}
+
+.upload-dropzone:hover, .upload-dropzone.dragging {
+  border-color: #6366f1;
+  background: rgba(99, 102, 241, 0.05);
+  transform: translateY(-2px);
+}
+
+.upload-circle {
+  width: 44px;
+  height: 44px;
+  background: #6366f1;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 10px;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.plus-icon {
+  color: white;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.dropzone-text {
+  text-align: center;
+}
+
+.dropzone-text p {
+  margin: 0;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+
+.dropzone-text span {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+/* Info Bar */
+.photo-info-bar {
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
+}
+
+.count-pill {
+  background: #6366f1;
+  color: white;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.photo-info-bar p {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+/* Mobile responsive fixes */
+@media (max-width: 480px) {
+  .photo-upload-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

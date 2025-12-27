@@ -1,5 +1,4 @@
 const User = require("../models/User");
-const bcrypt = require("bcrypt");
 
 const Newuser = async (req, res) => {
   try {
@@ -14,27 +13,27 @@ const Newuser = async (req, res) => {
       password
     } = req.body;
 
-    // Check all required fields
+    // 1. Check all required fields
     if (!name || !email || !phoneNumber || !address || !idProof || !aadharNumber || !password) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
-    // Validate email format
+    // 2. Validate email format
     const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     if (!isValidEmail) {
       return res.status(400).json({ message: "Invalid email format" });
     }
 
-    // Check existing user
+    // 3. Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(409).json({ message: "User already exists" });
     }
 
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, 10);
+    // ✅ NOTE: Manual bcrypt hashing removed from here. 
+    // The hashing now happens automatically in User.js inside the .pre('save') hook.
 
-    // Create user
+    // 4. Create user
     const user = await User.create({
       name,
       email,
@@ -43,10 +42,11 @@ const Newuser = async (req, res) => {
       idProof,
       aadharNumber,
       profileImage: profileImage || null,
-      password: hashedPassword,
-      isEmailVerified: true // set true since we are skipping email verification
+      password, // Pass plain text; the model hashes it for you
+      isEmailVerified: true 
     });
 
+    // 5. Send Response
     res.status(201).json({
       message: "Signup successful!",
       data: {
@@ -59,7 +59,7 @@ const Newuser = async (req, res) => {
     });
 
   } catch (error) {
-    console.error(error);
+    console.error("SIGNUP ERROR:", error);
     res.status(500).json({ message: "Server error" });
   }
 };

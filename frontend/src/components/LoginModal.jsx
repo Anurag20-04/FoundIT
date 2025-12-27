@@ -1,11 +1,14 @@
 import { useState } from "react";
 import axios from "axios";
+import { useAuth } from "../context/AuthContext";
 import "./LoginModal.css";
 import loginBg from "../assets/login-bg.png";
 import eyeClosed from "../assets/Hide.png";
 import eyeOpen from "../assets/Show.png";
 
 export default function LoginModal({ theme = "light", onClose, switchToSignup }) {
+  const { login } = useAuth();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -21,11 +24,10 @@ export default function LoginModal({ theme = "light", onClose, switchToSignup })
         password,
       });
 
-      // Save auth data globally
-    localStorage.setItem("token", res.data.token);
-    localStorage.setItem("user", JSON.stringify(res.data.user));
-      onClose();
-      window.location.reload(); // refresh navbar with profile
+      // ✅ SINGLE SOURCE OF TRUTH
+      login(res.data.user, res.data.token);
+
+      onClose(); // closes modal cleanly
     } catch (err) {
       console.error(err);
       setError("User does not exist or password is incorrect.");
@@ -46,9 +48,7 @@ export default function LoginModal({ theme = "light", onClose, switchToSignup })
 
         {/* RIGHT FORM */}
         <div className="login-right">
-          <button className="close-btn" onClick={onClose}>
-            ×
-          </button>
+          <button className="close-btn" onClick={onClose}>×</button>
 
           <h2>Log in</h2>
 
@@ -72,11 +72,11 @@ export default function LoginModal({ theme = "light", onClose, switchToSignup })
                 onChange={(e) => setPassword(e.target.value)}
               />
               <img
-    src={showPassword ? eyeOpen : eyeClosed}
-    alt="toggle password"
-    className="eye-icon"
-    onClick={() => setShowPassword((p) => !p)}
-  />
+                src={showPassword ? eyeOpen : eyeClosed}
+                alt="toggle password"
+                className="eye-icon"
+                onClick={() => setShowPassword(p => !p)}
+              />
             </div>
 
             {error && <p className="error-text">{error}</p>}
@@ -88,7 +88,7 @@ export default function LoginModal({ theme = "light", onClose, switchToSignup })
 
           <p className="switch-text">
             Don’t have an account?
-            <span onClick={switchToSignup}> Sign in</span>
+            <span onClick={switchToSignup}> Sign up</span>
           </p>
         </div>
       </div>

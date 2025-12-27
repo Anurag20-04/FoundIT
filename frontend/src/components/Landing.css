@@ -1,141 +1,244 @@
 /* ===============================
-   BASE LANDING STYLES
+   THEME VARIABLES
 ================================ */
-.landing {
-  min-height: calc(100vh - 140px); /* navbar + footer safe */
-  padding: 48px 24px;
-  transition: background 0.3s ease, color 0.3s ease;
-}
-
-/* ===============================
-   THEMES
-================================ */
-.landing.light {
-  background-color: #f8fafc;
-  color: #0f172a;
-}
-
 .landing.dark {
-  background-color: #020617;
-  color: #ffffff;
+  --bg-main: #020617;
+  --hero-gradient: radial-gradient(circle at center, #020b2d 0%, #020617 100%);
+  --text-main: #ffffff;
+  --text-muted: rgba(255, 255, 255, 0.85);
+  --card-bg: rgba(255, 255, 255, 0.05);
+  --card-border: rgba(148, 163, 184, 0.12);
+  --particle-color: #38bdf8;
+  --orb-glow: rgba(56, 189, 248, 0.4);
+}
+
+.landing.light {
+  --bg-main: #ffffff;
+  --hero-gradient: radial-gradient(circle at center, #f0f9ff 0%, #ffffff 100%);
+  --text-main: #0f172a;
+  --text-muted: #475569;
+  --card-bg: #ffffff;
+  --card-border: rgba(0, 0, 0, 0.1);
+  --particle-color: #1e40af;
+  --orb-glow: rgba(30, 64, 175, 0.35);
+}
+
+.landing {
+  width: 100%;
+  overflow-x: hidden;
+  background-color: var(--bg-main);
+  transition: background-color 0.5s ease;
 }
 
 /* ===============================
-   HERO SECTION
+   HERO WRAPPER
+================================ */
+.hero-wrapper {
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
+  overflow: hidden;
+  background: var(--hero-gradient);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ===============================
+   🔥 ORB CONTAINER (VISIBLE CENTER)
+================================ */
+.orb-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  width: 850px;
+  height: 850px;
+  max-width: 95vw;
+  max-height: 95vw;
+  aspect-ratio: 1 / 1;
+
+  z-index: 1;
+  pointer-events: all;
+
+  /* CENTER VISIBLE + RING EMPHASIS + BOTTOM FADE */
+  -webkit-mask-image:
+    radial-gradient(
+      circle,
+      black 0%,
+      black 58%,
+      black 64%,
+      transparent 68%
+    ),
+    linear-gradient(
+      to bottom,
+      black 80%,
+      transparent 100%
+    );
+
+  mask-image:
+    radial-gradient(
+      circle,
+      black 0%,
+      black 58%,
+      black 64%,
+      transparent 68%
+    ),
+    linear-gradient(
+      to bottom,
+      black 80%,
+      transparent 100%
+    );
+
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+}
+
+/* Light mode visibility tuning */
+.landing.light .orb-container {
+  filter: brightness(0.6) contrast(1.2);
+}
+
+#tsparticles {
+  width: 100% !important;
+  height: 100% !important;
+  position: absolute;
+  inset: 0;
+}
+
+#tsparticles canvas {
+  filter: drop-shadow(0 0 1px var(--particle-color));
+}
+
+/* ===============================
+   HERO CONTENT
 ================================ */
 .hero {
+  position: relative;
+  z-index: 10;
   max-width: 900px;
   margin: 0 auto;
+  padding: 40px 24px;
   text-align: center;
-  padding: 64px 0;
+  pointer-events: none;
+}
+
+.hero-actions,
+.hero h1,
+.hero p {
+  pointer-events: auto;
 }
 
 .hero h1 {
-  font-size: clamp(2rem, 4vw, 3.2rem);
+  font-size: clamp(2.8rem, 7vw, 5rem);
   font-weight: 800;
-  line-height: 1.1;
+  line-height: 1;
+  color: var(--text-main);
+  margin-bottom: 20px;
 }
 
-/* Gradient text (safe + no crash) */
 .hero h1 span {
   background: linear-gradient(90deg, #38bdf8, #2563eb);
-  background-clip: text;
   -webkit-background-clip: text;
+  background-clip: text;
   color: transparent;
 }
 
 .hero p {
-  margin-top: 18px;
-  font-size: 1.05rem;
-  opacity: 0.8;
-  max-width: 620px;
-  margin-left: auto;
-  margin-right: auto;
+  font-size: 1.25rem;
+  color: var(--text-muted);
+  max-width: 600px;
+  margin: 0 auto 40px;
 }
 
 /* ===============================
-   HERO BUTTONS
+   BUTTONS
 ================================ */
 .hero-actions {
-  margin-top: 32px;
   display: flex;
   justify-content: center;
-  gap: 14px;
-  flex-wrap: wrap;
+  gap: 16px;
 }
 
 .primary-btn {
-  padding: 12px 24px;
+  padding: 16px 36px;
   border-radius: 999px;
   border: none;
   cursor: pointer;
   font-weight: 600;
   color: white;
   background: linear-gradient(90deg, #38bdf8, #2563eb);
-  box-shadow:
-    0 10px 30px rgba(37, 99, 235, 0.45),
-    0 0 20px rgba(56, 189, 248, 0.4);
+  box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.4);
 }
 
 .secondary-btn {
-  padding: 12px 24px;
+  padding: 16px 36px;
   border-radius: 999px;
-  border: 1px solid rgba(148, 163, 184, 0.4);
-  background: transparent;
-  color: inherit;
+  border: 1px solid var(--card-border);
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  color: var(--text-main);
   cursor: pointer;
 }
 
 /* ===============================
-   FEATURES
+   FEATURES (SEAMLESS HANDOFF)
 ================================ */
 .features {
-  max-width: 1000px;
-  margin: 80px auto 0;
+  position: relative;
+  z-index: 10;
+  max-width: 1100px;
+  margin: 0 auto;
+
+  margin-top: -120px;
+  padding-top: 150px;
+  padding-bottom: 100px;
+
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    var(--bg-main) 20%
+  );
+
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 22px;
+  gap: 24px;
 }
 
 .feature-card {
-  padding: 28px;
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(148, 163, 184, 0.12);
+  position: relative;
+  z-index: 20;
+
+  padding: 40px 32px;
+  border-radius: 28px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  backdrop-filter: blur(20px);
+  transition: transform 0.3s ease;
 }
 
-.landing.light .feature-card {
-  background: #ffffff;
-}
-
-/* ===============================
-   SLIDE-IN ANIMATION
-================================ */
-.slide {
-  opacity: 0;
-  transform: translateY(40px);
-  transition: opacity 0.8s ease, transform 0.8s ease;
-}
-
-.landing.show .slide {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.slide.delay {
-  transition-delay: 0.2s;
+.feature-card:hover {
+  transform: translateY(-10px);
 }
 
 /* ===============================
-   RESPONSIVE
+   MOBILE
 ================================ */
 @media (max-width: 768px) {
   .features {
     grid-template-columns: 1fr;
+    padding-bottom: 60px;
+    margin-top: -80px;
+    padding-top: 120px;
   }
 
-  .hero {
-    padding: 40px 0;
+  .hero-wrapper {
+    min-height: 80vh;
+  }
+
+  .orb-container {
+    width: 95vw;
+    height: 95vw;
   }
 }
