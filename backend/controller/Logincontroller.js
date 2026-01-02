@@ -42,7 +42,12 @@ const Login = async (req, res) => {
             user: {
                 id: user._id,
                 name: user.name,
-                email: user.email
+                email: user.email,
+                phoneNumber: user.phoneNumber,      // ✅ REQUIRED
+                address: user.address,              // if you use it
+                profileImage: user.profileImage,    // for avatar
+                isEmailVerified: user.isEmailVerified
+    
             }
         });
 

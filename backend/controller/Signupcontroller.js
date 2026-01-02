@@ -1,61 +1,82 @@
 const User = require("../models/User");
+const crypto = require("crypto");
 
 const Newuser = async (req, res) => {
   try {
-    const {
-      name,
-      email,
-      phoneNumber,
-      address,
-      idProof,
-      aadharNumber,
-      profileImage,
-      password
-    } = req.body;
+    const { name, email, password } = req.body;
 
-    // 1. Check all required fields
-    if (!name || !email || !phoneNumber || !address || !idProof || !aadharNumber || !password) {
-      return res.status(400).json({ message: "All fields are required" });
+    /* =========================
+       1️⃣ REQUIRED FIELDS
+    ========================= */
+    if (!name || !email || !password) {
+      return res.status(400).json({
+        message: "Name, email, and password are required",
+      });
     }
 
-    // 2. Validate email format
-    const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    if (!isValidEmail) {
-      return res.status(400).json({ message: "Invalid email format" });
+    /* =========================
+       2️⃣ EMAIL FORMAT
+    ========================= */
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({
+        message: "Invalid email address",
+      });
     }
 
-    // 3. Check if user already exists
+    /* =========================
+       3️⃣ PASSWORD STRENGTH
+    ========================= */
+    if (password.length < 6) {
+      return res.status(400).json({
+        message: "Password must be at least 6 characters",
+      });
+    }
+
+    /* =========================
+       4️⃣ DUPLICATE USER CHECK
+    ========================= */
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(409).json({ message: "User already exists" });
+      return res.status(409).json({
+        message: "Email already registered",
+      });
     }
 
-    // ✅ NOTE: Manual bcrypt hashing removed from here. 
-    // The hashing now happens automatically in User.js inside the .pre('save') hook.
+    /* =========================
+       5️⃣ EMAIL VERIFY TOKEN
+    ========================= */
+    const emailVerifyToken = crypto.randomBytes(32).toString("hex");
 
-    // 4. Create user
-    const user = await User.create({
+    /* =========================
+       6️⃣ CREATE USER
+    ========================= */
+    await User.create({
       name,
       email,
-      phoneNumber,
-      address,
-      idProof,
-      aadharNumber,
-      profileImage: profileImage || null,
-      password, // Pass plain text; the model hashes it for you
-      isEmailVerified: true 
+      password,
+      isEmailVerified: false,
+      emailVerifyToken,
+      emailVerifyExpires: Date.now() + 24 * 60 * 60 * 1000, // 24 hours
     });
 
-    // 5. Send Response
+    /* =========================
+       7️⃣ VERIFICATION LINK
+       (ENV-BASED — WORKS LOCAL & PROD)
+    ========================= */
+    if (!process.env.FRONTEND_URL) {
+      throw new Error("FRONTEND_URL is not defined");
+    }
+
+    const verifyUrl = `${process.env.FRONTEND_URL}/verify-email?token=${emailVerifyToken}`;
+    console.log("📧 EMAIL VERIFY LINK:", verifyUrl);
+
+    /* =========================
+       8️⃣ RESPONSE
+    ========================= */
     res.status(201).json({
-      message: "Signup successful!",
-      data: {
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        phoneNumber: user.phoneNumber,
-        profileImage: user.profileImage
-      }
+      message:
+        "Signup successful. Please verify your email before logging in.",
     });
 
   } catch (error) {

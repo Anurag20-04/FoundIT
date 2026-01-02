@@ -1,15 +1,20 @@
 import { useState, useEffect } from "react";
 import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext";
 
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import LoginModal from "./components/LoginModal";
 import SignupModal from "./components/SignupModal";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 import Landing from "./components/Landing";
 import BrowseItems from "./pages/BrowseItems";
 import ItemDetail from "./pages/ItemDetail";
 import ReportItem from "./pages/ReportItem/ReportItem";
+import Profile from "./pages/Profile";
+import VerifyEmail from "./pages/VerifyEmail";
+
 
 import "./App.css";
 
@@ -45,82 +50,89 @@ function App() {
     setShowSignup(false);
   };
 
-  // ✅ REDIRECT GUARD: Prevents the modal from getting "stuck"
   const handleCloseAuth = () => {
     closeAuthModals();
-    // If the user closes the modal while on the protected /report page, 
-    // we must move them to the home page so the ReportItem component 
-    // doesn't trigger the login modal again.
     if (location.pathname === "/report") {
       navigate("/");
     }
   };
 
   return (
-    <div className={`app ${theme}`}>
-      <div className="app-content">
-        {/* ================= NAVBAR ================= */}
-        <Navbar
-          theme={theme}
-          onToggleTheme={() =>
-            setTheme((prev) => (prev === "light" ? "dark" : "light"))
-          }
-          onLogin={openLogin}
-          onSignup={openSignup}
-        />
-
-        {/* ================= ROUTES ================= */}
-        <Routes>
-          <Route path="/" element={<Landing theme={theme} />} />
-
-          <Route
-            path="/browse"
-            element={<BrowseItems theme={theme} />}
-          />
-
-          {/* ✅ ITEM DETAIL PAGE */}
-          <Route
-            path="/item/:id"
-            element={
-              <ItemDetail
-                theme={theme}
-                requireLogin={openLogin}
-              />
+    <AuthProvider>
+      <div className={`app ${theme}`}>
+        <div className="app-content">
+          {/* ================= NAVBAR ================= */}
+          <Navbar
+            theme={theme}
+            onToggleTheme={() =>
+              setTheme((prev) => (prev === "light" ? "dark" : "light"))
             }
+            onLogin={openLogin}
+            onSignup={openSignup}
           />
 
-          {/* ✅ REPORT ITEM FLOW */}
-          <Route
-            path="/report"
-            element={
-              <ReportItem
-                theme={theme}
-                requireLogin={openLogin}
-              />
-            }
-          />
-        </Routes>
+          {/* ================= ROUTES ================= */}
+          <Routes>
+            <Route path="/" element={<Landing theme={theme} />} />
 
-        <Footer />
+            <Route
+              path="/browse"
+              element={<BrowseItems theme={theme} />}
+            />
+
+            <Route
+              path="/item/:id"
+              element={
+                <ItemDetail
+                  theme={theme}
+                  requireLogin={openLogin}
+                />
+              }
+            />
+            <Route path="/verify-email" element={<VerifyEmail />} />
+
+            <Route
+              path="/report"
+              element={
+                <ReportItem
+                  theme={theme}
+                  requireLogin={openLogin}
+                />
+              }
+            />
+
+            {/* 🔐 PROTECTED PROFILE ROUTE */}
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <Profile />
+                </ProtectedRoute>
+              }
+            />
+          </Routes>
+
+          <Footer />
+        </div>
+
+        {/* ================= AUTH MODALS ================= */}
+        {showSignup && (
+          <SignupModal
+            theme={theme}
+            onClose={handleCloseAuth}
+            switchToLogin={openLogin}
+          />
+        )}
+
+        {showLogin && (
+          <LoginModal
+            theme={theme}
+            onClose={handleCloseAuth}
+            switchToSignup={openSignup}
+          />
+        )}
       </div>
-
-      {/* ================= AUTH MODALS ================= */}
-      {showSignup && (
-        <SignupModal
-          theme={theme}
-          onClose={handleCloseAuth} // ✅ Use redirecting closer
-          switchToLogin={openLogin}
-        />
-      )}
-
-      {showLogin && (
-        <LoginModal
-          theme={theme}
-          onClose={handleCloseAuth} // ✅ Use redirecting closer
-          switchToSignup={openSignup}
-        />
-      )}
-    </div>
+    </AuthProvider>
   );
 }
 

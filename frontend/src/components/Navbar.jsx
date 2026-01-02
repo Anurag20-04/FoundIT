@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import ProfileDropdown from "./ProfileDropdown";
 import "./Navbar.css";
 import logo from "../assets/foundit-logo.png";
 
@@ -44,12 +45,9 @@ export default function Navbar({ theme, onToggleTheme, onLogin, onSignup }) {
         {/* RIGHT – DESKTOP */}
         <div className="nav-right desktop-only">
           {user ? (
-            <div className="nav-profile">
-              <span className="nav-username">{user.name}</span>
-              <button className="btn outline" onClick={logout}>
-                Logout
-              </button>
-            </div>
+            <ProfileDropdown
+              key={user.profileImage} // 🔑 ONLY REQUIRED CHANGE
+            />
           ) : (
             <>
               <button className="btn outline" onClick={handleSignup}>

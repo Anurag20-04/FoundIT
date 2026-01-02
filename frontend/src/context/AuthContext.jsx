@@ -7,7 +7,9 @@ export function AuthProvider({ children }) {
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Restore session
+  /* =======================
+     RESTORE SESSION
+  ======================= */
   useEffect(() => {
     const storedUser = localStorage.getItem("auth_user");
     const storedToken = localStorage.getItem("auth_token");
@@ -20,7 +22,9 @@ export function AuthProvider({ children }) {
     setLoading(false);
   }, []);
 
-  // ===== LOGIN =====
+  /* =======================
+     LOGIN
+  ======================= */
   const login = (userData, authToken) => {
     setUser(userData);
     setToken(authToken);
@@ -29,7 +33,18 @@ export function AuthProvider({ children }) {
     localStorage.setItem("auth_token", authToken);
   };
 
-  // ===== LOGOUT =====
+  /* =======================
+     🔑 UPDATE USER (NEW)
+     Used by Profile page
+  ======================= */
+  const updateUser = (updatedUser) => {
+    setUser(updatedUser);
+    localStorage.setItem("auth_user", JSON.stringify(updatedUser));
+  };
+
+  /* =======================
+     LOGOUT
+  ======================= */
   const logout = () => {
     setUser(null);
     setToken(null);
@@ -45,6 +60,7 @@ export function AuthProvider({ children }) {
         token,
         isAuthenticated: !!user,
         login,
+        updateUser, // 🔑 exposed
         logout,
         loading,
       }}

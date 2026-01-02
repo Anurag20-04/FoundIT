@@ -1,4 +1,18 @@
 /* =========================================================
+   VISIBILITY FIX (CRITICAL)
+========================================================= */
+
+/* Desktop default */
+.desktop-only {
+  display: flex;
+}
+
+/* Mobile menu hidden by default */
+.mobile-menu {
+  display: none;
+}
+
+/* =========================================================
    NAVBAR WRAPPER
 ========================================================= */
 
@@ -13,6 +27,42 @@
   color: var(--text-primary);
 }
 
+/* =========================================================
+   PROFILE TRIGGER
+========================================================= */
+
+.profile-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 999px;
+}
+
+.profile-avatar {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  min-height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  border: 2px solid rgba(148, 163, 184, 0.4);
+}
+
+.profile-name {
+  font-weight: 600;
+  color: var(--text-main);
+  white-space: nowrap;
+}
+
+/* =========================================================
+   NAVBAR CORE
+========================================================= */
+
 .navbar {
   position: sticky;
   top: 16px;
@@ -26,11 +76,9 @@
   margin: auto;
   padding: 14px 22px;
   border-radius: 999px;
-
   display: flex;
   align-items: center;
   justify-content: space-between;
-
   backdrop-filter: blur(12px);
   transition: all 0.3s ease;
 }
@@ -62,7 +110,8 @@
 
 .navbar.dark .nav-center a,
 .navbar.dark .brand,
-.navbar.dark .btn.outline {
+.navbar.dark .btn.outline,
+.navbar.dark .profile-name {
   color: #ffffff;
   opacity: 0.9;
 }
@@ -105,7 +154,7 @@
 }
 
 /* =========================================================
-   CENTER NAVIGATION LINKS (NavLink-ready)
+   CENTER NAVIGATION LINKS (RESTORED)
 ========================================================= */
 
 .nav-center {
@@ -127,7 +176,7 @@
   opacity: 1;
 }
 
-/* Animated underline (ported from .nav-links) */
+/* 🔑 ACTIVE UNDERLINE (RESTORED) */
 .nav-center a::after {
   content: "";
   position: absolute;
@@ -154,7 +203,10 @@
   gap: 10px;
 }
 
-/* Buttons */
+/* =========================================================
+   BUTTONS (FULLY RESTORED)
+========================================================= */
+
 .btn {
   padding: 6px 16px;
   border-radius: 999px;
@@ -241,37 +293,17 @@
   color: inherit;
 }
 
-.navbar.light .hamburger {
-  color: #0f172a;
-}
-
-.navbar.dark .hamburger {
-  color: #ffffff;
-}
-
 /* =========================================================
-   MOBILE MENU
-========================================================= */
-
-.mobile-menu {
-  display: none;
-}
-
-.mobile-auth {
-  display: none;
-}
-
-/* =========================================================
-   RESPONSIVE
+   MOBILE
 ========================================================= */
 
 @media (max-width: 768px) {
-  .hamburger {
-    display: block;
+  .desktop-only {
+    display: none;
   }
 
-  .nav-center {
-    display: none;
+  .hamburger {
+    display: block;
   }
 
   .mobile-menu {
@@ -296,62 +328,8 @@
     pointer-events: auto;
   }
 
-  .mobile-menu a {
-    position: relative;
-    text-decoration: none;
-    color: inherit;
-    font-size: 1.05rem;
-  }
-
-  /* Mobile underline animation */
-  .mobile-menu a::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    bottom: -6px;
-    width: 0;
-    height: 2px;
-    background-color: #38bdf8;
-    transition: width 0.3s ease;
-  }
-
-  .mobile-menu a.active-link::after {
-    width: 100%;
-  }
-
   .btn.full {
     width: 100%;
     justify-content: center;
-  }
-}
-
-@media (max-width: 480px) {
-  .brand {
-    display: none;
-  }
-
-  .nav-right .btn {
-    display: none;
-  }
-
-  .nav-shell {
-    padding: 10px 14px;
-  }
-
-  .logo-box {
-    width: 38px;
-    height: 38px;
-  }
-
-  .logo-box img {
-    width: 22px;
-    height: 22px;
-  }
-
-  .mobile-auth {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    margin-top: 12px;
   }
 }

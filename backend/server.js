@@ -3,12 +3,16 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const path = require("path");
+const fs = require("fs");
 const connectDB = require("./config/dbconn.js");
 
 const Loginrouter = require("./router/Loginrouter");
 const Signuprouter = require("./router/Signuprouter");
-const itemRouter = require("./router/itemRouter"); 
+const itemRouter = require("./router/itemRouter");
 const notificationRoutes = require("./router/notificationRouters");
+
+// 🔹 NEW: User routes (Profile, etc.)
+const userRoutes = require("./router/userRoutes");
 
 dotenv.config();
 connectDB();
@@ -16,11 +20,25 @@ connectDB();
 const app = express();
 
 /* =======================
+   ENSURE UPLOAD DIRECTORIES EXIST
+======================= */
+const uploadDirs = [
+  path.join(__dirname, "uploads"),
+  path.join(__dirname, "uploads/profile-images"),
+];
+
+uploadDirs.forEach((dir) => {
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+});
+
+/* =======================
    CORS (FIXED & SAFE)
 ======================= */
 app.use(
   cors({
-    origin: "http://localhost:5173", // ✅ frontend origin (change if needed)
+    origin: "http://localhost:5173", // frontend
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
@@ -38,7 +56,6 @@ app.use(
   })
 );
 
-
 /* =======================
    BODY PARSERS
 ======================= */
@@ -52,6 +69,9 @@ app.use("/api/login", Loginrouter);
 app.use("/api/signup", Signuprouter);
 app.use("/api/items", itemRouter);
 app.use("/api/notifications", notificationRoutes);
+
+// 🔹 NEW: Users / Profile routes
+app.use("/api/users", userRoutes);
 
 /* =======================
    HEALTH CHECK
@@ -78,5 +98,6 @@ app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`📁 Static Assets: http://localhost:${PORT}/uploads`);
   console.log(`📁 Items endpoint: http://localhost:${PORT}/api/items`);
+  console.log(`📁 Users endpoint: http://localhost:${PORT}/api/users`);
   console.log(`=========================================`);
 });
