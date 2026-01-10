@@ -4,7 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import "./LoginModal.css";
 import loginBg from "../assets/login-bg.png";
 import eyeClosed from "../assets/Hide.png";
-import eyeOpen from "../assets/Show.png";
+import eyeOpen from "../assets/show.png";
 
 export default function LoginModal({ theme = "light", onClose, switchToSignup }) {
   const { login } = useAuth();

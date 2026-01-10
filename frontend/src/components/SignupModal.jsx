@@ -3,7 +3,7 @@ import axios from "axios";
 import "./SignupModal.css";
 import signupBg from "../assets/signup-bg.png";
 import eyeClosed from "../assets/Hide.png";
-import eyeOpen from "../assets/Show.png";
+import eyeOpen from "../assets/show.png";
 
 export default function SignupModal({ theme = "light", onClose, switchToLogin }) {
   const [form, setForm] = useState({
