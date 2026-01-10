@@ -1,5 +1,6 @@
 const multer = require("multer");
-const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const { CloudinaryStorage } = require("multer-storage-cloudinary").default;
+
 const cloudinary = require("../config/cloudinary");
 
 // Cloudinary storage (replaces local disk)
