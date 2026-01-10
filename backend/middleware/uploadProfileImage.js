@@ -1,12 +1,9 @@
 const multer = require("multer");
 const cloudinary = require("../config/cloudinary");
-
-// This line handles the version mismatch safely
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
-const StorageClass = CloudinaryStorage || require("multer-storage-cloudinary");
 
-const storage = new StorageClass({
-  cloudinary: cloudinary,
+const storage = new CloudinaryStorage({
+  cloudinary,
   params: {
     folder: "foundit/profiles",
     allowed_formats: ["jpg", "png", "jpeg", "webp"],
@@ -18,4 +15,4 @@ const uploadProfileImage = multer({
   limits: { fileSize: 5 * 1024 * 1024 },
 });
 
-module.exports = uploadProfileImage;
+module.exports = uploadProfileImage.single("image");
