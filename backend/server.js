@@ -42,8 +42,10 @@ uploadDirs.forEach((dir) => {
 
 const allowedOrigins = [
   "http://localhost:5173",
-  process.env.FRONTEND_URL
+  "https://found-it-git-main-anurags-projects-2a89023f.vercel.app",
+  "https://found-jlmz8wx0d-anurags-projects-2a89023f.vercel.app"
 ];
+
 
 /* =======================
    CORS (FIXED)
@@ -59,6 +61,7 @@ app.use(
       } else {
         callback(new Error("Not allowed by CORS"));
       }
+      return callback(null, true);
     },
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
