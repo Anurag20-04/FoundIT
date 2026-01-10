@@ -4,7 +4,9 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import "./ClaimRequests.css";
 
-const API = "http://localhost:5000";
+// const API = "http://localhost:5000";
+const API = import.meta.env.VITE_API_URL;
+
 
 export default function ClaimRequests() {
   const { user } = useAuth();

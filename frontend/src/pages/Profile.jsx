@@ -34,7 +34,9 @@ export default function Profile() {
 
     setProfileImagePreview(
       user.profileImage
-        ? `http://localhost:5000${user.profileImage}?t=${Date.now()}`
+        // ? `http://localhost:5000${user.profileImage}?t=${Date.now()}`
+        ?`${import.meta.env.VITE_API_URL}${user.profileImage}`
+
         : ""
     );
   }, [user]);
@@ -95,7 +97,9 @@ export default function Profile() {
 
       setProfileImagePreview(
         res.data.user.profileImage
-          ? `http://localhost:5000${res.data.user.profileImage}?t=${Date.now()}`
+          // ? `http://localhost:5000${res.data.user.profileImage}?t=${Date.now()}`
+          ?`${import.meta.env.VITE_API_URL}${res.data.user.profileImage}`
+
           : ""
       );
 

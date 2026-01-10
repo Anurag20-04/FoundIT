@@ -28,7 +28,8 @@ export default function SignupModal({ theme = "light", onClose, switchToLogin })
     setLoading(true);
 
     try {
-      await axios.post("http://localhost:5000/api/signup", {
+      // await axios.post("http://localhost:5000/api/signup", {
+      await axios.post(`${import.meta.env.VITE_API_URL}/api/signup`, {  
         name: form.name.trim(),
         email: form.email.trim(),
         password: form.password,

@@ -35,7 +35,9 @@ export default function ProfileDropdown() {
           <img
             src={
               user?.profileImage
-                ? `http://localhost:5000${user.profileImage}?t=${Date.now()}`
+                // ? `http://localhost:5000${user.profileImage}?t=${Date.now()}`
+                ?`${import.meta.env.VITE_API_URL}${user.profileImage}`
+
                 : avatarDefault
             }
             alt="Avatar"
