@@ -37,7 +37,7 @@ export default function Profile() {
         
         ?`${import.meta.env.VITE_API_URL}${user.profileImage}`
 
-        : ""
+        : avatarDefault
     );
   }, [user]);
 
