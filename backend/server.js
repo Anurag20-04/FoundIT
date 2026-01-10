@@ -4,8 +4,7 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const http = require("http");
 const { Server } = require("socket.io");
-const path = require("path");
-const fs = require("fs");
+
 
 const connectDB = require("./config/dbconn.js");
 
@@ -84,7 +83,7 @@ app.use("/api/users", userRoutes);
 // AUTH MIDDLEWARE IS HANDLED INSIDE THESE ROUTERS
 app.use("/api/notifications", notificationRoutes); 
 app.use("/api/chats", chatRoutes); // Removed authMiddleware from here to avoid double check
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
 /* =======================
    HEALTH CHECK
 ======================= */
