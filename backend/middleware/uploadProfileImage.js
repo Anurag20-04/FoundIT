@@ -1,6 +1,13 @@
 const multer = require("multer");
 const cloudinary = require("../config/cloudinary");
-const { CloudinaryStorage } = require("multer-storage-cloudinary");
+
+const cloudinaryModule = require("multer-storage-cloudinary");
+const CloudinaryStorage =
+  cloudinaryModule.CloudinaryStorage || cloudinaryModule;
+
+if (!CloudinaryStorage) {
+  throw new Error("CloudinaryStorage not found in multer-storage-cloudinary");
+}
 
 const storage = new CloudinaryStorage({
   cloudinary,
