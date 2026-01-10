@@ -44,15 +44,7 @@ uploadDirs.forEach((dir) => {
 ======================= */
 const allowedOrigins = [
   "https://found-it-git-main-anurags-projects-2a89023f.vercel.app",
-  process.env.FRONTEND_URL
-];
-
-/* =======================
-   CORS (FIXED)
-======================= */
-const allowedOrigins = [
-  "https://found-it-git-main-anurags-projects-2a89023f.vercel.app",
-  process.env.FRONTEND_URL
+  
 ];
 
 app.use(
