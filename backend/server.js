@@ -42,8 +42,7 @@ uploadDirs.forEach((dir) => {
 ======================= */
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://found-it-git-main-anurags-projects-2a89023f.vercel.app",
-  "https://found-jlmz8wx0d-anurags-projects-2a89023f.vercel.app"
+  process.env.FRONTEND_URL
 ];
 
 /* =======================
@@ -84,7 +83,7 @@ app.use("/api/users", userRoutes);
 // AUTH MIDDLEWARE IS HANDLED INSIDE THESE ROUTERS
 app.use("/api/notifications", notificationRoutes); 
 app.use("/api/chats", chatRoutes); // Removed authMiddleware from here to avoid double check
-
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 /* =======================
    HEALTH CHECK
 ======================= */
@@ -110,20 +109,16 @@ const jwt = require("jsonwebtoken");
    SOCKET AUTH
 ============================ */
 io.use((socket, next) => {
+  const token = socket.handshake.auth?.token;
+  if (!token) return next(new Error("No token provided")); // Add this check
   try {
-    const token = socket.handshake.auth?.token;
-    if (!token) return next(new Error("Authentication error")); // Safety check
-    
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const userId = decoded.id || decoded.userId || decoded._id;
-    socket.userId = String(userId);
-
+    socket.userId = String(decoded.id || decoded.userId || decoded._id);
     next();
   } catch (err) {
-    next(new Error("Authentication error"));
+    next(new Error("Auth failed: " + err.message));
   }
 });
-
 /* ============================
    SOCKET CORE
 ============================ */
