@@ -1,29 +1,27 @@
 const multer = require("multer");
-const path = require("path");
-const fs = require("fs");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const cloudinary = require("../config/cloudinary");
 
-const uploadDir = path.join(__dirname, "../uploads/profile-images");
-
-// 🔑 Ensure directory exists
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
-
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, uploadDir);
-  },
-  filename: function (req, file, cb) {
-    const ext = path.extname(file.originalname);
-
-    // 🔑 SAFE fallback if req.user is not ready
+/* =========================
+   CLOUDINARY STORAGE
+========================= */
+const storage = new CloudinaryStorage({
+  cloudinary,
+  params: async (req, file) => {
     const userId =
       req.user && req.user._id ? req.user._id.toString() : "temp";
 
-    cb(null, `${userId}-${Date.now()}${ext}`);
-  },
+    return {
+      folder: "foundit/profile-images",
+      public_id: `${userId}-${Date.now()}`,
+      allowed_formats: ["jpg", "jpeg", "png", "webp"]
+    };
+  }
 });
 
+/* =========================
+   ONLY IMAGES
+========================= */
 const fileFilter = (req, file, cb) => {
   if (file.mimetype.startsWith("image/")) {
     cb(null, true);
@@ -32,10 +30,18 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-module.exports = multer({
+/* =========================
+   MULTER CONFIG
+========================= */
+const upload = multer({
   storage,
   fileFilter,
   limits: {
-    fileSize: 10 * 1024 * 1024, // 10 MB
-  },
+    fileSize: 10 * 1024 * 1024 // 10 MB (same as your old file)
+  }
 });
+
+/* =========================
+   EXPORT SINGLE UPLOAD
+========================= */
+module.exports = upload.single("profileImage");
