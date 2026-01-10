@@ -21,6 +21,7 @@
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.0.1",
     "multer": "^2.0.2",
+    "multer-storage-cloudinary": "^2.2.1",
     "nodemailer": "^7.0.12",
     "socket.io": "^4.8.3"
   },
