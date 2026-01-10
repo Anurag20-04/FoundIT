@@ -3,28 +3,35 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "./NotificationPanel.css";
 
-export default function NotificationPanel() {
+const API = "http://localhost:5000";
+
+export default function NotificationPanel({ onCount, onClose }) {
   const [notifications, setNotifications] = useState([]);
-  const [isOpen, setIsOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
   const panelRef = useRef(null);
   const navigate = useNavigate();
 
   /* =========================
-     Fetch Notifications
+     FETCH NOTIFICATIONS
   ========================= */
   const fetchNotifications = async () => {
     try {
-      const res = await axios.get(
-        "http://localhost:5000/api/notifications/my",
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
-      setNotifications(res.data.data);
+      const res = await axios.get(`${API}/api/notifications/my`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
+        },
+      });
+
+      const data = res.data?.data || [];
+      setNotifications(data);
+
+      const unread = data.filter(n => !n.isRead).length;
+      onCount?.(unread);
+
     } catch (err) {
-      console.error("Failed to fetch notifications", err);
+      console.error("Notification fetch failed:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -33,97 +40,119 @@ export default function NotificationPanel() {
   }, []);
 
   /* =========================
-     Close on Outside Click
+     MARK AS READ
   ========================= */
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (panelRef.current && !panelRef.current.contains(e.target)) {
-        setIsOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  /* =========================
-     Mark as Read
-  ========================= */
-  const markAsRead = async (notifId) => {
+  const markAsRead = async (id) => {
     try {
       await axios.patch(
-        `http://localhost:5000/api/notifications/${notifId}/read`,
+        `${API}/api/notifications/${id}/read`,
         {},
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
+          },
+        }
+      );
+    } catch (err) {
+      console.error("Mark read failed:", err);
+    }
+  };
+
+  /* =========================
+     CLAIM ACTIONS (APPROVE / REJECT)
+  ========================= */
+  const handleClaimAction = async (notif, action) => {
+    try {
+      const res = await axios.patch(
+        `${API}/api/notifications/${notif._id}/${action}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
           },
         }
       );
 
-      setNotifications((prev) =>
-        prev.map((n) =>
-          n._id === notifId ? { ...n, read: true } : n
-        )
-      );
+      await fetchNotifications();
+
+      // ✅ APPROVED → open chat
+      if (action === "accept" && res.data?.chatId) {
+        navigate(`/chat/${res.data.chatId}`);
+        onClose?.();
+      }
+
     } catch (err) {
-      console.error("Failed to mark notification as read");
+  console.error("Claim action failed:", err.response?.data || err.message);
+}
+
+  };
+
+  /* =========================
+     NORMAL CLICK BEHAVIOR
+  ========================= */
+  const handleClick = async (notif) => {
+    await markAsRead(notif._id);
+    fetchNotifications();
+
+    if (notif.type === "claim-approved" && notif.claim?.chat) {
+      navigate(`/chat/${notif.claim.chat}`);
+      onClose?.();
+    }
+
+    if (notif.type === "claim-rejected" && notif.item?._id) {
+      navigate(`/item/${notif.item._id}`);
+      onClose?.();
     }
   };
 
   /* =========================
-     Notification Click Action
+     UI
   ========================= */
-  const handleNotificationClick = (notif) => {
-    markAsRead(notif._id);
-
-    if (notif.itemId) {
-      navigate(`/item/${notif.itemId}`);
-    }
-  };
-
-  const unreadCount = notifications.filter((n) => !n.read).length;
-
   return (
-    <div className="notif-wrapper" ref={panelRef}>
-      <button
-        className="notif-bell"
-        onClick={() => setIsOpen((p) => !p)}
-        aria-label="Notifications"
-      >
-        {/* CHANGED: removed bell emoji, keep dot */}
-        Notifications
-        {unreadCount > 0 && <span className="notif-dot" />}
-      </button>
+    <div className="notif-dropdown" ref={panelRef}>
+      <div className="notif-header">Notifications</div>
 
-      {isOpen && (
-        <div className="notif-dropdown">
-          <div className="notif-header">
-            <span>Notifications</span>
-            {unreadCount > 0 && (
-              <span className="notif-count">{unreadCount}</span>
-            )}
-          </div>
+      {loading ? (
+        <div className="notif-empty">Loading…</div>
+      ) : notifications.length === 0 ? (
+        <div className="notif-empty">No notifications yet</div>
+      ) : (
+        notifications.map((n) => (
+          <div
+            key={n._id}
+            className={`notif-item ${n.isRead ? "read" : "unread"}`}
+            onClick={() => handleClick(n)}
+          >
+            <div className="notif-main">
+              <p className="notif-message">{n.message}</p>
+              <span className="notif-time">
+                {new Date(n.createdAt).toLocaleString()}
+              </span>
+            </div>
 
-          <div className="notif-list">
-            {notifications.length === 0 ? (
-              <div className="notif-empty">No notifications yet</div>
-            ) : (
-              notifications.map((n) => (
-                <div
-                  key={n._id}
-                  className={`notif-item ${n.read ? "read" : "unread"}`}
-                  onClick={() => handleNotificationClick(n)}
+            {/* 🔥 CLAIM ACTION ZONE */}
+            {n.type === "claim" && (
+              <div
+                className="notif-actions"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <button
+                  className="notif-accept"
+                  onClick={() => handleClaimAction(n, "accept")}
                 >
-                  <p className="notif-message">{n.message}</p>
-                  <span className="notif-time">
-                    {new Date(n.createdAt).toLocaleString()}
-                  </span>
-                </div>
-              ))
+                  Approve
+                </button>
+
+                <button
+                  className="notif-reject"
+                  onClick={() => handleClaimAction(n, "reject")}
+                >
+                  Reject
+                </button>
+              </div>
             )}
           </div>
-        </div>
+        ))
       )}
     </div>
   );

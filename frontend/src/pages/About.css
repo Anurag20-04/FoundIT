@@ -1,0 +1,261 @@
+/* =========================================================
+   1. PREMIUM ASSETS & VARIABLES
+   ========================================================= */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap');
+
+:root {
+  /* ANIMATION PHYSICS */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-elastic: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* --- DARK THEME (The "Pro" Look) --- */
+.about-page.dark {
+  --bg-canvas: #020408;
+  --bg-mesh: radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+             radial-gradient(at 100% 100%, rgba(168, 85, 247, 0.1) 0px, transparent 50%);
+  --text-main: #ffffff;
+  --text-muted: #94a3b8;
+  --card-glass: rgba(255, 255, 255, 0.03);
+  --card-border: rgba(255, 255, 255, 0.08);
+  --card-hover: rgba(255, 255, 255, 0.06);
+  --accent: #6366f1;
+  --accent-glow: rgba(99, 102, 241, 0.4);
+  --noise-opacity: 0.04;
+}
+
+/* --- LIGHT THEME (Clean & Corporate) --- */
+.about-page.light {
+  --bg-canvas: #f8fafc;
+  --bg-mesh: radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.08) 0px, transparent 50%),
+             radial-gradient(at 100% 100%, rgba(226, 232, 240, 0.5) 0px, transparent 50%);
+  --text-main: #0f172a;
+  --text-muted: #475569;
+  --card-glass: rgba(255, 255, 255, 0.6);
+  --card-border: rgba(0, 0, 0, 0.06);
+  --card-hover: #ffffff;
+  --accent: #4f46e5;
+  --accent-glow: rgba(79, 70, 229, 0.15);
+  --noise-opacity: 0.02;
+}
+
+/* =========================================================
+   2. GLOBAL LAYOUT & TEXTURE
+   ========================================================= */
+.about-page {
+  background-color: var(--bg-canvas);
+  background-image: var(--bg-mesh);
+  color: var(--text-main);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+  padding-bottom: 120px;
+  /* Hardware acceleration for smoothness */
+  -webkit-font-smoothing: antialiased;
+}
+
+/* The "Film Grain" Texture (Creates the premium feel) */
+.about-page::before {
+  content: "";
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='1'/%3E%3C/svg%3E");
+  opacity: var(--noise-opacity);
+  pointer-events: none;
+  z-index: 0;
+  mix-blend-mode: overlay;
+}
+
+/* Common Section Styling */
+.about-section {
+  position: relative;
+  z-index: 2;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 80px 24px;
+}
+
+/* =========================================================
+   3. HERO SECTION (Cinematic Typography)
+   ========================================================= */
+.about-hero {
+  position: relative;
+  z-index: 2;
+  padding: 180px 24px 100px;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+}
+
+.about-hero-content {
+  max-width: 800px;
+}
+
+.about-hero h1 {
+  font-size: clamp(3rem, 6vw, 5rem);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.04em;
+  margin-bottom: 24px;
+  background: linear-gradient(180deg, var(--text-main) 0%, var(--text-muted) 120%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 30px var(--accent-glow));
+}
+
+.about-hero p {
+  font-size: clamp(1.1rem, 2vw, 1.35rem);
+  color: var(--text-muted);
+  line-height: 1.7;
+  max-width: 650px;
+  margin: 0 auto;
+}
+
+/* =========================================================
+   4. MISSION & TEXT SECTIONS
+   ========================================================= */
+.about-section h2 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  margin-bottom: 32px;
+  text-align: center;
+}
+
+.about-section p {
+  font-size: 1.15rem;
+  color: var(--text-muted);
+  line-height: 1.8;
+  max-width: 800px;
+  margin: 0 auto 24px;
+  text-align: center;
+}
+
+strong {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+/* =========================================================
+   5. "HOW IT WORKS" GRID (Glassmorphism Bento)
+   ========================================================= */
+.about-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+  margin-top: 40px;
+}
+
+.about-card {
+  background: var(--card-glass);
+  border: 1px solid var(--card-border);
+  border-radius: 24px;
+  padding: 32px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  transition: all 0.4s var(--ease-out);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+}
+
+/* Hover Effect: Lift & Glow */
+.about-card:hover {
+  transform: translateY(-8px) scale(1.01);
+  background: var(--card-hover);
+  border-color: var(--accent);
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.3);
+}
+
+/* Styling the Emojis/Icons inside H3 */
+.about-card h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.about-card p {
+  text-align: left;
+  font-size: 1rem;
+  margin: 0;
+}
+
+/* Make the cards look cohesive by dimming the emoji slightly until hover */
+.about-card h3::first-letter {
+  font-size: 1.8rem; /* Make emoji slightly larger */
+  filter: grayscale(0.5);
+  transition: filter 0.3s ease;
+}
+
+.about-card:hover h3::first-letter {
+  filter: grayscale(0) drop-shadow(0 0 10px var(--accent-glow));
+}
+
+/* =========================================================
+   6. TRUST SECTION (Pill Layout)
+   ========================================================= */
+/* Transform the standard <ul> into a modern grid of pills */
+.about-highlight ul {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.about-highlight li {
+  background: var(--card-glass);
+  border: 1px solid var(--card-border);
+  padding: 16px 24px;
+  border-radius: 100px; /* Pill shape */
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--text-muted);
+  transition: all 0.3s ease;
+  cursor: default;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Highlight the checkmark logic in the text */
+.about-highlight li:hover {
+  border-color: var(--accent);
+  background: var(--card-hover);
+  color: var(--text-main);
+  transform: scale(1.05);
+  box-shadow: 0 10px 20px -5px var(--accent-glow);
+}
+
+/* =========================================================
+   7. RESPONSIVE OPTIMIZATIONS
+   ========================================================= */
+@media (max-width: 768px) {
+  .about-hero {
+    padding: 140px 20px 60px;
+  }
+  
+  .about-section {
+    padding: 60px 20px;
+  }
+
+  .about-section h2 {
+    font-size: 2rem;
+  }
+
+  /* Force grid to single column on mobile for better readability */
+  .about-grid {
+    grid-template-columns: 1fr;
+  }
+}

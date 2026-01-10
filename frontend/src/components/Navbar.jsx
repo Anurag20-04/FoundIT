@@ -1,13 +1,59 @@
-import { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { useState ,useEffect} from "react";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import ProfileDropdown from "./ProfileDropdown";
 import "./Navbar.css";
 import logo from "../assets/foundit-logo.png";
+import ChatIcon from "../assets/chatIcon.png";
+import axios from "axios";
+import { getSocket } from "../services/socket";
+
+const API = "http://localhost:5000";
 
 export default function Navbar({ theme, onToggleTheme, onLogin, onSignup }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { user, logout } = useAuth();
+  const [unreadChats, setUnreadChats] = useState(0);
+
+useEffect(() => {
+  if (!user) return;
+
+  const socket = getSocket();
+
+  const fetchUnread = async () => {
+    try {
+      const res = await axios.get(`${API}/api/chats/my`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
+        },
+      });
+
+      const people = res.data.data.filter(c => c.unreadCount > 0).length;
+      setUnreadChats(people);
+    } catch (err) {
+      console.error("Unread fetch error:", err);
+    }
+  };
+
+  // initial load
+  fetchUnread();
+
+  // realtime refresh
+  if (socket) {
+    socket.on("unread:update", fetchUnread);
+    socket.on("message:new", fetchUnread);
+  }
+
+  return () => {
+    if (socket) {
+      socket.off("unread:update", fetchUnread);
+      socket.off("message:new", fetchUnread);
+    }
+  };
+
+}, [user]);
+
+  const navigate = useNavigate();
 
   const closeMobile = () => setMobileOpen(false);
 
@@ -28,12 +74,13 @@ export default function Navbar({ theme, onToggleTheme, onLogin, onSignup }) {
     <nav className={`navbar ${theme}`}>
       <div className="nav-shell">
         {/* LEFT */}
-        <div className="nav-left">
-          <div className="logo-box">
-            <img src={logo} alt="FindIT" />
-          </div>
-          <span className="brand">FindIT</span>
-        </div>
+       <NavLink to="/" className="nav-left" onClick={closeMobile}>
+  <div className="logo-box">
+    <img src={logo} alt="FoundIT" />
+  </div>
+  <span className="brand">FoundIT</span>
+</NavLink>
+
 
         {/* CENTER – DESKTOP */}
         <div className="nav-center desktop-only">
@@ -43,10 +90,29 @@ export default function Navbar({ theme, onToggleTheme, onLogin, onSignup }) {
         </div>
 
         {/* RIGHT – DESKTOP */}
-        <div className="nav-right desktop-only">
-          {user ? (
+        <div className="nav-right ">
+
+            <div className={`theme-toggle ${theme}`} onClick={onToggleTheme}>
+            <div className="toggle-thumb">
+              {theme === "dark" ? "🌙" : "☀️"}
+            </div>
+          </div>
+        </div>
+
+          {/* 🔹 CHAT BUTTON (only when logged in) */}
+        {user && (
+  <button className="nav-chat-btn" onClick={() => navigate("/messages")}>
+    <img src={ChatIcon} alt="Chat" />
+    {unreadChats > 0 && <span className="chat-dot">{unreadChats}</span>}
+  </button>
+)}
+
+      
+
+        
+            {user ? (
             <ProfileDropdown
-              key={user.profileImage} // 🔑 ONLY REQUIRED CHANGE
+              key={user.profileImage}
             />
           ) : (
             <>
@@ -58,13 +124,6 @@ export default function Navbar({ theme, onToggleTheme, onLogin, onSignup }) {
               </button>
             </>
           )}
-
-          <div className={`theme-toggle ${theme}`} onClick={onToggleTheme}>
-            <div className="toggle-thumb">
-              {theme === "dark" ? "🌙" : "☀️"}
-            </div>
-          </div>
-        </div>
 
         {/* HAMBURGER */}
         <button
@@ -80,6 +139,8 @@ export default function Navbar({ theme, onToggleTheme, onLogin, onSignup }) {
         <NavLink to="/" className={navLinkClass} onClick={closeMobile}>Home</NavLink>
         <NavLink to="/browse" className={navLinkClass} onClick={closeMobile}>Browse</NavLink>
         <NavLink to="/about" className={navLinkClass} onClick={closeMobile}>About</NavLink>
+
+       
 
         <div className="mobile-auth">
           {user ? (

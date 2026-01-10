@@ -1,5 +1,6 @@
 .profile-wrapper {
   position: relative;
+  z-index: 2000;
 }
 
 .profile-trigger {
@@ -20,17 +21,25 @@
 .profile-dropdown {
   position: absolute;
   right: 0;
-  top: 48px;
+  top: 52px;
   min-width: 220px;
-  background: var(--card-bg);
-  border: 1px solid var(--glass-border);
-  border-radius: 14px;
-  box-shadow: 0 30px 80px rgba(0,0,0,0.45);
+
+  background: #ffffff;
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+
+  box-shadow: 0 25px 70px rgba(0,0,0,0.45);
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  z-index: 3000;
+  z-index: 4000;
 }
+
+/* Dark mode solid dropdown */
+.navbar.dark .profile-dropdown {
+  background: #020617;
+}
+
 
 .profile-item {
   padding: 12px 16px;
@@ -53,4 +62,26 @@
 
 .notif-slot {
   position: relative;
+}
+.avatar-wrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.notif-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: #ef4444;
+  color: white;
+  font-size: 10px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.4);
 }

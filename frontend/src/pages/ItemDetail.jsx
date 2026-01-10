@@ -4,39 +4,115 @@ import { useAuth } from "../context/AuthContext";
 import axios from "axios";
 import "./ItemDetail.css";
 
+const API = "http://localhost:5000";
+
 export default function ItemDetail() {
   const { id } = useParams();
   const { user } = useAuth();
   const navigate = useNavigate();
 
   const [item, setItem] = useState(null);
+  const [claim, setClaim] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeImage, setActiveImage] = useState(0);
-  const [claiming, setClaiming] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+
+  /* ===============================
+     FETCH ITEM + USER CLAIM
+  =============================== */
+  const fetchAll = async () => {
+    try {
+      const res = await axios.get(`${API}/api/items/${id}`);
+      setItem(res.data.data);
+
+      if (user) {
+        const claimRes = await axios.get(
+          `${API}/api/claims/item/${id}/mine`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
+            },
+          }
+        );
+        setClaim(claimRes.data.data);
+      }
+    } catch (err) {
+      console.error("Failed to load item", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    let mounted = true;
+    fetchAll();
+  }, [id, user]);
 
-    const fetchItem = async () => {
-      try {
-        const res = await axios.get(
-          `http://localhost:5000/api/items/${id}`
-        );
-        if (mounted) setItem(res.data.data);
-      } catch (err) {
-        console.error("Failed to fetch item", err);
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    };
+  /* ===============================
+     CLAIM HANDLER
+  =============================== */
+  const handleClaim = async () => {
+    if (!user) {
+      localStorage.setItem("postLoginAction", "CLAIM_ITEM");
+      localStorage.setItem("postLoginItemId", item._id);
+      window.dispatchEvent(new Event("open-login"));
+      return;
+    }
 
-    fetchItem();
-    return () => {
-      mounted = false;
-    };
-  }, [id]);
+    if (submitting || claim) return;
 
-  /* ---------------- THEME-SAFE LOADER ---------------- */
+    try {
+      setSubmitting(true);
+
+      await axios.post(
+        `${API}/api/claims`,
+        {
+          itemId: item._id,
+          ownerId: item.reporter,
+          claimType: item.itemType === "lost" ? "FOUND" : "OWNERSHIP",
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
+          },
+        }
+      );
+
+      await fetchAll();
+    } catch (err) {
+      console.error("Claim failed", err);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  /* ===============================
+     REPORT
+  =============================== */
+  const handleReport = async () => {
+    if (!user) return navigate("/login");
+
+    try {
+      await axios.post(
+        `${API}/api/reports`,
+        {
+          targetType: "ITEM",
+          targetId: item._id,
+          reason: "Reported by user",
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
+          },
+        }
+      );
+    } catch (err) {
+      console.error("Report failed", err);
+    }
+  };
+
+  /* ===============================
+     LOAD STATES
+  =============================== */
   if (loading) {
     return (
       <div className="detail-page-wrapper">
@@ -56,84 +132,64 @@ export default function ItemDetail() {
   const userId = user?._id || user?.id;
   const ownerId = item.reporter?._id || item.reporter;
   const isOwner = userId === ownerId;
-  const isClaimed = Boolean(item.claimedBy);
-
-  /* ---------------- ACTION HANDLERS ---------------- */
-
-  const handleClaim = async () => {
-    if (!user) return navigate("/login");
-    if (isClaimed || claiming) return;
-
-    setClaiming(true);
-    try {
-      const claimRes = await axios.post(
-        "http://localhost:5000/api/claims",
-        {
-          itemId: item._id,
-          claimantId: userId,
-          claimType: item.itemType === "lost" ? "FOUND" : "OWNERSHIP",
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
-
-      const claimId = claimRes.data.data._id;
-
-      await axios.post(
-        "http://localhost:5000/api/notifications",
-        {
-          recipientId: ownerId,
-          senderId: userId,
-          type: "CLAIM",
-          itemId: item._id,
-          claimId,
-          message:
-            item.itemType === "lost"
-              ? "Someone claims they found your item."
-              : "Someone claims ownership of this item.",
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
-
-      navigate(`/chat/claim/${claimId}`);
-    } catch {
-      alert("Unable to submit claim.");
-    } finally {
-      setClaiming(false);
-    }
-  };
-
-  const handleReport = async () => {
-    if (!user) return navigate("/login");
-
-    try {
-      await axios.post(
-        "http://localhost:5000/api/reports",
-        {
-          targetType: "ITEM",
-          targetId: item._id,
-          reason: "Reported by user",
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
-      alert("Item reported successfully.");
-    } catch {
-      alert("Failed to report item.");
-    }
-  };
-
   const images = Array.isArray(item.images) ? item.images : [];
+
+  /* ===============================
+     ACTION STATE MACHINE
+  =============================== */
+
+  let actionUI = null;
+
+  if (!user) {
+    actionUI = (
+      <button className="btn-main-action" onClick={handleClaim}>
+        Log in to claim
+      </button>
+    );
+  } else if (isOwner) {
+    actionUI = (
+      <div className="status-info owner">This is your listing</div>
+    );
+  } else if (!claim) {
+    actionUI = (
+      <button
+        className="btn-main-action"
+        onClick={handleClaim}
+        disabled={submitting}
+      >
+        {submitting
+          ? "Sending request…"
+          : item.itemType === "lost"
+          ? "I Found This"
+          : "This Is Mine"}
+      </button>
+    );
+  } else if (claim.status === "pending") {
+    actionUI = (
+      <div className="status-info waiting">
+        Request sent · Waiting for approval
+      </div>
+    );
+  } else if (claim.status === "rejected") {
+    actionUI = (
+      <div className="status-info rejected">
+        Your request was declined
+      </div>
+    );
+  } else if (claim.status === "approved") {
+    actionUI = (
+      <button
+        className="btn-main-action success"
+        onClick={() => navigate(`/chat/${claim.chat}`)}
+      >
+        Open chat
+      </button>
+    );
+  }
+
+  /* ===============================
+     UI
+  =============================== */
 
   return (
     <div className="detail-page-wrapper">
@@ -143,9 +199,7 @@ export default function ItemDetail() {
           <div className="main-image-frame">
             {images[activeImage] && (
               <img
-                src={`http://localhost:5000/${images[
-                  activeImage
-                ].replace(/\\/g, "/")}`}
+                src={`${API}/${images[activeImage].replace(/\\/g, "/")}`}
                 alt={item.title}
               />
             )}
@@ -154,10 +208,6 @@ export default function ItemDetail() {
 
             {item.reward > 0 && (
               <div className="reward-tag">₹{item.reward} Reward</div>
-            )}
-
-            {isClaimed && (
-              <div className="claimed-overlay">CLAIMED</div>
             )}
           </div>
 
@@ -172,7 +222,7 @@ export default function ItemDetail() {
                   onClick={() => setActiveImage(idx)}
                 >
                   <img
-                    src={`http://localhost:5000/${img.replace(/\\/g, "/")}`}
+                    src={`${API}/${img.replace(/\\/g, "/")}`}
                     alt="thumbnail"
                   />
                 </button>
@@ -194,7 +244,9 @@ export default function ItemDetail() {
             </div>
           </header>
 
-          <div className="description-box">{item.description}</div>
+          <div className="description-box">
+            {item.description}
+          </div>
 
           <div className="contact-card-premium">
             <div className="card-header">Protected Contact</div>
@@ -208,23 +260,7 @@ export default function ItemDetail() {
           </div>
 
           {/* ACTION STATE */}
-          {isOwner ? (
-            <div className="status-info">This is your listing</div>
-          ) : isClaimed ? (
-            <div className="status-info claimed">
-              Claim already submitted
-            </div>
-          ) : (
-            <button
-              className="btn-main-action"
-              onClick={handleClaim}
-              disabled={claiming}
-            >
-              {item.itemType === "lost"
-                ? "I Found This"
-                : "This Is Mine"}
-            </button>
-          )}
+          {actionUI}
 
           <div className="utility-bar">
             <button
@@ -247,4 +283,3 @@ export default function ItemDetail() {
     </div>
   );
 }
-

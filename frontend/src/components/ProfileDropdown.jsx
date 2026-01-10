@@ -9,6 +9,7 @@ export default function ProfileDropdown() {
   const { user, logout } = useAuth();
   const [open, setOpen] = useState(false);
   const [showNotifs, setShowNotifs] = useState(false);
+  const [notifCount, setNotifCount] = useState(0);
   const ref = useRef(null);
   const navigate = useNavigate();
 
@@ -30,18 +31,26 @@ export default function ProfileDropdown() {
         className="profile-trigger"
         onClick={() => setOpen((p) => !p)}
       >
-        <img
-  src={
-    user?.profileImage
-      ? `http://localhost:5000${user.profileImage}?t=${Date.now()}`
-      : avatarDefault
-  }
-  alt="Avatar"
-  className="profile-avatar"
-  onError={(e) => {
-    e.currentTarget.src = avatarDefault;
-  }}
-/>
+        <div className="avatar-wrap">
+          <img
+            src={
+              user?.profileImage
+                ? `http://localhost:5000${user.profileImage}?t=${Date.now()}`
+                : avatarDefault
+            }
+            alt="Avatar"
+            className="profile-avatar"
+            onError={(e) => {
+              e.currentTarget.src = avatarDefault;
+            }}
+          />
+
+          {notifCount > 0 && (
+            <span className="notif-badge">
+              {notifCount > 9 ? "9+" : notifCount}
+            </span>
+          )}
+        </div>
 
         <span className="profile-name">{user?.name}</span>
       </button>
@@ -58,12 +67,16 @@ export default function ProfileDropdown() {
             👤 Profile
           </button>
 
-          <button
-            className="profile-item"
-            onClick={() => setShowNotifs((p) => !p)}
-          >
-            🔔 Notifications
-          </button>
+        <button
+  className="profile-item"
+  onClick={() => {
+    setOpen(false);        // close profile menu
+    setShowNotifs(true);  // open notifications
+  }}
+>
+  🔔 Notifications
+</button>
+
 
           <button
             className="profile-item"
@@ -84,8 +97,14 @@ export default function ProfileDropdown() {
         </div>
       )}
 
-      {/* 🔔 Notification panel rendered SEPARATELY */}
-      {showNotifs && <NotificationPanel />}
+  {/* 🔔 Notification panel */}
+{showNotifs && (
+  <NotificationPanel
+    onCount={setNotifCount}
+    onClose={() => setShowNotifs(false)}
+  />
+)}
+
     </div>
   );
 }

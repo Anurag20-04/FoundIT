@@ -4,15 +4,20 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const path = require("path");
 const fs = require("fs");
+const http = require("http");
+const { Server } = require("socket.io");
+
 const connectDB = require("./config/dbconn.js");
 
 const Loginrouter = require("./router/Loginrouter");
 const Signuprouter = require("./router/Signuprouter");
 const itemRouter = require("./router/itemRouter");
 const notificationRoutes = require("./router/notificationRouters");
+const claimRoutes = require("./router/claimRoutes");
+const authMiddleware = require("./middleware/auth");
 
-// 🔹 NEW: User routes (Profile, etc.)
 const userRoutes = require("./router/userRoutes");
+const chatRoutes = require("./router/chatRoutes");
 
 dotenv.config();
 connectDB();
@@ -28,33 +33,25 @@ const uploadDirs = [
 ];
 
 uploadDirs.forEach((dir) => {
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
-  }
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 });
 
 /* =======================
-   CORS (FIXED & SAFE)
+   CORS
 ======================= */
 app.use(
   cors({
-    origin: "http://localhost:5173", // frontend
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
   })
 );
 
 /* =======================
-   STATIC FILES (IMAGES)
+   STATIC FILES
 ======================= */
-app.use(
-  "/uploads",
-  express.static(path.join(__dirname, "uploads"), {
-    setHeaders: (res) => {
-      res.setHeader("Access-Control-Allow-Origin", "*");
-    },
-  })
-);
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 /* =======================
    BODY PARSERS
@@ -68,36 +65,92 @@ app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 app.use("/api/login", Loginrouter);
 app.use("/api/signup", Signuprouter);
 app.use("/api/items", itemRouter);
-app.use("/api/notifications", notificationRoutes);
-
-// 🔹 NEW: Users / Profile routes
+app.use("/api/notifications", authMiddleware, notificationRoutes);
+app.use("/api/claims", claimRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/chats", authMiddleware, chatRoutes);
 
 /* =======================
    HEALTH CHECK
 ======================= */
-app.get("/", (req, res) => {
-  res.send("🚀 Lost & Found API is running...");
+app.get("/", (req, res) => res.send("🚀 Lost & Found API running"));
+
+/* =========================================================
+   SOCKET SERVER
+========================================================= */
+
+const PORT = process.env.PORT || 5000;
+const server = http.createServer(app);
+
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST"],
+    credentials: true,
+  },
 });
 
-/* =======================
-   GLOBAL ERROR HANDLER
-======================= */
-app.use((err, req, res, next) => {
-  console.error("❌ Server Error:", err.stack);
-  res.status(500).json({
-    success: false,
-    message: "Internal Server Error",
+const jwt = require("jsonwebtoken");
+const onlineUsers = new Map();
+
+/* ============================
+   SOCKET AUTH
+============================ */
+io.use((socket, next) => {
+  try {
+    const token = socket.handshake.auth?.token;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    const userId = decoded.id || decoded.userId || decoded._id;
+    socket.userId = String(userId);
+
+    next();
+  } catch {
+    next(new Error("Authentication error"));
+  }
+});
+
+/* ============================
+   SOCKET CORE
+============================ */
+io.on("connection", (socket) => {
+  const userId = socket.userId;
+  console.log("🟢 User online:", userId);
+
+  /* MESSAGE PIPE */
+  socket.on("message:send", (message) => {
+    socket.to(message.chat).emit("message:new", message);
+  });
+
+  /* UNREAD SYNC PIPE ✅ */
+  socket.on("unread:update", ({ targetUserId }) => {
+    io.emit("unread:update", { userId: targetUserId });
+  });
+
+  /* TYPING */
+  socket.on("typing:start", ({ chatId }) => {
+    socket.to(chatId).emit("typing:start", { userId, chatId });
+  });
+
+  socket.on("typing:stop", ({ chatId }) => {
+    socket.to(chatId).emit("typing:stop", { userId, chatId });
+  });
+
+  /* ROOMS */
+  socket.on("chat:join", ({ chatId }) => socket.join(chatId));
+  socket.on("chat:leave", ({ chatId }) => socket.leave(chatId));
+
+  /* DISCONNECT */
+  socket.on("disconnect", () => {
+    console.log("🔴 User offline:", userId);
   });
 });
 
-const PORT = process.env.PORT || 5000;
+app.set("io", io);
 
-app.listen(PORT, () => {
-  console.log(`=========================================`);
-  console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`📁 Static Assets: http://localhost:${PORT}/uploads`);
-  console.log(`📁 Items endpoint: http://localhost:${PORT}/api/items`);
-  console.log(`📁 Users endpoint: http://localhost:${PORT}/api/users`);
-  console.log(`=========================================`);
+/* =======================
+   START
+======================= */
+server.listen(PORT, () => {
+  console.log(`🚀 Server running on ${PORT}`);
 });

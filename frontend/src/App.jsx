@@ -7,13 +7,17 @@ import Footer from "./components/Footer";
 import LoginModal from "./components/LoginModal";
 import SignupModal from "./components/SignupModal";
 import ProtectedRoute from "./components/ProtectedRoute";
-
+import About from "./pages/About";
 import Landing from "./components/Landing";
 import BrowseItems from "./pages/BrowseItems";
 import ItemDetail from "./pages/ItemDetail";
 import ReportItem from "./pages/ReportItem/ReportItem";
 import Profile from "./pages/Profile";
 import VerifyEmail from "./pages/VerifyEmail";
+import ChatInbox from "./pages/ChatInbox";
+import ClaimRequests from "./pages/ClaimRequests";
+import ChatRoom from "./pages/ChatRoom";
+
 
 
 import "./App.css";
@@ -79,6 +83,9 @@ function App() {
               path="/browse"
               element={<BrowseItems theme={theme} />}
             />
+            <Route path="/about"
+             element={<About theme={theme} />} />
+
 
             <Route
               path="/item/:id"
@@ -110,7 +117,19 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            <Route path="/messages" element={<ChatInbox theme={theme} />} />
+            <Route path="/claims/requests" element={<ClaimRequests />} />
+              <Route
+  path="/chat/:chatId"
+  element={
+    <ProtectedRoute>
+      <ChatRoom theme={theme} />
+    </ProtectedRoute>
+  }
+/>
+
           </Routes>
+          
 
           <Footer />
         </div>

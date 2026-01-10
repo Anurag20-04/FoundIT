@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
+import { connectSocket, disconnectSocket } from "../services/socket";
 
 const AuthContext = createContext(null);
 
@@ -11,27 +12,31 @@ export function AuthProvider({ children }) {
      RESTORE SESSION
   ======================= */
   useEffect(() => {
-    const storedUser = localStorage.getItem("auth_user");
-    const storedToken = localStorage.getItem("auth_token");
+  const storedUser = localStorage.getItem("auth_user");
+  const storedToken = localStorage.getItem("auth_token");
 
-    if (storedUser && storedToken) {
-      setUser(JSON.parse(storedUser));
-      setToken(storedToken);
-    }
+  if (storedUser && storedToken) {
+    setUser(JSON.parse(storedUser));
+    setToken(storedToken);
+    connectSocket(storedToken);
+  }
 
-    setLoading(false);
-  }, []);
+  setLoading(false);
+}, []);
 
   /* =======================
      LOGIN
   ======================= */
   const login = (userData, authToken) => {
-    setUser(userData);
-    setToken(authToken);
+  setUser(userData);
+  setToken(authToken);
 
-    localStorage.setItem("auth_user", JSON.stringify(userData));
-    localStorage.setItem("auth_token", authToken);
-  };
+  localStorage.setItem("auth_user", JSON.stringify(userData));
+  localStorage.setItem("auth_token", authToken);
+
+  connectSocket(authToken);
+};
+
 
   /* =======================
      🔑 UPDATE USER (NEW)
@@ -45,13 +50,16 @@ export function AuthProvider({ children }) {
   /* =======================
      LOGOUT
   ======================= */
-  const logout = () => {
-    setUser(null);
-    setToken(null);
+ const logout = () => {
+  setUser(null);
+  setToken(null);
 
-    localStorage.removeItem("auth_user");
-    localStorage.removeItem("auth_token");
-  };
+  localStorage.removeItem("auth_user");
+  localStorage.removeItem("auth_token");
+
+  disconnectSocket();
+};
+
 
   return (
     <AuthContext.Provider
