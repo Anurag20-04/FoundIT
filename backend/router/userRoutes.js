@@ -8,7 +8,7 @@ const { updateMyProfile } = require("../controller/userController");
 router.put(
   "/me",
   authMiddleware,
-  uploadProfileImage.single("profileImage"),
+  uploadProfileImage,
   updateMyProfile
 );
 
