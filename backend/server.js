@@ -23,33 +23,46 @@ connectDB();
 const app = express();
 
 /* =======================
+   ENSURE UPLOAD FOLDERS
+======================= */
+const uploadDirs = [
+  path.join(__dirname, "uploads"),
+  path.join(__dirname, "uploads/profile-images"),
+];
+
+uploadDirs.forEach((dir) => {
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+});
+
+/* =======================
    ALLOWED ORIGINS
 ======================= */
 
 const allowedOrigins = [
   "http://localhost:5173",
   process.env.FRONTEND_URL
-].filter(Boolean);
+];
 
 /* =======================
    CORS (FIXED)
 ======================= */
 
-app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("CORS blocked: " + origin));
-    }
-  },
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"]
-}));
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin) return callback(null, true); // allow mobile apps, curl, postman
 
-
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+  })
+);
 /* =======================
    BODY PARSERS
 ======================= */
