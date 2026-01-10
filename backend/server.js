@@ -41,7 +41,7 @@ uploadDirs.forEach((dir) => {
    ALLOWED ORIGINS
 ======================= */
 const allowedOrigins = [
-  "http://localhost:5173",
+
   process.env.FRONTEND_URL
 ];
 
