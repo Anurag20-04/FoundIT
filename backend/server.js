@@ -2,8 +2,6 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const dotenv = require("dotenv");
-const path = require("path");
-const fs = require("fs");
 const http = require("http");
 const { Server } = require("socket.io");
 
@@ -25,45 +23,45 @@ connectDB();
 const app = express();
 
 /* =======================
-   ENSURE UPLOAD DIRECTORIES EXIST
+   ALLOWED ORIGINS
 ======================= */
-const uploadDirs = [
-  path.join(__dirname, "uploads"),
-  path.join(__dirname, "uploads/profile-images"),
-];
 
-uploadDirs.forEach((dir) => {
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-});
+const allowedOrigins = [
+  "http://localhost:5173",
+  process.env.FRONTEND_URL
+].filter(Boolean);
 
 /* =======================
-   CORS
+   CORS (FIXED)
 ======================= */
-app.use(
-  cors({
-    origin: ["http://localhost:5173",
-      "https://found-it-git-main-anurags-projects-2a89023f.vercel.app"
-    ] ,
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true,
-  })
-);
 
-/* =======================
-   STATIC FILES
-======================= */
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("CORS blocked: " + origin));
+    }
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"]
+}));
+
+app.options("*", cors());
 
 /* =======================
    BODY PARSERS
 ======================= */
+
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
 /* =======================
    ROUTES
 ======================= */
+
 app.use("/api/login", Loginrouter);
 app.use("/api/signup", Signuprouter);
 app.use("/api/items", itemRouter);
@@ -75,6 +73,7 @@ app.use("/api/chats", authMiddleware, chatRoutes);
 /* =======================
    HEALTH CHECK
 ======================= */
+
 app.get("/", (req, res) => res.send("🚀 Lost & Found API running"));
 
 /* =========================================================
@@ -86,18 +85,18 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: allowedOrigins,
     methods: ["GET", "POST"],
     credentials: true,
   },
 });
 
 const jwt = require("jsonwebtoken");
-const onlineUsers = new Map();
 
 /* ============================
    SOCKET AUTH
 ============================ */
+
 io.use((socket, next) => {
   try {
     const token = socket.handshake.auth?.token;
@@ -115,21 +114,19 @@ io.use((socket, next) => {
 /* ============================
    SOCKET CORE
 ============================ */
+
 io.on("connection", (socket) => {
   const userId = socket.userId;
   console.log("🟢 User online:", userId);
 
-  /* MESSAGE PIPE */
   socket.on("message:send", (message) => {
     socket.to(message.chat).emit("message:new", message);
   });
 
-  /* UNREAD SYNC PIPE ✅ */
   socket.on("unread:update", ({ targetUserId }) => {
     io.emit("unread:update", { userId: targetUserId });
   });
 
-  /* TYPING */
   socket.on("typing:start", ({ chatId }) => {
     socket.to(chatId).emit("typing:start", { userId, chatId });
   });
@@ -138,11 +135,9 @@ io.on("connection", (socket) => {
     socket.to(chatId).emit("typing:stop", { userId, chatId });
   });
 
-  /* ROOMS */
   socket.on("chat:join", ({ chatId }) => socket.join(chatId));
   socket.on("chat:leave", ({ chatId }) => socket.leave(chatId));
 
-  /* DISCONNECT */
   socket.on("disconnect", () => {
     console.log("🔴 User offline:", userId);
   });
@@ -153,6 +148,7 @@ app.set("io", io);
 /* =======================
    START
 ======================= */
+
 server.listen(PORT, () => {
   console.log(`🚀 Server running on ${PORT}`);
 });
