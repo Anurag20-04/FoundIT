@@ -41,7 +41,9 @@ uploadDirs.forEach((dir) => {
 ======================= */
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: ["http://localhost:5173",
+      "https://found-it-git-main-anurags-projects-2a89023f.vercel.app"
+    ] ,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
