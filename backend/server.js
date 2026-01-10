@@ -43,22 +43,28 @@ uploadDirs.forEach((dir) => {
    ALLOWED ORIGINS
 ======================= */
 const allowedOrigins = [
-
+  "https://found-it-git-main-anurags-projects-2a89023f.vercel.app",
   process.env.FRONTEND_URL
 ];
 
 /* =======================
    CORS (FIXED)
 ======================= */
+const allowedOrigins = [
+  "https://found-it-git-main-anurags-projects-2a89023f.vercel.app",
+  process.env.FRONTEND_URL
+];
+
 app.use(
   cors({
     origin: function (origin, callback) {
       if (!origin) return callback(null, true);
 
       if (allowedOrigins.includes(origin)) {
-        return callback(null, true); // Added return
+        return callback(null, true);
       } else {
-        return callback(new Error("Not allowed by CORS")); // Added return
+        console.log("❌ Blocked by CORS:", origin);
+        return callback(new Error("Not allowed by CORS"));
       }
     },
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
@@ -66,6 +72,7 @@ app.use(
     credentials: true,
   })
 );
+
 
 /* =======================
    BODY PARSERS
@@ -99,11 +106,15 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: process.env.FRONTEND_URL,
+    origin: [
+      "https://found-it-git-main-anurags-projects-2a89023f.vercel.app",
+      process.env.FRONTEND_URL
+    ],
     methods: ["GET", "POST"],
     credentials: true,
   },
 });
+
 
 const jwt = require("jsonwebtoken");
 
