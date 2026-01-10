@@ -9,15 +9,16 @@ const fs = require("fs");
 
 const connectDB = require("./config/dbconn.js");
 
+// CHECK YOUR FILE NAMES! Ensure these match exactly (case-sensitive)
 const Loginrouter = require("./router/Loginrouter");
 const Signuprouter = require("./router/Signuprouter");
-const itemRouter = require("./router/itemRouter");
+const itemRouter = require("./router/itemRouter"); 
 const notificationRoutes = require("./router/notificationRouters");
 const claimRoutes = require("./router/claimRoutes");
-const authMiddleware = require("./middleware/auth");
-
 const userRoutes = require("./router/userRoutes");
 const chatRoutes = require("./router/chatRoutes");
+
+const authMiddleware = require("./middleware/auth");
 
 dotenv.config();
 connectDB();
@@ -39,64 +40,59 @@ uploadDirs.forEach((dir) => {
 /* =======================
    ALLOWED ORIGINS
 ======================= */
-
 const allowedOrigins = [
   "http://localhost:5173",
   "https://found-it-git-main-anurags-projects-2a89023f.vercel.app",
   "https://found-jlmz8wx0d-anurags-projects-2a89023f.vercel.app"
 ];
 
-
 /* =======================
    CORS (FIXED)
 ======================= */
-
 app.use(
   cors({
     origin: function (origin, callback) {
-      if (!origin) return callback(null, true); // allow mobile apps, curl, postman
+      if (!origin) return callback(null, true);
 
       if (allowedOrigins.includes(origin)) {
-        callback(null, true);
+        return callback(null, true); // Added return
       } else {
-        callback(new Error("Not allowed by CORS"));
+        return callback(new Error("Not allowed by CORS")); // Added return
       }
-      return callback(null, true);
     },
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
   })
 );
+
 /* =======================
    BODY PARSERS
 ======================= */
-
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
 /* =======================
    ROUTES
 ======================= */
-
 app.use("/api/login", Loginrouter);
 app.use("/api/signup", Signuprouter);
 app.use("/api/items", itemRouter);
-app.use("/api/notifications", authMiddleware, notificationRoutes);
 app.use("/api/claims", claimRoutes);
 app.use("/api/users", userRoutes);
-app.use("/api/chats", authMiddleware, chatRoutes);
+
+// AUTH MIDDLEWARE IS HANDLED INSIDE THESE ROUTERS
+app.use("/api/notifications", notificationRoutes); 
+app.use("/api/chats", chatRoutes); // Removed authMiddleware from here to avoid double check
 
 /* =======================
    HEALTH CHECK
 ======================= */
-
 app.get("/", (req, res) => res.send("🚀 Lost & Found API running"));
 
-/* =========================================================
+/* =======================
    SOCKET SERVER
-========================================================= */
-
+======================= */
 const PORT = process.env.PORT || 5000;
 const server = http.createServer(app);
 
@@ -113,17 +109,17 @@ const jwt = require("jsonwebtoken");
 /* ============================
    SOCKET AUTH
 ============================ */
-
 io.use((socket, next) => {
   try {
     const token = socket.handshake.auth?.token;
+    if (!token) return next(new Error("Authentication error")); // Safety check
+    
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
     const userId = decoded.id || decoded.userId || decoded._id;
     socket.userId = String(userId);
 
     next();
-  } catch {
+  } catch (err) {
     next(new Error("Authentication error"));
   }
 });
@@ -131,7 +127,6 @@ io.use((socket, next) => {
 /* ============================
    SOCKET CORE
 ============================ */
-
 io.on("connection", (socket) => {
   const userId = socket.userId;
   console.log("🟢 User online:", userId);
@@ -161,10 +156,6 @@ io.on("connection", (socket) => {
 });
 
 app.set("io", io);
-
-/* =======================
-   START
-======================= */
 
 server.listen(PORT, () => {
   console.log(`🚀 Server running on ${PORT}`);
