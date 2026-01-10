@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./ChatInbox.css";
 
-// const BACKEND_URL = "http://localhost:5000";
+
 const BACKEND_URL = import.meta.env.VITE_API_URL;
 
 

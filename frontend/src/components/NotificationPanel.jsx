@@ -3,7 +3,6 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "./NotificationPanel.css";
 
-// const API = "http://localhost:5000";
 const API = import.meta.env.VITE_API_URL;
 
 export default function NotificationPanel({ onCount, onClose }) {

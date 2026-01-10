@@ -8,7 +8,9 @@ import ChatIcon from "../assets/chatIcon.png";
 import axios from "axios";
 import { getSocket } from "../services/socket";
 
-const API = "http://localhost:5000";
+
+const API = import.meta.env.VITE_API_URL;
+
 
 export default function Navbar({ theme, onToggleTheme, onLogin, onSignup }) {
   const [mobileOpen, setMobileOpen] = useState(false);

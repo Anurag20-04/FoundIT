@@ -5,7 +5,7 @@ import { useAuth } from "../context/AuthContext";
 import { getSocket } from "../services/socket";
 import "./ChatRoom.css";
 
-// const API = "http://localhost:5000";
+
 const API = import.meta.env.VITE_API_URL;
 
 export default function ChatRoom() {
@@ -143,7 +143,7 @@ useEffect(() => {
           <div className="chat-avatar">
             {otherUser?.profileImage ? (
               <img
-                // src={`http://localhost:5000${otherUser.profileImage}`}
+                
                 src={`${import.meta.env.VITE_API_URL}${otherUser.profileImage}`}
 
                 alt=""
