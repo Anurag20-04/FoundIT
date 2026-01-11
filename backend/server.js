@@ -69,8 +69,7 @@ app.use(
   })
 );
 
-// ✅ REQUIRED
-app.options("/*", cors());
+
 
 /* =======================
    BODY PARSERS
