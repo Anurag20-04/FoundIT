@@ -1,67 +1,65 @@
-const User = require("../models/User");
-
 exports.updateMyProfile = async (req, res) => {
   try {
+    // 1. Check Auth
     if (!req.user || !req.user._id) {
-      return res.status(401).json({
-        success: false,
-        message: "Unauthorized",
-      });
+      return res.status(401).json({ success: false, message: "Unauthorized" });
     }
 
-    const updates = {};
-
-    /* =========================
-       NORMALIZE TEXT FIELDS
-    ========================= */
-    if ("name" in req.body) {
-      updates.name = req.body.name?.trim() || null;
+    // 2. Fetch the user document
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
     }
 
-    if ("phoneNumber" in req.body) {
-      updates.phoneNumber =
-        req.body.phoneNumber === "" ? null : req.body.phoneNumber;
+    // 3. Update text fields manually
+    if (req.body.name !== undefined) user.name = req.body.name.trim();
+    if (req.body.address !== undefined) user.address = req.body.address.trim();
+    
+    // Handle phone specifically to allow null/empty
+    if (req.body.phoneNumber !== undefined) {
+      user.phoneNumber = req.body.phoneNumber === "" ? null : req.body.phoneNumber;
     }
 
-    if ("address" in req.body) {
-      updates.address = req.body.address?.trim() || null;
+    // 4. Handle Profile Image (Singular)
+    if (req.file && req.file.path) {
+      user.profileImage = req.file.path; 
     }
 
-    /* =========================
-       PROFILE IMAGE
-    ========================= */
-    if (req.files && Array.isArray(req.files) && req.files.length > 0) {
-      updates.profileImage = req.files[0].path; // Cloudinary URL
-    }
+    // 5. Save the document
+    // This runs your schema validators and password middleware correctly
+    await user.save();
 
-    const updatedUser = await User.findByIdAndUpdate(
-      req.user._id,
-      updates,
-      {
-        new: true,
-        runValidators: true,
-        context: "query",
-      }
-    ).select("-password");
-
-    if (!updatedUser) {
-      return res.status(404).json({
-        success: false,
-        message: "User not found",
-      });
-    }
+    // Remove password before sending response
+    const userResponse = user.toObject();
+    delete userResponse.password;
 
     res.status(200).json({
       success: true,
-      user: updatedUser,
+      user: userResponse,
     });
 
   } catch (error) {
     console.error("PROFILE UPDATE ERROR:", error);
 
+    // If it's a validation error (like bad phone format), send 400 instead of 500
+    if (error.name === "ValidationError") {
+      return res.status(400).json({
+        success: false,
+        message: Object.values(error.errors).map(val => val.message)[0],
+      });
+    }
+
+    // Handle Duplicate Key Error (Aadhar or Email)
+    if (error.code === 11000) {
+       return res.status(400).json({
+        success: false,
+        message: "Duplicate value detected (Email or Aadhar already exists).",
+      });
+    }
+
     res.status(500).json({
       success: false,
-      message: error.message || "Failed to update profile",
+      message: error.message || "Internal Server Error",
     });
   }
 };
