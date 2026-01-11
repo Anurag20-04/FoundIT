@@ -15,9 +15,7 @@ const CATEGORIES = [
   "Other",
 ];
 
-
-const BACKEND_URL = import.meta.env.VITE_API_URL;
-
+const BACKEND_URL = import.meta.env.VITE_API_URL || "";
 
 export default function BrowseItems({ theme }) {
   const navigate = useNavigate();
@@ -61,22 +59,20 @@ export default function BrowseItems({ theme }) {
   }, []);
 
   /* =======================
-     IMAGE RESOLVER (FIXED)
+     IMAGE RESOLVER (FINAL)
   ======================= */
-  const resolveImage = (path) => {
-    if (!path) return "/no-image.png";
+  const resolveImage = (img) => {
+    if (!img) return "/no-image.png";
 
-    // Handle absolute Windows paths saved in DB
-    if (path.includes("uploads")) {
-      const cleanedPath = path
-        .substring(path.indexOf("uploads"))
+    // ✅ Cloudinary or any external CDN
+    if (img.startsWith("http")) return img;
+
+    // ✅ Old local uploads fallback
+    if (img.includes("uploads")) {
+      const cleaned = img
+        .substring(img.indexOf("uploads"))
         .replace(/\\/g, "/");
-      return `${BACKEND_URL}/${cleanedPath}`;
-    }
-
-    // Already full URL or base64
-    if (path.startsWith("http") || path.startsWith("data:")) {
-      return path;
+      return `${BACKEND_URL}/${cleaned}`;
     }
 
     return "/no-image.png";
@@ -194,11 +190,9 @@ export default function BrowseItems({ theme }) {
                     <img
                       src={imageSrc}
                       alt={item.title}
-                      crossOrigin="anonymous"
                       loading="lazy"
                       onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = "/no-image.png";
+                        e.currentTarget.src = "/no-image.png";
                       }}
                     />
 
