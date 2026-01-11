@@ -5,10 +5,11 @@ const authMiddleware = require("../middleware/auth");
 const uploadProfileImage = require("../middleware/uploadProfileImage");
 const { updateMyProfile } = require("../controller/userController");
 
-router.put("/me", authMiddleware, (req, res, next) => {
-  uploadProfileImage(req, res, function () {
-    next();
-  });
-}, updateMyProfile);
+router.put(
+  "/me",
+  authMiddleware,
+  uploadProfileImage,   // ✅ proper multer middleware
+  updateMyProfile
+);
 
 module.exports = router;
