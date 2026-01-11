@@ -84,8 +84,8 @@ export default function Profile() {
       formData.append("address", form.address || user.address);
 
       if (profileImageFile) {
-        formData.append("image", profileImageFile);
-      }
+  formData.append("profileImage", profileImageFile); // ✅ Matches backend middleware
+}
 
       const res = await api.put("/users/me", formData);
 
