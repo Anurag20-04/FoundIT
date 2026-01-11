@@ -23,14 +23,10 @@ exports.updateMyProfile = async (req, res) => {
     }
 
    // 4. Handle Profile Image (Singular)
-console.log("🔥 FILE RECEIVED:", req.file);
-
-if (req.file && req.file.path) {
-  console.log("🔥 FILE PATH:", req.file.path);
-  user.profileImage = req.file.path;
-} else {
-  console.log("❌ NO FILE OR NO PATH");
+if (req.file && req.file.secure_url) {
+  user.profileImage = req.file.secure_url; 
 }
+
 
 
     // 5. Save the document
