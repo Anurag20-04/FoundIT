@@ -17,7 +17,7 @@ const notificationRoutes = require("./router/notificationRouters");
 const claimRoutes = require("./router/claimRoutes");
 const userRoutes = require("./router/userRoutes");
 const chatRoutes = require("./router/chatRoutes");
-
+const authMiddleware = require("./middleware/auth");
 dotenv.config();
 connectDB();
 
@@ -89,7 +89,7 @@ app.use("/api/signup", Signuprouter);
 app.use("/api/items", itemRouter);
 app.use("/api/claims", claimRoutes);
 app.use("/api/users", userRoutes);
-app.use("/api/notifications", notificationRoutes); 
+app.use("/api/notifications", authMiddleware, notificationRoutes); 
 app.use("/api/chats", chatRoutes);
 
 /* =======================
