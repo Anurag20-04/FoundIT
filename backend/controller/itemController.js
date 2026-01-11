@@ -44,7 +44,9 @@ const addItem = async (req, res) => {
     ========================= */
     let images = [];
     if (req.files && Array.isArray(req.files)) {
-      images = req.files.map((file) => file.path);
+      images = req.files.map(
+        (file) => file.secure_url || file.url
+      );
     }
 
     const safeReward =
