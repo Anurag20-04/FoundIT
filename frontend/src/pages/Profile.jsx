@@ -33,11 +33,7 @@ export default function Profile() {
     });
 
     setProfileImagePreview(
-      user.profileImage
-        
-        ?`${import.meta.env.VITE_API_URL}${user.profileImage}`
-
-        : avatarDefault
+      user.profileImage ? user.profileImage : avatarDefault
     );
   }, [user]);
 
@@ -88,7 +84,7 @@ export default function Profile() {
       formData.append("address", form.address || user.address);
 
       if (profileImageFile) {
-        formData.append("profileImage", profileImageFile);
+        formData.append("image", profileImageFile);
       }
 
       const res = await api.put("/users/me", formData);
@@ -96,11 +92,7 @@ export default function Profile() {
       updateUser(res.data.user);
 
       setProfileImagePreview(
-        res.data.user.profileImage
-        
-          ?`${import.meta.env.VITE_API_URL}${res.data.user.profileImage}`
-
-          : ""
+        res.data.user.profileImage || avatarDefault
       );
 
       setSuccess(true);

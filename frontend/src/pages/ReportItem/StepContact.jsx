@@ -19,7 +19,7 @@ export default function StepContact({ formData, setFormData, onBack }) {
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState("");
 
-  /* Ensure default country if none selected */
+  /* Ensure default country */
   useEffect(() => {
     if (!formData.countryCode) {
       setFormData((prev) => ({
@@ -72,6 +72,7 @@ export default function StepContact({ formData, setFormData, onBack }) {
 
     try {
       const form = new FormData();
+
       form.append("itemType", formData.type);
       form.append("title", formData.title);
       form.append("description", formData.description);
@@ -82,28 +83,28 @@ export default function StepContact({ formData, setFormData, onBack }) {
       form.append("reward", formData.type === "lost" ? Number(formData.reward) || 0 : 0);
       form.append("contactPhone", `${selectedCountry.code}${formData.phone}`);
       form.append("contactEmail", user.email);
-      form.append("displayEmail", formData.showEmail || false);
+      form.append("displayEmail", Boolean(formData.showEmail));
       form.append("reporter", user._id || user.id);
 
-      if (formData.images && formData.images.length > 0) {
+      if (Array.isArray(formData.images)) {
         formData.images.forEach((img) => {
-          if (img.file) form.append("images", img.file);
+          if (img?.file) form.append("images", img.file);
         });
       }
 
       const response = await axios.post(
-        
         `${import.meta.env.VITE_API_URL}/api/items/report`,
         form,
-        { headers: { "Content-Type": "multipart/form-data" } }
+        { withCredentials: true }
       );
 
       if (response.data.success) {
         setIsSuccess(true);
         setTimeout(() => navigate("/browse"), 2200);
       }
+
     } catch (err) {
-      console.error(err);
+      console.error("❌ Item submit error:", err);
       setIsSubmitting(false);
       setError(err.response?.data?.error || "Failed to submit report. Please try again.");
     }
@@ -116,7 +117,9 @@ export default function StepContact({ formData, setFormData, onBack }) {
           <div className="check-animated">✓</div>
           <h2>Report Published!</h2>
           <p>Your item is now live. Redirecting you...</p>
-          <div className="progress-track"><div className="progress-fill"></div></div>
+          <div className="progress-track">
+            <div className="progress-fill"></div>
+          </div>
         </div>
       </div>
     );
@@ -130,9 +133,9 @@ export default function StepContact({ formData, setFormData, onBack }) {
       </header>
 
       <div className="form-main-container">
-        {/* Phone Input */}
         <div className={`premium-field ${error ? "error-state" : ""}`}>
           <label>Mobile Number <span className="req">*</span></label>
+
           <div className="phone-grid-premium">
             <div className="country-select-wrapper">
               <span className="flag-icon">{selectedCountry.flag}</span>
@@ -142,6 +145,7 @@ export default function StepContact({ formData, setFormData, onBack }) {
                 ))}
               </select>
             </div>
+
             <div className="number-input-wrapper">
               <input
                 type="tel"
@@ -149,13 +153,15 @@ export default function StepContact({ formData, setFormData, onBack }) {
                 value={formData.phone || ""}
                 onChange={handlePhoneChange}
               />
-              <span className="count">{formData.phone?.length || 0}/{selectedCountry.length}</span>
+              <span className="count">
+                {formData.phone?.length || 0}/{selectedCountry.length}
+              </span>
             </div>
           </div>
+
           {error && <p className="error-text-msg">⚠️ {error}</p>}
         </div>
 
-        {/* 📧 Toggle Card - Fixed for Dark Mode */}
         <div className="toggle-card-premium" onClick={handleToggle}>
           <div className="toggle-info">
             <h4>Display Email Address</h4>
@@ -174,9 +180,11 @@ export default function StepContact({ formData, setFormData, onBack }) {
       </div>
 
       <footer className="step-footer">
-        <button className="btn-back-minimal" onClick={onBack} disabled={isSubmitting}>Back</button>
-        <button 
-          className={`btn-finish-premium ${isSubmitting ? "is-loading" : ""}`} 
+        <button className="btn-back-minimal" onClick={onBack} disabled={isSubmitting}>
+          Back
+        </button>
+        <button
+          className={`btn-finish-premium ${isSubmitting ? "is-loading" : ""}`}
           onClick={handleSubmit}
           disabled={isSubmitting}
         >
