@@ -8,7 +8,7 @@ const { updateMyProfile } = require("../controller/userController");
 router.put(
   "/me",
   authMiddleware,
-  uploadProfileImage,
+  uploadProfileImage,   // ✅ handles multipart + profileImage
   updateMyProfile
 );
 
