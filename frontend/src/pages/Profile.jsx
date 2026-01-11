@@ -23,7 +23,7 @@ export default function Profile() {
   /* =========================
      INIT FORM FROM AUTH
   ========================= */
-  useEffect(() => {
+   useEffect(() => {
     if (!user) return;
 
     setForm({
@@ -33,9 +33,12 @@ export default function Profile() {
     });
 
     setProfileImagePreview(
-      user.profileImage ? user.profileImage : avatarDefault
+      user.profileImage
+        ? `${BACKEND_URL}${user.profileImage}`
+        : avatarDefault
     );
   }, [user]);
+
 
   /* =========================
      CLEAN OBJECT URL

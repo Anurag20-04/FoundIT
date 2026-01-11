@@ -22,7 +22,6 @@ dotenv.config();
 connectDB();
 
 const app = express();
-
 /* =======================
    ENSURE UPLOAD FOLDERS
 ======================= */
@@ -34,6 +33,11 @@ const uploadDirs = [
 uploadDirs.forEach((dir) => {
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 });
+
+/* =======================
+   🔥 STATIC UPLOADS (FIX)
+======================= */
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 /* =======================
    ALLOWED ORIGINS
