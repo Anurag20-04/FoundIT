@@ -40,6 +40,8 @@ uploadDirs.forEach((dir) => {
 ======================= */
 const allowedOrigins = [
   "https://found-it-git-main-anurags-projects-2a89023f.vercel.app",
+  "https://found-it-rho.vercel.app",
+  "https://found-8vvp0abdy-anurags-projects-2a89023f.vercel.app",
   process.env.FRONTEND_URL,
 ].filter(Boolean);
 
@@ -51,18 +53,24 @@ app.use(
     origin: function (origin, callback) {
       if (!origin) return callback(null, true);
 
-      if (allowedOrigins.includes(origin)) {
+      if (
+        allowedOrigins.includes(origin) ||
+        origin.endsWith(".vercel.app")
+      ) {
         return callback(null, true);
-      } else {
-        console.log("❌ Blocked by CORS:", origin);
-        return callback(new Error("Not allowed by CORS"));
       }
+
+      console.log("❌ Blocked by CORS:", origin);
+      return callback(new Error("Not allowed by CORS"));
     },
+    credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true,
   })
 );
+
+// ✅ REQUIRED
+app.options("*", cors());
 
 /* =======================
    BODY PARSERS
@@ -94,12 +102,21 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: allowedOrigins,
-    methods: ["GET", "POST"],
-    credentials: true,
-  },
+    origin: function (origin, callback) {
+      if (!origin) return callback(null, true);
 
-  // ✅ REQUIRED for Render stability
+      if (
+        allowedOrigins.includes(origin) ||
+        origin.endsWith(".vercel.app")
+      ) {
+        return callback(null, true);
+      }
+
+      return callback(new Error("Not allowed by CORS"));
+    },
+    credentials: true,
+    methods: ["GET", "POST"],
+  },
   transports: ["polling", "websocket"],
 });
 
