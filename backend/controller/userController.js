@@ -22,10 +22,16 @@ exports.updateMyProfile = async (req, res) => {
       user.phoneNumber = req.body.phoneNumber === "" ? null : req.body.phoneNumber;
     }
 
-    // 4. Handle Profile Image (Singular)
-    if (req.file && req.file.path) {
-      user.profileImage = req.file.path; 
-    }
+   // 4. Handle Profile Image (Singular)
+console.log("🔥 FILE RECEIVED:", req.file);
+
+if (req.file && req.file.path) {
+  console.log("🔥 FILE PATH:", req.file.path);
+  user.profileImage = req.file.path;
+} else {
+  console.log("❌ NO FILE OR NO PATH");
+}
+
 
     // 5. Save the document
     // This runs your schema validators and password middleware correctly
