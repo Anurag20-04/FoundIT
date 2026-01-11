@@ -188,6 +188,17 @@ io.on("connection", (socket) => {
 
 app.set("io", io);
 
+app.use((err, req, res, next) => {
+  console.error("🔥 SERVER ERROR:");
+  console.error(err.stack || err);
+
+  res.status(500).json({
+    success: false,
+    message: err.message || "Internal Server Error"
+  });
+});
+
+
 server.listen(PORT, () => {
   console.log(`🚀 Server running on ${PORT}`);
 });
