@@ -7,10 +7,6 @@ const storage = new CloudinaryStorage({
   params: {
     folder: "foundit/profiles",
     allowed_formats: ["jpg", "jpeg", "png", "webp"],
-    public_id: (req, file) => {
-      const unique = Date.now() + "-" + Math.round(Math.random() * 1e9);
-      return `profile-${unique}`;
-    },
   },
 });
 
