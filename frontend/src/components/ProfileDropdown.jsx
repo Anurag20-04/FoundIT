@@ -5,6 +5,17 @@ import NotificationPanel from "./NotificationPanel";
 import avatarDefault from "../assets/Portrait_Placeholder.png";
 import "./ProfileDropdown.css";
 
+const BACKEND_URL = import.meta.env.VITE_API_URL || "";
+
+/* =========================
+   IMAGE RESOLVER (FINAL)
+========================= */
+const resolveImage = (img) => {
+  if (!img) return avatarDefault;
+  if (img.startsWith("http")) return img;      // ✅ Cloudinary
+  return `${BACKEND_URL}${img}`;               // ✅ Old local uploads
+};
+
 export default function ProfileDropdown() {
   const { user, logout } = useAuth();
   const [open, setOpen] = useState(false);
@@ -33,13 +44,7 @@ export default function ProfileDropdown() {
       >
         <div className="avatar-wrap">
           <img
-            src={
-              user?.profileImage
-                
-                ?`${import.meta.env.VITE_API_URL}${user.profileImage}`
-
-                : avatarDefault
-            }
+            src={resolveImage(user?.profileImage)}
             alt="Avatar"
             className="profile-avatar"
             onError={(e) => {
@@ -69,16 +74,15 @@ export default function ProfileDropdown() {
             👤 Profile
           </button>
 
-        <button
-  className="profile-item"
-  onClick={() => {
-    setOpen(false);        // close profile menu
-    setShowNotifs(true);  // open notifications
-  }}
->
-  🔔 Notifications
-</button>
-
+          <button
+            className="profile-item"
+            onClick={() => {
+              setOpen(false);
+              setShowNotifs(true);
+            }}
+          >
+            🔔 Notifications
+          </button>
 
           <button
             className="profile-item"
@@ -99,14 +103,13 @@ export default function ProfileDropdown() {
         </div>
       )}
 
-  {/* 🔔 Notification panel */}
-{showNotifs && (
-  <NotificationPanel
-    onCount={setNotifCount}
-    onClose={() => setShowNotifs(false)}
-  />
-)}
-
+      {/* 🔔 Notification panel */}
+      {showNotifs && (
+        <NotificationPanel
+          onCount={setNotifCount}
+          onClose={() => setShowNotifs(false)}
+        />
+      )}
     </div>
   );
 }

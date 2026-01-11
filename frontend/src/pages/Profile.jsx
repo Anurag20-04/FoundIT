@@ -3,7 +3,17 @@ import api from "../utils/axios";
 import { useAuth } from "../context/AuthContext";
 import "./Profile.css";
 import avatarDefault from "../assets/Portrait_Placeholder.png";
+
 const BACKEND_URL = import.meta.env.VITE_API_URL || "";
+
+/* =========================
+   IMAGE RESOLVER (FINAL)
+========================= */
+const resolveImage = (img) => {
+  if (!img) return avatarDefault;
+  if (img.startsWith("http")) return img;      // ✅ Cloudinary
+  return `${BACKEND_URL}${img}`;               // ✅ Old local uploads
+};
 
 export default function Profile() {
   const { user, updateUser } = useAuth();
@@ -24,7 +34,7 @@ export default function Profile() {
   /* =========================
      INIT FORM FROM AUTH
   ========================= */
-   useEffect(() => {
+  useEffect(() => {
     if (!user) return;
 
     setForm({
@@ -33,13 +43,8 @@ export default function Profile() {
       address: user.address || "",
     });
 
-    setProfileImagePreview(
-      user.profileImage
-        ? `${BACKEND_URL}${user.profileImage}`
-        : avatarDefault
-    );
+    setProfileImagePreview(resolveImage(user.profileImage));
   }, [user]);
-
 
   /* =========================
      CLEAN OBJECT URL
@@ -88,18 +93,16 @@ export default function Profile() {
       formData.append("address", form.address || user.address);
 
       if (profileImageFile) {
-  formData.append("profileImage", profileImageFile); // ✅ Matches backend middleware
-}
+        formData.append("profileImage", profileImageFile);
+      }
 
       const res = await api.put("/users/me", formData);
 
       updateUser(res.data.user);
-setProfileImagePreview(
-  res.data.user.profileImage
-    ? `${BACKEND_URL}${res.data.user.profileImage}?t=${Date.now()}`
-    : avatarDefault
-);
 
+      setProfileImagePreview(
+        resolveImage(res.data.user.profileImage) + `?t=${Date.now()}`
+      );
 
       setSuccess(true);
       setProfileImageFile(null);
