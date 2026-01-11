@@ -4,9 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import axios from "axios";
 import "./ItemDetail.css";
 
-
 const API = import.meta.env.VITE_API_URL;
-
 
 export default function ItemDetail() {
   const { id } = useParams();
@@ -137,6 +135,24 @@ export default function ItemDetail() {
   const images = Array.isArray(item.images) ? item.images : [];
 
   /* ===============================
+     IMAGE RESOLVER (FINAL)
+  =============================== */
+  const resolveImage = (img) => {
+    if (!img) return "/no-image.png";
+
+    // Cloudinary or external
+    if (img.startsWith("http")) return img;
+
+    // Old uploads fallback
+    if (img.includes("uploads")) {
+      const cleaned = img.substring(img.indexOf("uploads")).replace(/\\/g, "/");
+      return `${API}/${cleaned}`;
+    }
+
+    return "/no-image.png";
+  };
+
+  /* ===============================
      ACTION STATE MACHINE
   =============================== */
 
@@ -201,7 +217,7 @@ export default function ItemDetail() {
           <div className="main-image-frame">
             {images[activeImage] && (
               <img
-                src={`${API}/${images[activeImage].replace(/\\/g, "/")}`}
+                src={resolveImage(images[activeImage])}
                 alt={item.title}
               />
             )}
@@ -223,10 +239,7 @@ export default function ItemDetail() {
                   }`}
                   onClick={() => setActiveImage(idx)}
                 >
-                  <img
-                    src={`${API}/${img.replace(/\\/g, "/")}`}
-                    alt="thumbnail"
-                  />
+                  <img src={resolveImage(img)} alt="thumbnail" />
                 </button>
               ))}
             </div>
@@ -261,7 +274,6 @@ export default function ItemDetail() {
             </div>
           </div>
 
-          {/* ACTION STATE */}
           {actionUI}
 
           <div className="utility-bar">
