@@ -84,15 +84,7 @@ export default function ProfileDropdown() {
             🔔 Notifications
           </button>
 
-          <button
-            className="profile-item"
-            onClick={() => {
-              navigate("/settings");
-              setOpen(false);
-            }}
-          >
-            ⚙️ Settings
-          </button>
+         
 
           <button
             className="profile-item logout"
