@@ -1,3 +1,5 @@
+const User = require("../models/User");
+
 exports.updateMyProfile = async (req, res) => {
   try {
     // 1. Check Auth
