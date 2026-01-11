@@ -70,7 +70,7 @@ app.use(
 );
 
 // ✅ REQUIRED
-app.options("*", cors());
+app.options("/*", cors());
 
 /* =======================
    BODY PARSERS
