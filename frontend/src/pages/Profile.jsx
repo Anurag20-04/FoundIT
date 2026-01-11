@@ -3,6 +3,7 @@ import api from "../utils/axios";
 import { useAuth } from "../context/AuthContext";
 import "./Profile.css";
 import avatarDefault from "../assets/Portrait_Placeholder.png";
+const BACKEND_URL = import.meta.env.VITE_API_URL || "";
 
 export default function Profile() {
   const { user, updateUser } = useAuth();
