@@ -5,7 +5,6 @@ import { useAuth } from "../context/AuthContext";
 import { getSocket } from "../services/socket";
 import "./ChatRoom.css";
 
-
 const API = import.meta.env.VITE_API_URL;
 
 export default function ChatRoom() {
@@ -21,6 +20,8 @@ export default function ChatRoom() {
 
   const bottomRef = useRef(null);
 
+  const myId = user?._id || user?.id;
+
   /* =========================
      FETCH CHAT
   ========================= */
@@ -35,52 +36,50 @@ export default function ChatRoom() {
     setMessages(res.data.data.messages);
     setLoading(false);
   };
-useEffect(() => {
-  fetchChat();
 
-  axios.patch(
-    `${API}/api/chats/${chatId}/read`,
-    {},
-    {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
-      },
+  useEffect(() => {
+    fetchChat();
+
+    axios.patch(
+      `${API}/api/chats/${chatId}/read`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
+        },
+      }
+    );
+
+    if (socket && myId) {
+      socket.emit("chat:join", { chatId });
+
+      socket.emit("unread:update", {
+        targetUserId: myId,
+      });
     }
-  );
 
-  if (socket) {
-    socket.emit("chat:join", { chatId });
-
-    // 🔔 tell system unread count changed
-    socket.emit("unread:update", {
-      targetUserId: user?.id || user?._id
-    });
-  }
-
-  return () => {
-    if (socket) socket.emit("chat:leave", { chatId });
-  };
-}, [chatId]);
-
+    return () => {
+      if (socket) socket.emit("chat:leave", { chatId });
+    };
+  }, [chatId]);
 
   /* =========================
      REALTIME RECEIVE
   ========================= */
   useEffect(() => {
-    if (!socket) return;
+    if (!socket || !myId) return;
 
     socket.on("message:new", (message) => {
       if (String(message.chat) === String(chatId)) {
-        setMessages(prev => [...prev, message]);
+        setMessages((prev) => [...prev, message]);
       }
     });
 
-   socket.on("typing:start", ({ userId }) => {
-  if (String(userId) !== String(user.id || user._id)) {
-    setTypingUser(userId);
-  }
-});
-
+    socket.on("typing:start", ({ userId }) => {
+      if (String(userId) !== String(myId)) {
+        setTypingUser(userId);
+      }
+    });
 
     socket.on("typing:stop", () => {
       setTypingUser(null);
@@ -91,7 +90,7 @@ useEffect(() => {
       socket.off("typing:start");
       socket.off("typing:stop");
     };
-  }, [chatId]);
+  }, [chatId, myId]);
 
   /* =========================
      AUTO SCROLL
@@ -118,7 +117,7 @@ useEffect(() => {
       }
     );
 
-    setMessages(prev => [...prev, res.data.data]);
+    setMessages((prev) => [...prev, res.data.data]);
     setText("");
 
     if (socket) {
@@ -129,11 +128,22 @@ useEffect(() => {
   if (loading) return <div className="chatroom-shell">Loading…</div>;
   if (!chat || !user) return null;
 
-  const myId = user.id || user._id;
-
   const otherUser = chat.participants.find(
     (p) => String(p._id) !== String(myId)
   );
+
+  /* =========================
+     IMAGE RESOLVER (FINAL)
+  ========================= */
+  const resolveAvatar = (img) => {
+    if (!img) return null;
+    if (img.startsWith("http")) return img; // Cloudinary
+    if (img.includes("uploads")) {
+      const cleaned = img.substring(img.indexOf("uploads")).replace(/\\/g, "/");
+      return `${API}/${cleaned}`;
+    }
+    return null;
+  };
 
   return (
     <div className="chatroom-shell">
@@ -143,9 +153,7 @@ useEffect(() => {
           <div className="chat-avatar">
             {otherUser?.profileImage ? (
               <img
-                
-                src={`${import.meta.env.VITE_API_URL}${otherUser.profileImage}`}
-
+                src={resolveAvatar(otherUser.profileImage)}
                 alt=""
               />
             ) : (
@@ -155,8 +163,7 @@ useEffect(() => {
 
           <div className="chat-user-info">
             <h3>{otherUser?.name || "User"}</h3>
-           <p>{typingUser ? "typing…" : "online"}</p>
-
+            <p>{typingUser ? "typing…" : "online"}</p>
           </div>
         </div>
 
@@ -190,26 +197,21 @@ useEffect(() => {
           );
         })}
 
-        {/* ✅ Typing indicator */}
-      {/* ✅ Typing indicator */}
-{typingUser && (
-  <div className="typing-indicator">
-    <span className="typing-name">
-      {otherUser?.name || "Someone"}
-    </span>
-    <span>is typing</span>
-    <div className="typing-dots">
-      <span></span>
-      <span></span>
-      <span></span>
-    </div>
-  </div>
-)}
+        {typingUser && (
+          <div className="typing-indicator">
+            <span className="typing-name">
+              {otherUser?.name || "Someone"}
+            </span>
+            <span>is typing</span>
+            <div className="typing-dots">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          </div>
+        )}
 
-
-<div ref={bottomRef} />
-
-       
+        <div ref={bottomRef} />
       </div>
 
       {/* ================= INPUT ================= */}
