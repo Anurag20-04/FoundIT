@@ -94,10 +94,12 @@ export default function Profile() {
       const res = await api.put("/users/me", formData);
 
       updateUser(res.data.user);
+setProfileImagePreview(
+  res.data.user.profileImage
+    ? `${BACKEND_URL}${res.data.user.profileImage}?t=${Date.now()}`
+    : avatarDefault
+);
 
-      setProfileImagePreview(
-        res.data.user.profileImage || avatarDefault
-      );
 
       setSuccess(true);
       setProfileImageFile(null);
