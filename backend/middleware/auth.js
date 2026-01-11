@@ -14,6 +14,10 @@ const authMiddleware = async (req, res, next) => {
 
     const token = authHeader.split(" ")[1];
 
+    if (!token) {
+      return res.status(401).json({ message: "No token provided" });
+    }
+
     /* =========================
        2️⃣ VERIFY TOKEN
     ========================= */
@@ -21,17 +25,14 @@ const authMiddleware = async (req, res, next) => {
 
     /* =========================
        3️⃣ EXTRACT USER ID
-       (SUPPORT ALL PAYLOAD TYPES)
     ========================= */
     const userId =
-      decoded.id ||          // preferred
-      decoded.userId ||      // common alternative
-      decoded._id;           // fallback
+      decoded.id ||
+      decoded.userId ||
+      decoded._id;
 
     if (!userId) {
-      return res
-        .status(401)
-        .json({ message: "Invalid token payload" });
+      return res.status(401).json({ message: "Invalid token payload" });
     }
 
     /* =========================
@@ -51,9 +52,7 @@ const authMiddleware = async (req, res, next) => {
 
   } catch (error) {
     console.error("Auth error:", error.message);
-    return res
-      .status(401)
-      .json({ message: "Invalid or expired token" });
+    return res.status(401).json({ message: "Invalid or expired token" });
   }
 };
 

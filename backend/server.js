@@ -7,10 +7,9 @@ const { Server } = require("socket.io");
 const fs = require("fs");
 const path = require("path");
 
-
 const connectDB = require("./config/dbconn.js");
 
-// CHECK YOUR FILE NAMES! Ensure these match exactly (case-sensitive)
+// Routers
 const Loginrouter = require("./router/Loginrouter");
 const Signuprouter = require("./router/Signuprouter");
 const itemRouter = require("./router/itemRouter"); 
@@ -19,13 +18,10 @@ const claimRoutes = require("./router/claimRoutes");
 const userRoutes = require("./router/userRoutes");
 const chatRoutes = require("./router/chatRoutes");
 
-const authMiddleware = require("./middleware/auth");
-
 dotenv.config();
 connectDB();
 
 const app = express();
-
 
 /* =======================
    ENSURE UPLOAD FOLDERS
@@ -44,9 +40,12 @@ uploadDirs.forEach((dir) => {
 ======================= */
 const allowedOrigins = [
   "https://found-it-git-main-anurags-projects-2a89023f.vercel.app",
-  
-];
+  process.env.FRONTEND_URL,
+].filter(Boolean);
 
+/* =======================
+   CORS (API)
+======================= */
 app.use(
   cors({
     origin: function (origin, callback) {
@@ -65,7 +64,6 @@ app.use(
   })
 );
 
-
 /* =======================
    BODY PARSERS
 ======================= */
@@ -80,10 +78,8 @@ app.use("/api/signup", Signuprouter);
 app.use("/api/items", itemRouter);
 app.use("/api/claims", claimRoutes);
 app.use("/api/users", userRoutes);
-
-// AUTH MIDDLEWARE IS HANDLED INSIDE THESE ROUTERS
 app.use("/api/notifications", notificationRoutes); 
-app.use("/api/chats", chatRoutes); // Removed authMiddleware from here to avoid double check
+app.use("/api/chats", chatRoutes);
 
 /* =======================
    HEALTH CHECK
@@ -98,15 +94,14 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: [
-      "https://found-it-git-main-anurags-projects-2a89023f.vercel.app",
-      process.env.FRONTEND_URL
-    ],
+    origin: allowedOrigins,
     methods: ["GET", "POST"],
     credentials: true,
   },
-});
 
+  // ✅ REQUIRED for Render stability
+  transports: ["polling", "websocket"],
+});
 
 const jwt = require("jsonwebtoken");
 
@@ -115,15 +110,22 @@ const jwt = require("jsonwebtoken");
 ============================ */
 io.use((socket, next) => {
   const token = socket.handshake.auth?.token;
-  if (!token) return next(new Error("No token provided")); // Add this check
+
+  if (!token) {
+    return next(new Error("No token provided"));
+  }
+
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    socket.userId = String(decoded.id || decoded.userId || decoded._id);
+    socket.userId = String(
+      decoded.id || decoded.userId || decoded._id
+    );
     next();
   } catch (err) {
-    next(new Error("Auth failed: " + err.message));
+    next(new Error("Auth failed"));
   }
 });
+
 /* ============================
    SOCKET CORE
 ============================ */
@@ -131,27 +133,40 @@ io.on("connection", (socket) => {
   const userId = socket.userId;
   console.log("🟢 User online:", userId);
 
+  socket.on("chat:join", ({ chatId }) => {
+    if (chatId) socket.join(chatId);
+  });
+
+  socket.on("chat:leave", ({ chatId }) => {
+    if (chatId) socket.leave(chatId);
+  });
+
   socket.on("message:send", (message) => {
-    socket.to(message.chat).emit("message:new", message);
+    if (message?.chat) {
+      socket.to(message.chat).emit("message:new", message);
+    }
   });
 
   socket.on("unread:update", ({ targetUserId }) => {
-    io.emit("unread:update", { userId: targetUserId });
+    if (targetUserId) {
+      io.emit("unread:update", { userId: targetUserId });
+    }
   });
 
   socket.on("typing:start", ({ chatId }) => {
-    socket.to(chatId).emit("typing:start", { userId, chatId });
+    if (chatId) {
+      socket.to(chatId).emit("typing:start", { userId, chatId });
+    }
   });
 
   socket.on("typing:stop", ({ chatId }) => {
-    socket.to(chatId).emit("typing:stop", { userId, chatId });
+    if (chatId) {
+      socket.to(chatId).emit("typing:stop", { userId, chatId });
+    }
   });
 
-  socket.on("chat:join", ({ chatId }) => socket.join(chatId));
-  socket.on("chat:leave", ({ chatId }) => socket.leave(chatId));
-
-  socket.on("disconnect", () => {
-    console.log("🔴 User offline:", userId);
+  socket.on("disconnect", (reason) => {
+    console.log("🔴 User offline:", userId, "|", reason);
   });
 });
 

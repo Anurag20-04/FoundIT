@@ -39,11 +39,12 @@ const addItem = async (req, res) => {
 
     const normalizedType = itemType.toLowerCase();
 
-    // ✅ STORE RELATIVE PATHS ONLY (REQUIRED FOR STATIC SERVING)
+    /* =========================
+       IMAGES (Cloudinary URLs)
+    ========================= */
     let images = [];
-    if (req.files && req.files.length > 0) {
-     images = req.files.map(file => file.path);
-
+    if (req.files && Array.isArray(req.files)) {
+      images = req.files.map((file) => file.path);
     }
 
     const safeReward =
@@ -67,6 +68,9 @@ const addItem = async (req, res) => {
 
     const savedItem = await newItem.save();
 
+    /* =========================
+       MATCHING LOGIC
+    ========================= */
     const oppositeType = normalizedType === "found" ? "lost" : "found";
 
     const potentialMatches = await Item.find({
@@ -187,9 +191,6 @@ const deleteItem = async (req, res) => {
   }
 };
 
-/* =========================================================
-   EXPORTS
-========================================================= */
 module.exports = {
   addItem,
   getAllItems,

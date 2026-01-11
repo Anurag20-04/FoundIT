@@ -17,11 +17,18 @@ const {
    CREATE ITEM (Lost / Found) — WITH IMAGES
    Expects FormData with key: "images"
 ========================================================= */
-router.post(
-  "/report",
-  upload.array("images", 5), // accepts up to 5 images
-  addItem
-);
+router.post("/report", (req, res, next) => {
+  upload.array("images", 5)(req, res, function (err) {
+    if (err) {
+      console.error("❌ Item upload error:", err);
+      return res.status(400).json({
+        success: false,
+        error: err.message || "Item image upload failed",
+      });
+    }
+    next();
+  });
+}, addItem);
 
 /* =========================================================
    READ
