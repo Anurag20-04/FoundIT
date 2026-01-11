@@ -1,26 +1,18 @@
 const multer = require("multer");
-const path = require("path");
-const fs = require("fs");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const cloudinary = require("./cloudinary"); // Importing your config
 
-// Ensure uploads folder exists
-const uploadDir = path.join(__dirname, "..", "uploads");
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
-
-// Storage config
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, uploadDir);
-  },
-  filename: (req, file, cb) => {
-    const uniqueName =
-      Date.now() + "-" + Math.round(Math.random() * 1e9);
-    cb(null, uniqueName + path.extname(file.originalname));
+// Configure Cloudinary Storage
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary, 
+  params: {
+    folder: "foundit-uploads", // This is the folder name in your Cloudinary dashboard
+    allowed_formats: ["jpg", "png", "jpeg"],
+    transformation: [{ width: 800, height: 800, crop: "limit" }], // Optional: resizes large images
   },
 });
 
-// File filter (images only)
+// File filter to ensure only images are uploaded
 const fileFilter = (req, file, cb) => {
   if (file.mimetype.startsWith("image/")) {
     cb(null, true);
@@ -29,11 +21,11 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-// Multer instance
+// Create the Multer instance
 const upload = multer({
-  storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB per image
-  fileFilter,
+  storage: storage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+  fileFilter: fileFilter,
 });
 
 module.exports = upload;
