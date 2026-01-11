@@ -22,14 +22,14 @@ export default function NotificationPanel({ onCount, onClose }) {
         },
       });
 
-      const data = res.data?.data || [];
+      const data = Array.isArray(res.data?.data) ? res.data.data : [];
       setNotifications(data);
 
-      const unread = data.filter(n => !n.isRead).length;
+      const unread = data.filter(n => !n?.isRead).length;
       onCount?.(unread);
 
     } catch (err) {
-      console.error("Notification fetch failed:", err);
+      console.error("Fetch notifications error:", err.response?.data || err.message);
     } finally {
       setLoading(false);
     }
@@ -43,6 +43,7 @@ export default function NotificationPanel({ onCount, onClose }) {
      MARK AS READ
   ========================= */
   const markAsRead = async (id) => {
+    if (!id) return;
     try {
       await axios.patch(
         `${API}/api/notifications/${id}/read`,
@@ -54,14 +55,16 @@ export default function NotificationPanel({ onCount, onClose }) {
         }
       );
     } catch (err) {
-      console.error("Mark read failed:", err);
+      console.error("Mark read failed:", err.response?.data || err.message);
     }
   };
 
   /* =========================
-     CLAIM ACTIONS (APPROVE / REJECT)
+     CLAIM ACTIONS
   ========================= */
   const handleClaimAction = async (notif, action) => {
+    if (!notif?._id) return;
+
     try {
       const res = await axios.patch(
         `${API}/api/notifications/${notif._id}/${action}`,
@@ -75,32 +78,35 @@ export default function NotificationPanel({ onCount, onClose }) {
 
       await fetchNotifications();
 
-      // ✅ APPROVED → open chat
       if (action === "accept" && res.data?.chatId) {
         navigate(`/chat/${res.data.chatId}`);
         onClose?.();
       }
 
     } catch (err) {
-  console.error("Claim action failed:", err.response?.data || err.message);
-}
-
+      console.error("Claim action failed:", err.response?.data || err.message);
+    }
   };
 
   /* =========================
-     NORMAL CLICK BEHAVIOR
+     NORMAL CLICK
   ========================= */
   const handleClick = async (notif) => {
+    if (!notif?._id) return;
+
     await markAsRead(notif._id);
     fetchNotifications();
 
-    if (notif.type === "claim-approved" && notif.claim?.chat) {
-      navigate(`/chat/${notif.claim.chat}`);
+    const chatId = notif?.claim?.chat;
+    const itemId = notif?.item?._id || notif?.item?.id;
+
+    if (notif.type === "claim-approved" && chatId) {
+      navigate(`/chat/${chatId}`);
       onClose?.();
     }
 
-    if (notif.type === "claim-rejected" && notif.item?._id) {
-      navigate(`/item/${notif.item._id}`);
+    if (notif.type === "claim-rejected" && itemId) {
+      navigate(`/item/${itemId}`);
       onClose?.();
     }
   };
@@ -119,19 +125,18 @@ export default function NotificationPanel({ onCount, onClose }) {
       ) : (
         notifications.map((n) => (
           <div
-            key={n._id}
-            className={`notif-item ${n.isRead ? "read" : "unread"}`}
+            key={n?._id || Math.random()}
+            className={`notif-item ${n?.isRead ? "read" : "unread"}`}
             onClick={() => handleClick(n)}
           >
             <div className="notif-main">
-              <p className="notif-message">{n.message}</p>
+              <p className="notif-message">{n?.message || "New notification"}</p>
               <span className="notif-time">
-                {new Date(n.createdAt).toLocaleString()}
+                {n?.createdAt ? new Date(n.createdAt).toLocaleString() : ""}
               </span>
             </div>
 
-            {/* 🔥 CLAIM ACTION ZONE */}
-            {n.type === "claim" && (
+            {n?.type === "claim" && (
               <div
                 className="notif-actions"
                 onClick={(e) => e.stopPropagation()}

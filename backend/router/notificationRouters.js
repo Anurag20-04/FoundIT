@@ -9,7 +9,9 @@ const Chat = require("../models/Chat");
 ====================================================== */
 router.get("/my", async (req, res) => {
   try {
-    const notifs = await Notification.find({ user: req.user.id })
+    const userId = req.user?._id || req.user?.id;
+
+    const notifs = await Notification.find({ user: userId })
       .populate({
         path: "claim",
         populate: { path: "item claimant owner chat" },
@@ -33,8 +35,10 @@ router.get("/my", async (req, res) => {
 ====================================================== */
 router.patch("/:id/read", async (req, res) => {
   try {
+    const userId = req.user?._id || req.user?.id;
+
     await Notification.updateOne(
-      { _id: req.params.id, user: req.user.id },
+      { _id: req.params.id, user: userId },
       { isRead: true }
     );
 
@@ -51,9 +55,11 @@ router.patch("/:id/read", async (req, res) => {
 ====================================================== */
 router.patch("/:id/accept", async (req, res) => {
   try {
+    const userId = req.user?._id || req.user?.id;
+
     const notif = await Notification.findOne({
       _id: req.params.id,
-      user: req.user.id,
+      user: userId,
       type: "claim",
     }).populate("claim");
 
@@ -73,7 +79,7 @@ router.patch("/:id/accept", async (req, res) => {
       });
     }
 
-    if (String(claim.owner) !== req.user.id) {
+    if (String(claim.owner) !== String(userId)) {
       return res.status(403).json({
         success: false,
         message: "Not authorized",
@@ -139,9 +145,11 @@ router.patch("/:id/accept", async (req, res) => {
 ====================================================== */
 router.patch("/:id/reject", async (req, res) => {
   try {
+    const userId = req.user?._id || req.user?.id;
+
     const notif = await Notification.findOne({
       _id: req.params.id,
-      user: req.user.id,
+      user: userId,
       type: "claim",
     }).populate("claim");
 
@@ -158,7 +166,7 @@ router.patch("/:id/reject", async (req, res) => {
       return res.status(404).json({ success: false });
     }
 
-    if (String(claim.owner) !== req.user.id) {
+    if (String(claim.owner) !== String(userId)) {
       return res.status(403).json({ success: false });
     }
 
