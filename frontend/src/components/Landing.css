@@ -183,62 +183,383 @@
 }
 
 /* ===============================
-   FEATURES (SEAMLESS HANDOFF)
+   FEATURES — SUPER PREMIUM ZONE
 ================================ */
+
 .features {
   position: relative;
   z-index: 10;
-  max-width: 1100px;
+  max-width: 1120px;
   margin: 0 auto;
 
   margin-top: -120px;
   padding-top: 150px;
-  padding-bottom: 100px;
+  padding-bottom: 110px;
+
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 26px;
 
   background: linear-gradient(
     to bottom,
     transparent,
-    var(--bg-main) 20%
+    var(--bg-main) 22%
   );
 
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
+  isolation: isolate;
 }
+
+/* ===============================
+   CINEMATIC LIGHT FIELD
+================================ */
+
+.features::before {
+  content: "";
+  position: absolute;
+  inset: -30% -15% auto -15%;
+  height: 480px;
+
+  background:
+    radial-gradient(circle at 50% 20%, rgba(56,189,248,0.22), transparent 60%),
+    radial-gradient(circle at 15% 30%, rgba(37,99,235,0.18), transparent 55%),
+    radial-gradient(circle at 85% 25%, rgba(99,102,241,0.14), transparent 55%);
+
+  filter: blur(70px);
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* ===============================
+   FEATURE CARD — LUXURY SURFACE
+================================ */
 
 .feature-card {
   position: relative;
-  z-index: 20;
+  z-index: 2;
 
-  padding: 40px 32px;
-  border-radius: 28px;
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
-  backdrop-filter: blur(20px);
-  transition: transform 0.3s ease;
+  padding: 44px 36px;
+  border-radius: 30px;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255,255,255,0.08),
+      rgba(255,255,255,0.02)
+    ),
+    var(--card-bg);
+
+  border: 1px solid rgba(148,163,184,0.18);
+  backdrop-filter: blur(22px);
+
+  box-shadow:
+    0 30px 90px rgba(0,0,0,0.45),
+    inset 0 0 0 1px rgba(255,255,255,0.05),
+    inset 0 -1px 0 rgba(255,255,255,0.08);
+
+  transition:
+    transform 0.45s cubic-bezier(.2,.8,.2,1),
+    box-shadow 0.45s cubic-bezier(.2,.8,.2,1),
+    border-color 0.3s ease;
 }
+
+/* ===============================
+   GLOW EDGE SYSTEM
+================================ */
+
+.feature-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+
+  background:
+    linear-gradient(120deg,
+      rgba(56,189,248,0.55),
+      rgba(37,99,235,0.35),
+      transparent 65%);
+
+  opacity: 0;
+  transition: opacity 0.45s ease;
+  pointer-events: none;
+}
+
+.feature-card::after {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  border-radius: inherit;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255,255,255,0.12),
+      rgba(255,255,255,0.02)
+    );
+
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* ===============================
+   HOVER PHYSICS
+================================ */
 
 .feature-card:hover {
-  transform: translateY(-10px);
+  transform: translateY(-16px) scale(1.02);
+  border-color: rgba(56,189,248,0.45);
+
+  box-shadow:
+    0 60px 150px rgba(0,0,0,0.65),
+    0 0 70px rgba(56,189,248,0.35),
+    inset 0 0 0 1px rgba(56,189,248,0.35);
 }
+
+.feature-card:hover::before {
+  opacity: 1;
+}
+
+/* ===============================
+   TEXT & CONTENT BEAUTIFICATION
+================================ */
+
+.feature-card h3 {
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  margin-bottom: 12px;
+
+  background: linear-gradient(90deg, #38bdf8, #818cf8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.feature-card p {
+  font-size: 0.95rem;
+  line-height: 1.65;
+  opacity: 0.78;
+  color: var(--text-muted);
+}
+
+/* Optional icon style if you use icons */
+.feature-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 18px;
+
+  background: linear-gradient(135deg, #38bdf8, #2563eb);
+  box-shadow:
+    0 10px 30px rgba(37,99,235,0.5),
+    inset 0 0 0 1px rgba(255,255,255,0.35);
+
+  font-size: 20px;
+  color: white;
+
+  transition: transform 0.4s ease;
+}
+
+/* ===============================
+   MICRO INTERACTIONS
+================================ */
+
+.feature-card * {
+  transition: transform 0.35s ease, opacity 0.35s ease;
+}
+
+.feature-card:hover h3 {
+  transform: translateY(-2px);
+}
+
+.feature-card:hover p {
+  opacity: 0.92;
+}
+
+.feature-card:hover .feature-icon {
+  transform: scale(1.12) rotate(-3deg);
+}
+
+/* ===============================
+   RESPONSIVE SYSTEM
+================================ */
+
+/* Tablets */
+@media (max-width: 1024px) {
+  .features {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 22px;
+    padding-bottom: 90px;
+  }
+}
+
+/* Phones */
+@media (max-width: 640px) {
+  .features {
+    grid-template-columns: 1fr;
+    gap: 18px;
+    margin-top: -90px;
+    padding-top: 130px;
+    padding-bottom: 70px;
+  }
+
+  .feature-card {
+    padding: 30px 22px;
+    border-radius: 24px;
+  }
+
+  .feature-card h3 {
+    font-size: 1.2rem;
+  }
+
+  .feature-card p {
+    font-size: 0.9rem;
+  }
+}
+
+/* Ultra small phones */
+@media (max-width: 360px) {
+  .feature-card {
+    padding: 24px 18px;
+  }
+}
+
+/* ===============================
+   MOTION SAFETY
+================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .feature-card,
+  .feature-card::before {
+    transition: none !important;
+  }
+
+  .feature-card:hover {
+    transform: none;
+  }
+}
+/* =========================================
+   LIGHT MODE — FEATURES (GLOBAL THEME FIX)
+========================================= */
+
+.landing.light .features::before {
+  background:
+    radial-gradient(circle at 50% 10%, rgba(37,99,235,0.10), transparent 55%),
+    radial-gradient(circle at 10% 20%, rgba(56,189,248,0.08), transparent 55%),
+    radial-gradient(circle at 90% 20%, rgba(99,102,241,0.06), transparent 55%);
+  filter: blur(80px);
+}
+
+/* ===============================
+   LIGHT CARD SURFACE
+================================ */
+
+.landing.light .feature-card {
+  background:
+    linear-gradient(180deg, #ffffff, #f8fafc);
+
+  border: 1px solid rgba(15,23,42,0.08);
+  backdrop-filter: none;
+
+  box-shadow:
+    0 10px 28px rgba(15,23,42,0.08),
+    0 1px 0 rgba(15,23,42,0.04),
+    inset 0 0 0 1px rgba(255,255,255,0.9);
+}
+
+/* ===============================
+   REMOVE DARK GLASS FEEL
+================================ */
+
+.landing.light .feature-card::before {
+  background:
+    linear-gradient(120deg,
+      rgba(37,99,235,0.22),
+      rgba(56,189,248,0.16),
+      transparent 65%);
+}
+
+.landing.light .feature-card::after {
+  background:
+    linear-gradient(180deg,
+      rgba(255,255,255,0.95),
+      rgba(255,255,255,0.45));
+  opacity: 0.85;
+}
+
+/* ===============================
+   LIGHT HOVER PHYSICS
+================================ */
+
+.landing.light .feature-card:hover {
+  transform: translateY(-10px) scale(1.015);
+  border-color: rgba(37,99,235,0.25);
+
+  box-shadow:
+    0 22px 55px rgba(15,23,42,0.14),
+    0 12px 26px rgba(37,99,235,0.12),
+    inset 0 0 0 1px rgba(37,99,235,0.12);
+}
+
+.landing.light .feature-card:hover::before {
+  opacity: 0.55;
+}
+
+/* ===============================
+   LIGHT TEXT SYSTEM
+================================ */
+
+.landing.light .feature-card h3 {
+  background: linear-gradient(90deg, #0e033c, #1d065a);
+  -webkit-background-clip: text;
+  background-clip: text;
+    -webkit-text-fill-color: #0e033c;
+}
+
+.landing.light .feature-card p {
+  color: #1f2937;
+  opacity: 0.88;
+}
+
+/* ===============================
+   LIGHT ICON SYSTEM
+================================ */
+
+.landing.light .feature-icon {
+  background: linear-gradient(135deg, #2563eb, #38bdf8);
+  box-shadow:
+    0 10px 24px rgba(37,99,235,0.32),
+    inset 0 0 0 1px rgba(255,255,255,0.85);
+}
+
 
 /* ===============================
    MOBILE
 ================================ */
 @media (max-width: 768px) {
-  .features {
-    grid-template-columns: 1fr;
-    padding-bottom: 60px;
-    margin-top: -80px;
-    padding-top: 120px;
+
+  /* Kill all forced viewport heights */
+  section,
+  main,
+  .landing,
+  .landing-page,
+  .page-wrapper,
+  .hero,
+  .hero-wrapper {
+    min-height: auto !important;
+    height: auto !important;
+  }
+
+  /* Neutralize flex-centering that creates empty space */
+  .hero,
+  .hero-wrapper {
+    align-items: flex-start !important;
+    justify-content: flex-start !important;
   }
 
   .hero-wrapper {
-    min-height: 80vh;
-  }
-
-  .orb-container {
-    width: 95vw;
-    height: 95vw;
+    padding-top: 110px !important;
+    padding-bottom: 40px !important;
   }
 }
+

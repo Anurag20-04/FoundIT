@@ -4,8 +4,9 @@
 
 .footer {
   width: 100%;
-  padding: 28px 24px;
-  border-top: 1px solid rgba(148, 163, 184, 0.2);
+  padding: 48px 24px 36px;
+  border-top: 1px solid rgba(148, 163, 184, 0.15);
+  backdrop-filter: blur(6px);
 }
 
 .footer-container {
@@ -14,49 +15,123 @@
 
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  gap: 20px;
+  align-items: flex-start;
+  gap: 32px;
   flex-wrap: wrap;
 }
 
-/* Left */
-.footer-left p {
-  font-size: 0.9rem;
+/* ================= LEFT ================= */
+
+.footer-left {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 420px;
+}
+
+.footer-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+
+.footer-dot {
+  opacity: 0.4;
+}
+
+.footer-tagline {
+  font-weight: 500;
   opacity: 0.75;
 }
 
-/* Right */
+.footer-desc {
+  font-size: 0.92rem;
+  line-height: 1.55;
+  opacity: 0.75;
+}
+
+.footer-copy {
+  font-size: 0.78rem;
+  opacity: 0.55;
+  margin-top: 6px;
+}
+
+/* ================= RIGHT ================= */
+
 .footer-right {
   display: flex;
-  gap: 18px;
+  align-items: flex-start;
 }
 
-.footer-right a {
+.footer-links {
+  display: flex;
+  gap: 22px;
+  flex-wrap: wrap;
+}
+
+.footer-links a {
   text-decoration: none;
   font-size: 0.9rem;
+  font-weight: 500;
   opacity: 0.75;
   color: inherit;
+  position: relative;
+  transition: opacity 0.25s ease;
 }
 
-.footer-right a:hover {
+.footer-links a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  width: 0%;
+  height: 2px;
+  background: currentColor;
+  opacity: 0.6;
+  transition: width 0.25s ease;
+}
+
+.footer-links a:hover {
   opacity: 1;
 }
 
-/* Theme awareness */
+.footer-links a:hover::after {
+  width: 100%;
+}
+
+/* ================= THEMES ================= */
+
 .app.light .footer {
-  background: #ffffff;
+  background: linear-gradient(
+    to bottom,
+    #ffffff,
+    #f8fafc
+  );
   color: #0f172a;
 }
 
 .app.dark .footer {
-  background: #020617;
+  background: linear-gradient(
+    to bottom,
+    #020617,
+    #020617,
+    #020617
+  );
   color: #e5e7eb;
 }
 
-/* Mobile */
-@media (max-width: 600px) {
+/* ================= MOBILE ================= */
+
+@media (max-width: 700px) {
   .footer-container {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .footer-links {
+    margin-top: 8px;
   }
 }

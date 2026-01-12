@@ -144,7 +144,7 @@ useEffect(() => {
 
        
 
-        <div className="mobile-auth">
+        {/* <div className="mobile-auth">
           {user ? (
             <button className="btn outline full" onClick={logout}>
               Logout
@@ -157,10 +157,10 @@ useEffect(() => {
               <button className="btn filled full" onClick={handleLogin}>
                 Log in
               </button>
-            </>
-          )}
+            </> */}
+          {/* )} */}
         </div>
-      </div>
+      {/* </div> */}
     </nav>
   );
 }
