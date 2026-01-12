@@ -90,6 +90,7 @@
   height: 100%;
   object-fit: cover;
   display: block;
+  border-radius: 50%;
 }
 
 .thread-avatar-fallback {
