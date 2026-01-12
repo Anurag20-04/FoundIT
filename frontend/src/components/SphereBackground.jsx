@@ -80,7 +80,7 @@ export default function SphereBackground() {
     }
   },
   {
-    maxWidth: 480,
+    maxWidth: 400,
     options: {
       particles: {
         number: { value: 0 }
