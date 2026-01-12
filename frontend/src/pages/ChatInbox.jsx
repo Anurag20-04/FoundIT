@@ -3,11 +3,15 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./ChatInbox.css";
 import { getSocket } from "../services/socket";
+import { useAuth } from "../context/AuthContext";
 
 const BACKEND_URL = import.meta.env.VITE_API_URL;
 
 export default function ChatInbox({ theme }) {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const myId = user?._id || user?.id;
+
   const [threads, setThreads] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -52,12 +56,19 @@ export default function ChatInbox({ theme }) {
   ========================= */
   useEffect(() => {
     const socket = getSocket();
-    if (!socket) return;
+    if (!socket || !myId) return;
 
-    const handleNewMessage = ({ chatId, message }) => {
+    const handleInboxUpdate = ({ chatId, message }) => {
+      const senderId =
+        typeof message.sender === "object"
+          ? message.sender._id
+          : message.sender;
+
+      // ✅ ignore messages sent by me
+      if (String(senderId) === String(myId)) return;
+
       setThreads((prev) => {
         let updated = [...prev];
-
         const index = updated.findIndex((c) => c._id === chatId);
 
         if (index !== -1) {
@@ -66,19 +77,17 @@ export default function ChatInbox({ theme }) {
           const newChat = {
             ...chat,
             lastMessage: message,
-            unreadCount: chat.unreadCount + 1,
+            unreadCount: (chat.unreadCount || 0) + 1,
           };
 
           updated.splice(index, 1);
-          return [newChat, ...updated]; // move to top
+          return [newChat, ...updated];
         }
 
-        // brand new chat (edge case)
         return [
           {
             _id: chatId,
             lastMessage: message,
-            participants: [message.sender],
             unreadCount: 1,
           },
           ...updated,
@@ -86,13 +95,12 @@ export default function ChatInbox({ theme }) {
       });
     };
 
-    // ✅ listen to inbox event (NOT room event)
-    socket.on("inbox:update", handleNewMessage);
+    socket.on("inbox:update", handleInboxUpdate);
 
     return () => {
-      socket.off("inbox:update", handleNewMessage);
+      socket.off("inbox:update", handleInboxUpdate);
     };
-  }, []);
+  }, [myId]);
 
   if (loading) {
     return (
@@ -174,12 +182,8 @@ export default function ChatInbox({ theme }) {
 
                 <div className="thread-info">
                   <h4>{chat.otherUser?.name || "User"}</h4>
-
                   <p className="last-msg">
-                    {chat.lastMessage?.text ||
-                      (chat.lastMessage?.image && "📷 Photo") ||
-                      (chat.lastMessage?.file && "📎 Attachment") ||
-                      "Conversation started"}
+                    {chat.lastMessage?.text || "Conversation started"}
                   </p>
                 </div>
 
