@@ -7,12 +7,20 @@ import avatarDefault from "../assets/Portrait_Placeholder.png";
 const BACKEND_URL = import.meta.env.VITE_API_URL || "";
 
 /* =========================
-   IMAGE RESOLVER (FINAL)
+   IMAGE RESOLVER
 ========================= */
 const resolveImage = (img) => {
   if (!img) return avatarDefault;
-  if (img.startsWith("http")) return img;      // ✅ Cloudinary
-  return `${BACKEND_URL}${img}`;               // ✅ Old local uploads
+  if (img.startsWith("http")) return img;
+  return `${BACKEND_URL}${img}`;
+};
+
+/* =========================
+   PHONE VALIDATION (INDIA)
+========================= */
+const isValidIndianPhone = (phone) => {
+  if (!phone) return true; // optional
+  return /^[6-9]\d{9}$/.test(phone);
 };
 
 export default function Profile() {
@@ -32,7 +40,13 @@ export default function Profile() {
   const [error, setError] = useState(null);
 
   /* =========================
-     INIT FORM FROM AUTH
+     REPORTED ITEMS
+  ========================= */
+  const [myItems, setMyItems] = useState([]);
+  const [itemsLoading, setItemsLoading] = useState(true);
+
+  /* =========================
+     INIT FROM AUTH
   ========================= */
   useEffect(() => {
     if (!user) return;
@@ -57,13 +71,40 @@ export default function Profile() {
     };
   }, [profileImagePreview]);
 
+  /* =========================
+     FETCH MY ITEMS
+  ========================= */
+  useEffect(() => {
+    if (!user) return;
+
+    const fetchMyItems = async () => {
+      try {
+        const res = await api.get("/items/my");
+        setMyItems(res.data.data || []);
+      } catch (err) {
+        console.error("Fetch my items failed", err);
+      } finally {
+        setItemsLoading(false);
+      }
+    };
+
+    fetchMyItems();
+  }, [user]);
+
   if (!user) return null;
 
   /* =========================
      HANDLERS
   ========================= */
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+
+    if (name === "phoneNumber") {
+      if (!/^\d*$/.test(value)) return; // only numbers
+      if (value.length > 10) return;   // hard limit
+    }
+
+    setForm({ ...form, [name]: value });
     setSuccess(false);
     setError(null);
   };
@@ -87,10 +128,15 @@ export default function Profile() {
       setSuccess(false);
       setError(null);
 
+      if (!isValidIndianPhone(form.phoneNumber)) {
+        setSaving(false);
+        return setError("Enter a valid 10-digit Indian mobile number");
+      }
+
       const formData = new FormData();
-      formData.append("name", form.name || user.name);
-      formData.append("phoneNumber", form.phoneNumber || user.phoneNumber);
-      formData.append("address", form.address || user.address);
+      formData.append("name", form.name);
+      formData.append("phoneNumber", form.phoneNumber || "");
+      formData.append("address", form.address || "");
 
       if (profileImageFile) {
         formData.append("profileImage", profileImageFile);
@@ -118,11 +164,30 @@ export default function Profile() {
     }
   };
 
+  /* =========================
+     DELETE ITEM
+  ========================= */
+  const handleDeleteItem = async (id) => {
+    if (!window.confirm("Mark this item as resolved and remove it?")) return;
+
+    try {
+      await api.delete(`/items/${id}`);
+      setMyItems(prev => prev.filter(i => i._id !== id));
+    } catch (err) {
+      console.error("Delete item failed", err);
+      alert("Unable to remove item");
+    }
+  };
+
+  /* =========================
+     UI
+  ========================= */
   return (
     <div className="profile-page">
       <div className="profile-card">
         <h1>Your Profile</h1>
 
+        {/* ---------- AVATAR ---------- */}
         <div className="avatar-section">
           <img
             src={profileImagePreview || avatarDefault}
@@ -141,6 +206,7 @@ export default function Profile() {
           </label>
         </div>
 
+        {/* ---------- FORM ---------- */}
         <div className="profile-grid">
           <div className="profile-field">
             <label>Name</label>
@@ -151,6 +217,7 @@ export default function Profile() {
             <label>Phone Number</label>
             <input
               name="phoneNumber"
+              placeholder="10-digit mobile number"
               value={form.phoneNumber}
               onChange={handleChange}
             />
@@ -171,6 +238,7 @@ export default function Profile() {
             Profile updated successfully
           </p>
         )}
+
         {error && (
           <p className="profile-status error">{error}</p>
         )}
@@ -182,6 +250,39 @@ export default function Profile() {
         >
           {saving ? "Saving..." : "Save Changes"}
         </button>
+
+        {/* ---------- MY ITEMS ---------- */}
+        <div className="profile-items-section">
+          <h2>My Reported Items</h2>
+
+          {itemsLoading ? (
+            <p className="muted">Loading your items…</p>
+          ) : myItems.length === 0 ? (
+            <p className="muted">You have not reported any items yet.</p>
+          ) : (
+            <div className="my-items-grid">
+              {myItems.map(item => (
+                <div key={item._id} className="my-item-card">
+                  <img
+                    src={resolveImage(item.images?.[0])}
+                    alt=""
+                  />
+                  <div className="my-item-info">
+                    <h4>{item.title}</h4>
+                    <p>{item.itemType} · {item.category}</p>
+                    <button
+                      className="remove-item-btn"
+                      onClick={() => handleDeleteItem(item._id)}
+                    >
+                      Mark as resolved
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
       </div>
     </div>
   );
