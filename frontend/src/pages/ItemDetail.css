@@ -170,64 +170,96 @@
 }
 
 /* =========================================================
-   🔥 PREMIUM THUMBNAIL UPGRADE — NO CROPPING
+   🎞 PREMIUM THUMBNAIL RAIL — 5 IMAGE SAFE
+========================================================= */
+
+.thumbnail-strip {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;                 /* ✅ horizontal scroll */
+  overflow-y: hidden;
+  padding: 6px 4px 14px;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* hide scrollbar but keep scroll */
+.thumbnail-strip::-webkit-scrollbar {
+  height: 0;
+}
+.thumbnail-strip {
+  scrollbar-width: none;
+}
+
+
+/* =========================================================
+   PREMIUM THUMB CARD
 ========================================================= */
 
 .thumb-btn {
-  all: unset;
+  flex: 0 0 auto;                   /* ✅ never shrink */
   width: 96px;
   height: 64px;
   border-radius: 14px;
   overflow: hidden;
   border: 1px solid var(--glass-border);
   cursor: pointer;
-  opacity: 0.65;
+  opacity: 0.6;
   background: linear-gradient(
     135deg,
-    rgba(255,255,255,0.04),
-    rgba(0,0,0,0.2)
+    rgba(255,255,255,0.05),
+    rgba(0,0,0,0.25)
   );
   backdrop-filter: blur(8px);
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.04);
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,0.04),
+    0 6px 16px rgba(0,0,0,0.35);
   transition: all 0.35s ease;
   display: grid;
   place-items: center;
 }
 
-/* image inside thumbnail */
+
+/* =========================================================
+   IMAGE INSIDE THUMB (NO CROP)
+========================================================= */
+
 .thumb-btn img {
   width: 100%;
   height: 100%;
-  object-fit: contain;              /* ✅ FIX: no crop */
+  object-fit: contain;              /* ✅ FULL image always */
   object-position: center;
-  padding: 6px;                     /* premium spacing */
-  background: var(--inner-card-bg); /* clean frame */
+  padding: 6px;
+  background: var(--inner-card-bg);
   border-radius: 12px;
   transition: transform 0.45s ease, opacity 0.3s ease;
 }
 
-/* hover */
+
+/* =========================================================
+   HOVER + ACTIVE
+========================================================= */
+
 .thumb-btn:hover {
   opacity: 0.9;
   transform: translateY(-2px) scale(1.03);
   box-shadow:
-    0 10px 24px rgba(0,0,0,0.35),
-    0 0 18px rgba(99,102,241,0.25);
+    0 10px 24px rgba(0,0,0,0.45),
+    0 0 20px rgba(99,102,241,0.25);
 }
 
-.thumb-btn:hover img {
-  transform: scale(1.05);
-}
-
-/* active */
 .thumb-btn.active {
   opacity: 1;
   border-color: var(--accent-primary);
   transform: translateY(-4px) scale(1.05);
   box-shadow:
-    0 14px 34px rgba(0,0,0,0.45),
-    0 0 28px rgba(99,102,241,0.35),
-    inset 0 0 0 1px rgba(99,102,241,0.45);
+    0 14px 36px rgba(0,0,0,0.55),
+    0 0 28px rgba(99,102,241,0.45),
+    inset 0 0 0 1px rgba(99,102,241,0.5);
+}
+
+.thumb-btn:hover img {
+  transform: scale(1.05);
 }
 
 /* =========================================================
