@@ -69,11 +69,11 @@ export default function ChatRoom() {
   useEffect(() => {
     if (!socket || !myId) return;
 
-    socket.on("message:new", (message) => {
-      if (String(message.chat) === String(chatId)) {
-        setMessages((prev) => [...prev, message]);
-      }
-    });
+    socket.on("message:new", ({ chatId: incomingChatId, message }) => {
+  if (String(incomingChatId) === String(chatId)) {
+    setMessages(prev => [...prev, message]);
+  }
+});
 
     socket.on("typing:start", ({ userId }) => {
       if (String(userId) !== String(myId)) {

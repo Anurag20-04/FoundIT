@@ -52,7 +52,6 @@ router.get("/my", auth, async (req, res) => {
 });
 
 
-
 /* =========================
    GET CHAT + MESSAGES
    GET /api/chats/:id
@@ -119,7 +118,14 @@ router.post("/:id/message", auth, async (req, res) => {
     // 🔥 SOCKET PUSH
     const io = req.app.get("io");
 
+    // 1️⃣ Chat room (ChatRoom realtime)
     io.to(chat._id.toString()).emit("message:new", {
+      chatId: chat._id,
+      message
+    });
+
+    // 2️⃣ Inbox (ChatInbox realtime)
+    io.emit("inbox:update", {
       chatId: chat._id,
       message
     });
@@ -131,7 +137,6 @@ router.post("/:id/message", auth, async (req, res) => {
     res.status(500).json({ success: false });
   }
 });
-
 
 
 /* =========================
