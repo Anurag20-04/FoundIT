@@ -1,15 +1,28 @@
-const { Resend } = require("resend");
+const nodemailer = require("nodemailer");
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const transporter = nodemailer.createTransport({
+  host: process.env.SMTP_HOST,
+  port: Number(process.env.SMTP_PORT),
+  secure: false,
+  auth: {
+    user: process.env.SMTP_EMAIL,
+    pass: process.env.SMTP_PASSWORD,
+  },
+});
 
 module.exports = async function sendMail({ to, subject, html }) {
-  console.log("RESEND KEY PRESENT:", !!process.env.RESEND_API_KEY);
-  console.log("EMAIL_FROM:", process.env.EMAIL_FROM);
+  try {
+    const info = await transporter.sendMail({
+      from: process.env.EMAIL_FROM,
+      to,
+      subject,
+      html,
+    });
 
-  return await resend.emails.send({
-    from: "FoundIT <onboarding@resend.dev>",
-    to: [to],
-    subject,
-    html,
-  });
+    console.log("📨 Email sent:", info.messageId);
+    return info;
+  } catch (err) {
+    console.error("❌ Mail server error:", err);
+    throw err;
+  }
 };

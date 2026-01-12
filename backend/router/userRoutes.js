@@ -11,16 +11,5 @@ router.put(
   uploadProfileImage,   // ✅ handles multipart + profileImage
   updateMyProfile
 );
-router.get("/mail-test", async (req, res) => {
-  const sendMail = require("../utils/mailer");
-
-  await sendMail({
-    to: "YOURPERSONALEMAIL@gmail.com",
-    subject: "FoundIT mail test",
-    html: "<h1>If you see this, Resend is working.</h1>",
-  });
-
-  res.send("Mail attempted");
-});
 
 module.exports = router;
