@@ -541,7 +541,7 @@
 
   .mobile-menu {
     width: 94%;
-    padding: 16px 14px 18px;
+    padding: 16px 14px 17px;
     border-radius: 18px;
     gap: 14px;
   }
@@ -694,5 +694,22 @@
   .nav-chat-btn,
   .theme-toggle {
     flex-shrink: 0;
+  }
+}
+ @media (max-width: 768px) {
+  .mobile-menu {
+    left: 50%;
+    transform: translateX(-50%) translateY(-12px) scale(0.98);
+    right: auto;
+  }
+
+  .mobile-menu.open {
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+}
+ @media (max-width: 420px) {
+  .mobile-menu {
+    width: calc(100% - 24px);
+    max-width: none;
   }
 }

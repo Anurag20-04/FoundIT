@@ -61,7 +61,7 @@
   aspect-ratio: 1 / 1;
 
   z-index: 1;
-  pointer-events: none
+  pointer-events: none;
 
   /* CENTER VISIBLE + RING EMPHASIS + BOTTOM FADE */
   -webkit-mask-image:
@@ -585,3 +585,5 @@
     padding-top: 110px;
   }
 }
+  
+

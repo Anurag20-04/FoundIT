@@ -4,6 +4,9 @@ const API = import.meta.env.VITE_API_URL;
 
 let socket = null;
 
+/* =========================
+   CONNECT SOCKET
+========================= */
 export const connectSocket = (token) => {
   if (socket) return socket;
 
@@ -11,7 +14,7 @@ export const connectSocket = (token) => {
     auth: { token },
     withCredentials: true,
 
-    // 🔒 DO NOT force websocket on Render
+    // Keep both for Render stability
     transports: ["polling", "websocket"],
 
     reconnection: true,
@@ -35,10 +38,22 @@ export const connectSocket = (token) => {
   return socket;
 };
 
-export const getSocket = () => socket;
+/* =========================
+   SAFE GETTER
+========================= */
+export const getSocket = () => {
+  if (!socket) {
+    console.warn("⚠️ Socket not connected yet");
+  }
+  return socket;
+};
 
+/* =========================
+   CLEAN DISCONNECT
+========================= */
 export const disconnectSocket = () => {
   if (socket) {
+    console.log("🟠 Socket disconnected manually");
     socket.disconnect();
     socket = null;
   }

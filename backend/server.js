@@ -18,6 +18,7 @@ const claimRoutes = require("./router/claimRoutes");
 const userRoutes = require("./router/userRoutes");
 const chatRoutes = require("./router/chatRoutes");
 const authMiddleware = require("./middleware/auth");
+
 dotenv.config();
 connectDB();
 

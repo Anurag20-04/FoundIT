@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./ChatInbox.css";
+import { getSocket } from "../services/socket";
 
 
 const BACKEND_URL = import.meta.env.VITE_API_URL;
@@ -32,6 +33,7 @@ export default function ChatInbox({ theme }) {
     const timeB = b.lastMessage?.createdAt || b.updatedAt || b.createdAt;
     return new Date(timeB) - new Date(timeA);
   });
+ 
 
   setThreads(sorted);
 }
@@ -45,6 +47,47 @@ export default function ChatInbox({ theme }) {
 
     fetchChats();
   }, []);
+
+
+   useEffect(() => {
+  const socket = getSocket();
+  if (!socket) return;
+
+  const handleNewMessage = ({ chatId, message }) => {
+    setThreads(prev => {
+      let updated = [...prev];
+
+      const index = updated.findIndex(c => c._id === chatId);
+
+      if (index !== -1) {
+        const chat = updated[index];
+
+        const newChat = {
+          ...chat,
+          lastMessage: message,
+          unreadCount: chat.unreadCount + 1
+        };
+
+        updated.splice(index, 1);
+        return [newChat, ...updated]; // move to top
+      }
+
+      // brand new chat (rare but possible)
+      return [{
+        _id: chatId,
+        lastMessage: message,
+        participants: [message.sender],
+        unreadCount: 1
+      }, ...updated];
+    });
+  };
+
+  socket.on("message:new", handleNewMessage);
+
+  return () => {
+    socket.off("message:new", handleNewMessage);
+  };
+}, []);
 
   if (loading) {
     return (
