@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import axios from "axios";
 import "./ItemDetail.css";
+import { getSocket } from "../services/socket";
 
 const API = import.meta.env.VITE_API_URL;
 
@@ -13,6 +14,7 @@ export default function ItemDetail() {
 
   const [item, setItem] = useState(null);
   const [claim, setClaim] = useState(null);
+  const [contact, setContact] = useState(null); // ✅ NEW
   const [loading, setLoading] = useState(true);
   const [activeImage, setActiveImage] = useState(0);
   const [submitting, setSubmitting] = useState(false);
@@ -43,9 +45,59 @@ export default function ItemDetail() {
     }
   };
 
+  /* ===============================
+     🔥 REALTIME CLAIM UPDATE
+  =============================== */
+  useEffect(() => {
+    const socket = getSocket();
+    if (!socket || !item?._id) return;
+
+    const handleApproved = (payload) => {
+      if (String(payload.itemId) === String(item._id)) {
+        fetchAll(); // 🔥 auto refresh
+      }
+    };
+
+    socket.on("claim:approved", handleApproved);
+    socket.on("claim:update", handleApproved);
+
+    return () => {
+      socket.off("claim:approved", handleApproved);
+      socket.off("claim:update", handleApproved);
+    };
+  }, [item]);
+
   useEffect(() => {
     fetchAll();
   }, [id, user]);
+
+  /* ===============================
+     🔓 FETCH CONTACT AFTER APPROVAL
+  =============================== */
+  useEffect(() => {
+    const fetchContact = async () => {
+      if (!claim || claim.status !== "approved") return;
+
+      try {
+        const res = await axios.get(
+          `${API}/api/claims/${claim._id}/contact`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
+            },
+          }
+        );
+
+        if (res.data.success) {
+          setContact(res.data.data);
+        }
+      } catch (err) {
+        console.error("Contact fetch failed");
+      }
+    };
+
+    fetchContact();
+  }, [claim]);
 
   /* ===============================
      CLAIM HANDLER
@@ -135,27 +187,21 @@ export default function ItemDetail() {
   const images = Array.isArray(item.images) ? item.images : [];
 
   /* ===============================
-     IMAGE RESOLVER (FINAL)
+     IMAGE RESOLVER
   =============================== */
   const resolveImage = (img) => {
     if (!img) return "/no-image.png";
-
-    // Cloudinary or external
     if (img.startsWith("http")) return img;
-
-    // Old uploads fallback
     if (img.includes("uploads")) {
       const cleaned = img.substring(img.indexOf("uploads")).replace(/\\/g, "/");
       return `${API}/${cleaned}`;
     }
-
     return "/no-image.png";
   };
 
   /* ===============================
      ACTION STATE MACHINE
   =============================== */
-
   let actionUI = null;
 
   if (!user) {
@@ -165,9 +211,7 @@ export default function ItemDetail() {
       </button>
     );
   } else if (isOwner) {
-    actionUI = (
-      <div className="status-info owner">This is your listing</div>
-    );
+    actionUI = <div className="status-info owner">This is your listing</div>;
   } else if (!claim) {
     actionUI = (
       <button
@@ -208,7 +252,6 @@ export default function ItemDetail() {
   /* ===============================
      UI
   =============================== */
-
   return (
     <div className="detail-page-wrapper">
       <div className="detail-container-premium">
@@ -253,24 +296,30 @@ export default function ItemDetail() {
             <h1>{item.title}</h1>
             <div className="meta-row">
               <span>📍 {item.location}</span>
-              <span>
-                🕒 {new Date(item.date).toLocaleDateString()}
-              </span>
+              <span>🕒 {new Date(item.date).toLocaleDateString()}</span>
             </div>
           </header>
 
-          <div className="description-box">
-            {item.description}
-          </div>
+          <div className="description-box">{item.description}</div>
 
           <div className="contact-card-premium">
             <div className="card-header">Protected Contact</div>
             <p className="shield-note">
               Contact details unlock after claim approval.
             </p>
+
             <div className="masked-data">
-              <div>📧 u***@gmail.com</div>
-              <div>📞 +91 XXX-XXXX</div>
+              {contact ? (
+                <>
+                  <div>📧 {contact.email}</div>
+                  <div>📞 {contact.phoneNumber || "Not provided"}</div>
+                </>
+              ) : (
+                <>
+                  <div>📧 u***@gmail.com</div>
+                  <div>📞 +91 XXX-XXXX</div>
+                </>
+              )}
             </div>
           </div>
 

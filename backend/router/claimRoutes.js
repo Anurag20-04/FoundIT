@@ -106,19 +106,39 @@ router.patch("/:id/approve", auth, async (req, res) => {
     claim.status = "approved";
     claim.chat = chat._id;
     await claim.save();
-
-    // 🔔 Notify claimant
-   await Notification.create({
+// 🔔 Notify claimant
+await Notification.create({
   user: claim.claimant,
   message: "Your claim has been approved. You can now chat.",
-  type: "claim-approved",     // 🔴 REQUIRED
+  type: "claim-approved",
   claim: claim._id,
   item: claim.item,
   isRead: false,
 });
 
+/* =========================
+   🔥 REALTIME EMIT
+========================= */
+const io = req.app.get("io");
 
-    res.json({ success: true, data: claim });
+// to claimant
+io.emit("claim:approved", {
+  claimId: claim._id,
+  itemId: claim.item,
+  chatId: claim.chat,
+  owner: claim.owner,
+  claimant: claim.claimant,
+});
+
+// to owner also (if they are viewing page)
+io.emit("claim:update", {
+  claimId: claim._id,
+  itemId: claim.item,
+  status: "approved",
+});
+
+res.json({ success: true, data: claim });
+
   } catch (err) {
     console.error("Approve error:", err);
     res.status(500).json({ success: false, message: "Approval failed" });
@@ -175,6 +195,46 @@ router.get("/received", auth, async (req, res) => {
   } catch (err) {
     console.error("Fetch received claims error:", err);
     res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+/* ======================================================
+   GET CONTACT AFTER APPROVAL
+   GET /api/claims/:id/contact
+====================================================== */
+router.get("/:id/contact", auth, async (req, res) => {
+  try {
+    const claim = await Claim.findById(req.params.id).populate(
+      "owner",
+      "name email phoneNumber profileImage"
+    );
+
+    if (!claim) {
+      return res.status(404).json({ success: false });
+    }
+
+    if (
+      String(req.user._id) !== String(claim.claimant) &&
+      String(req.user._id) !== String(claim.owner._id)
+    ) {
+      return res.status(403).json({ success: false });
+    }
+
+    if (claim.status !== "approved") {
+      return res.status(403).json({ success: false, message: "Not approved" });
+    }
+
+    res.json({
+      success: true,
+      data: {
+        name: claim.owner.name,
+        email: claim.owner.email,
+        phoneNumber: claim.owner.phoneNumber,
+        profileImage: claim.owner.profileImage,
+      },
+    });
+  } catch (err) {
+    console.error("Contact fetch error:", err);
+    res.status(500).json({ success: false });
   }
 });
 
