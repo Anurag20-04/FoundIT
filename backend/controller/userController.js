@@ -1,39 +1,72 @@
 const User = require("../models/User");
+const Item = require("../models/Item"); // 🔥 REQUIRED for reported items
 
+/* ======================================================
+   UPDATE MY PROFILE
+   PUT /api/users/me
+====================================================== */
 exports.updateMyProfile = async (req, res) => {
   try {
-    // 1. Check Auth
+    /* =========================
+       1️⃣ AUTH CHECK
+    ========================= */
     if (!req.user || !req.user._id) {
       return res.status(401).json({ success: false, message: "Unauthorized" });
     }
 
-    // 2. Fetch the user document
+    /* =========================
+       2️⃣ FETCH USER
+    ========================= */
     const user = await User.findById(req.user._id);
     if (!user) {
       return res.status(404).json({ success: false, message: "User not found" });
     }
 
-    // 3. Update text fields manually
-    if (req.body.name !== undefined) user.name = req.body.name.trim();
-    if (req.body.address !== undefined) user.address = req.body.address.trim();
-    
-    // Handle phone specifically to allow null/empty
-    if (req.body.phoneNumber !== undefined) {
-      user.phoneNumber = req.body.phoneNumber === "" ? null : req.body.phoneNumber;
+    /* =========================
+       3️⃣ SAFE FIELD UPDATES
+       (PARTIAL UPDATE SYSTEM)
+    ========================= */
+    if (req.body.name !== undefined) {
+      user.name = req.body.name.trim();
     }
 
-   // 4. Handle Profile Image (Singular)
-if (req.file && req.file.secure_url) {
-  user.profileImage = req.file.secure_url; 
-}
+    if (req.body.address !== undefined) {
+      user.address = req.body.address.trim();
+    }
 
+    if (req.body.phoneNumber !== undefined) {
+      const phone = req.body.phoneNumber.trim();
 
+      if (phone === "") {
+        user.phoneNumber = null;
+        user.isPhoneVerified = false;
+      } else {
+        // ✅ strict Indian mobile validation
+        const phoneRegex = /^[6-9]\d{9}$/;
+        if (!phoneRegex.test(phone)) {
+          return res.status(400).json({
+            success: false,
+            message: "Please provide a valid 10-digit Indian mobile number",
+          });
+        }
 
-    // 5. Save the document
-    // This runs your schema validators and password middleware correctly
+        user.phoneNumber = phone;
+        user.isPhoneVerified = false; // reset if changed
+      }
+    }
+
+    /* =========================
+       4️⃣ PROFILE IMAGE
+    ========================= */
+    if (req.file && req.file.secure_url) {
+      user.profileImage = req.file.secure_url;
+    }
+
+    /* =========================
+       5️⃣ SAVE
+    ========================= */
     await user.save();
 
-    // Remove password before sending response
     const userResponse = user.toObject();
     delete userResponse.password;
 
@@ -45,25 +78,73 @@ if (req.file && req.file.secure_url) {
   } catch (error) {
     console.error("PROFILE UPDATE ERROR:", error);
 
-    // If it's a validation error (like bad phone format), send 400 instead of 500
     if (error.name === "ValidationError") {
       return res.status(400).json({
         success: false,
-        message: Object.values(error.errors).map(val => val.message)[0],
+        message: Object.values(error.errors)[0].message,
       });
     }
 
-    // Handle Duplicate Key Error (Aadhar or Email)
     if (error.code === 11000) {
-       return res.status(400).json({
+      return res.status(400).json({
         success: false,
-        message: "Duplicate value detected (Email or Aadhar already exists).",
+        message: "Duplicate value detected.",
       });
     }
 
     res.status(500).json({
       success: false,
-      message: error.message || "Internal Server Error",
+      message: "Internal Server Error",
     });
+  }
+};
+
+
+/* ======================================================
+   GET MY REPORTED ITEMS
+   GET /api/users/me/items
+====================================================== */
+exports.getMyReportedItems = async (req, res) => {
+  try {
+    const items = await Item.find({ reporter: req.user._id })
+      .sort({ createdAt: -1 });
+
+    res.json({ success: true, data: items });
+
+  } catch (err) {
+    console.error("FETCH MY ITEMS ERROR:", err);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+
+/* ======================================================
+   DELETE MY REPORTED ITEM
+   DELETE /api/users/me/items/:id
+====================================================== */
+exports.deleteMyReportedItem = async (req, res) => {
+  try {
+    const item = await Item.findOne({
+      _id: req.params.id,
+      reporter: req.user._id,
+    });
+
+    if (!item) {
+      return res.status(404).json({
+        success: false,
+        message: "Item not found or unauthorized",
+      });
+    }
+
+    await item.deleteOne();
+
+    res.json({
+      success: true,
+      message: "Item removed successfully",
+    });
+
+  } catch (err) {
+    console.error("DELETE ITEM ERROR:", err);
+    res.status(500).json({ success: false, message: "Server error" });
   }
 };
