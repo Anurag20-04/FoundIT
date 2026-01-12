@@ -1,129 +1,180 @@
-give css with these theme settings for the verify email/* StepType.css - Compact Premium Version */
-.step-content-wrapper {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem; /* Reduced from 2rem for a tighter feel */
-}
+/* =========================================================
+   VERIFY EMAIL — PREMIUM ENTERPRISE UI
+   Theme-aware (dark/light), glassmorphism, cinematic polish
+========================================================= */
 
-.selection-group {
+/* ===============================
+   PAGE WRAPPER
+================================ */
+.verify-email-page {
+  min-height: 100vh;
   width: 100%;
-}
-
-.group-title {
-  font-size: 1.15rem; /* Slightly smaller for better hierarchy */
-  font-weight: 700;
-  margin-bottom: 1rem; /* Reduced from 1.5rem */
-  color: var(--text-primary);
-}
-
-/* --- The 2-column Type Grid --- */
-.type-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1rem; /* Tighter gap */
+  place-items: center;
+  padding: 32px;
+  background:
+    radial-gradient(circle at top, rgba(99,102,241,0.12), transparent 60%),
+    radial-gradient(circle at bottom, rgba(56,189,248,0.10), transparent 55%),
+    linear-gradient(180deg, var(--bg-main), var(--bg-deep));
+  color: var(--text-main);
 }
 
-.type-card {
-  background: var(--input-bg);
-  border: 1px solid var(--card-border);
-  border-radius: 18px; /* Slightly more rounded-compact */
-  padding: 1.25rem; /* Reduced padding */
-  display: flex;
-  align-items: center;
-  gap: 0.85rem;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.type-card:hover {
-  transform: translateY(-3px);
-  background: rgba(99, 102, 241, 0.05);
-}
-
-/* Active State: Lost (Red) */
-.type-card.lost.active {
-  border: 2px solid #ef4444;
-  background: rgba(239, 68, 68, 0.08);
-  box-shadow: 0 0 15px rgba(239, 68, 68, 0.1);
-}
-
-/* Active State: Found (Purple/Blue) */
-.type-card.found.active {
-  border: 2px solid #6366f1;
-  background: rgba(99, 102, 241, 0.08);
-  box-shadow: 0 0 15px rgba(99, 102, 241, 0.1);
-}
-
-.type-icon-circle {
-  font-size: 1.25rem;
-  width: 40px;
-  height: 40px;
-  background: rgba(255, 255, 255, 0.05);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 10px;
-}
-
-.type-info h4 {
-  font-size: 1rem;
-  font-weight: 700;
-  margin-bottom: 2px;
-}
-
-.type-info p {
-  font-size: 0.8rem;
-  color: var(--text-secondary);
-}
-
-/* --- The 4-column Category Grid --- */
-.category-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 0.85rem;
-}
-
-.category-card {
-  background: var(--input-bg);
-  border: 1px solid var(--card-border);
-  border-radius: 14px;
-  padding: 1rem 0.5rem; /* Compact padding */
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.category-card:hover {
-  background: rgba(255, 255, 255, 0.08);
-}
-
-.category-card.selected {
-  border: 2px solid #22d3ee; /* Cyan accent */
-  background: rgba(34, 211, 238, 0.1);
-  box-shadow: 0 0 20px rgba(34, 211, 238, 0.15);
-}
-
-.cat-emoji { 
-  font-size: 1.6rem; /* Slightly smaller emoji */
-}
-
-.cat-label { 
-  font-size: 0.8rem; 
-  font-weight: 600; 
-  color: var(--text-secondary); 
+/* ===============================
+   MAIN CARD
+================================ */
+.verify-email-card {
+  width: 100%;
+  max-width: 460px;
+  padding: 44px 40px 42px;
+  border-radius: 28px;
   text-align: center;
+
+  background: var(--card-bg);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+
+  border: 1px solid var(--glass-border);
+
+  box-shadow:
+    0 30px 80px rgba(0,0,0,0.45),
+    inset 0 0 0 1px rgba(255,255,255,0.04);
+
+  animation: fadeUp 0.6s cubic-bezier(.22,1,.36,1);
 }
 
-.category-card.selected .cat-label {
-  color: var(--text-primary);
+/* ===============================
+   ICON SYSTEM
+================================ */
+.verify-icon {
+  width: 86px;
+  height: 86px;
+  margin: 0 auto 22px;
+  border-radius: 22px;
+
+  display: grid;
+  place-items: center;
+  font-size: 2.4rem;
+
+  background:
+    linear-gradient(135deg,
+      rgba(99,102,241,0.35),
+      rgba(56,189,248,0.35)
+    );
+
+  box-shadow:
+    0 18px 50px rgba(99,102,241,0.45),
+    inset 0 0 0 1px rgba(255,255,255,0.35);
+
+  color: white;
 }
 
-/* --- Responsive Adjustments --- */
-@media (max-width: 640px) {
-  .category-grid { grid-template-columns: repeat(2, 1fr); }
-  .type-grid { grid-template-columns: 1fr; }
-  .type-card { padding: 1rem; }
+/* ===============================
+   TEXT
+================================ */
+.verify-email-card h2 {
+  font-size: 1.8rem;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  margin-bottom: 10px;
+}
+
+.verify-email-card p {
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: var(--text-muted);
+}
+
+/* ===============================
+   BUTTON
+================================ */
+.verify-email-card button {
+  margin-top: 26px;
+  width: 100%;
+  padding: 14px 18px;
+  border-radius: 14px;
+  border: none;
+  cursor: pointer;
+
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  font-size: 0.95rem;
+
+  background: linear-gradient(135deg, #6366f1, #38bdf8);
+  color: white;
+
+  box-shadow:
+    0 18px 45px rgba(56,189,248,0.55),
+    0 0 30px rgba(99,102,241,0.55);
+
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.verify-email-card button:hover {
+  transform: translateY(-1px) scale(1.01);
+  box-shadow:
+    0 26px 65px rgba(56,189,248,0.75),
+    0 0 45px rgba(99,102,241,0.75);
+}
+
+/* ===============================
+   STATES
+================================ */
+
+/* Loading */
+.verify-loading .verify-icon {
+  background: linear-gradient(135deg, #94a3b8, #64748b);
+  box-shadow: 0 0 28px rgba(148,163,184,0.55);
+}
+
+/* Success */
+.verify-success .verify-icon {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  box-shadow:
+    0 20px 55px rgba(34,197,94,0.55),
+    0 0 32px rgba(34,197,94,0.45);
+}
+
+/* Error */
+.verify-error .verify-icon {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  box-shadow:
+    0 20px 55px rgba(239,68,68,0.55),
+    0 0 32px rgba(239,68,68,0.45);
+}
+
+/* ===============================
+   LIGHT MODE OVERRIDES
+================================ */
+
+.light-mode .verify-email-page,
+.app.light .verify-email-page,
+[data-theme="light"] .verify-email-page {
+  background:
+    radial-gradient(circle at top, rgba(99,102,241,0.18), transparent 60%),
+    radial-gradient(circle at bottom, rgba(56,189,248,0.14), transparent 55%),
+    linear-gradient(180deg, #f8fafc, #f1f5f9);
+}
+
+.light-mode .verify-email-card,
+.app.light .verify-email-card,
+[data-theme="light"] .verify-email-card {
+  background: rgba(255,255,255,0.95);
+  border: 1px solid rgba(15,23,42,0.08);
+  box-shadow:
+    0 28px 70px rgba(15,23,42,0.15),
+    inset 0 0 0 1px rgba(255,255,255,0.6);
+}
+
+/* ===============================
+   ANIMATION
+================================ */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }

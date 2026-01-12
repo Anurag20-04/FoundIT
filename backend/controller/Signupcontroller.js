@@ -1,5 +1,6 @@
 const User = require("../models/User");
 const crypto = require("crypto");
+const sendMail = require("../utils/mailer");
 
 const Newuser = async (req, res) => {
   try {
@@ -44,9 +45,14 @@ const Newuser = async (req, res) => {
     }
 
     /* =========================
-       5️⃣ EMAIL VERIFY TOKEN
+       5️⃣ EMAIL VERIFY TOKEN (SECURE)
     ========================= */
-    const emailVerifyToken = crypto.randomBytes(32).toString("hex");
+    const rawToken = crypto.randomBytes(32).toString("hex");
+
+    const emailVerifyToken = crypto
+      .createHash("sha256")
+      .update(rawToken)
+      .digest("hex");
 
     /* =========================
        6️⃣ CREATE USER
@@ -57,26 +63,45 @@ const Newuser = async (req, res) => {
       password,
       isEmailVerified: false,
       emailVerifyToken,
-      emailVerifyExpires: Date.now() + 24 * 60 * 60 * 1000, // 24 hours
+      emailVerifyExpires: Date.now() + 24 * 60 * 60 * 1000,
     });
 
     /* =========================
        7️⃣ VERIFICATION LINK
-       (ENV-BASED — WORKS LOCAL & PROD)
     ========================= */
     if (!process.env.FRONTEND_URL) {
       throw new Error("FRONTEND_URL is not defined");
     }
 
-    const verifyUrl = `${process.env.FRONTEND_URL}/verify-email?token=${emailVerifyToken}`;
-    console.log("📧 EMAIL VERIFY LINK:", verifyUrl);
+    const verifyUrl = `${process.env.FRONTEND_URL}/verify-email?token=${rawToken}`;
 
     /* =========================
-       8️⃣ RESPONSE
+       8️⃣ SEND EMAIL
+    ========================= */
+    await sendMail({
+      to: email,
+      subject: "Verify your FoundIT account",
+      html: `
+        <div style="font-family:Arial,sans-serif;line-height:1.6;max-width:520px">
+          <h2>Welcome to FoundIT</h2>
+          <p>Please verify your email to activate your account.</p>
+          <a href="${verifyUrl}" 
+             style="display:inline-block;padding:12px 22px;background:#2563eb;color:white;
+                    border-radius:6px;text-decoration:none;font-weight:600">
+             Verify Email
+          </a>
+          <p style="margin-top:16px;font-size:12px;color:#666">
+            This link expires in 24 hours. If you did not sign up, ignore this email.
+          </p>
+        </div>
+      `,
+    });
+
+    /* =========================
+       9️⃣ RESPONSE
     ========================= */
     res.status(201).json({
-      message:
-        "Signup successful. Please verify your email before logging in.",
+      message: "Signup successful. Please verify your email before logging in.",
     });
 
   } catch (error) {

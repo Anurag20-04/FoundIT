@@ -23,6 +23,16 @@ const Login = async (req, res) => {
     }
 
     /* =========================
+       🔒 EMAIL VERIFICATION CHECK (NEW - CRITICAL)
+    ========================= */
+    if (!user.isEmailVerified) {
+      return res.status(403).json({
+        message: "Please verify your email before logging in.",
+        code: "EMAIL_NOT_VERIFIED"
+      });
+    }
+
+    /* =========================
        3️⃣ Compare password
     ========================= */
     const isMatch = await bcrypt.compare(password, user.password);
@@ -34,8 +44,8 @@ const Login = async (req, res) => {
        4️⃣ Create JWT
     ========================= */
     const token = jwt.sign(
-      { userId: user._id },                 // ✅ standard
-      process.env.JWT_SECRET || "MY_SECRET_KEY",
+      { userId: user._id },
+      process.env.JWT_SECRET,
       { expiresIn: "1d" }
     );
 
@@ -45,13 +55,13 @@ const Login = async (req, res) => {
     user.password = undefined;
 
     /* =========================
-       6️⃣ Response (CRITICAL FIX)
+       6️⃣ Response
     ========================= */
     res.status(200).json({
       message: "Login Successful",
       token,
       user: {
-        _id: user._id,                      // 🔥 FIXED
+        _id: user._id,
         name: user.name,
         email: user.email,
         phoneNumber: user.phoneNumber,

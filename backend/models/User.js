@@ -16,6 +16,7 @@ const userSchema = new mongoose.Schema(
       unique: true,
       lowercase: true,
       trim: true,
+      index: true, // ✅ FAST LOOKUPS (LOGIN + VERIFY)
       match: [
         /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
         "Please provide a valid email address",
@@ -25,22 +26,19 @@ const userSchema = new mongoose.Schema(
     /* =========================
        PHONE (OPTIONAL INITIALLY)
     ========================= */
-   phoneNumber: {
-  type: String,
-  trim: true,
-  sparse: true,
-  default: null,
-  validate: {
-    validator: function (v) {
-      if (v === null || v === undefined || v === "") return true;
-      return /^[6-9]\d{9}$/.test(v);
+    phoneNumber: {
+      type: String,
+      trim: true,
+      sparse: true,
+      default: null,
+      validate: {
+        validator: function (v) {
+          if (v === null || v === undefined || v === "") return true;
+          return /^[6-9]\d{9}$/.test(v);
+        },
+        message: "Please provide a valid Indian mobile number",
+      },
     },
-    message: "Please provide a valid Indian mobile number",
-  },
-},
-
-
-
 
     isPhoneVerified: {
       type: Boolean,
@@ -59,13 +57,11 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: null,
     },
-aadharNumber: {
-  type: String,
-  
-  sparse: true,
-  
-},
 
+    aadharNumber: {
+      type: String,
+      sparse: true,
+    },
 
     profileImage: {
       type: String,
@@ -80,14 +76,19 @@ aadharNumber: {
     },
 
     /* =========================
-       EMAIL VERIFICATION
+       EMAIL VERIFICATION (CRITICAL)
     ========================= */
     isEmailVerified: {
       type: Boolean,
       default: false,
+      index: true, // ✅ fast auth filtering
     },
 
-    emailVerifyToken: String,
+    emailVerifyToken: {
+      type: String,
+      index: true, // ✅ fast verification
+    },
+
     emailVerifyExpires: Date,
   },
   {

@@ -10,6 +10,10 @@ const path = require("path");
 const connectDB = require("./config/dbconn.js");
 
 // Routers
+const verifyEmailRouter = require("./router/verifyEmailRouter");
+
+
+
 const Loginrouter = require("./router/Loginrouter");
 const Signuprouter = require("./router/Signuprouter");
 const itemRouter = require("./router/itemRouter"); 
@@ -86,6 +90,7 @@ app.use(express.urlencoded({ extended: true, limit: "10mb" }));
    ROUTES
 ======================= */
 app.use("/api/login", Loginrouter);
+app.use("/api", verifyEmailRouter);
 app.use("/api/signup", Signuprouter);
 app.use("/api/items", itemRouter);
 app.use("/api/claims", claimRoutes);
