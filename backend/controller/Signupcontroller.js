@@ -79,23 +79,25 @@ const Newuser = async (req, res) => {
        8️⃣ SEND EMAIL
     ========================= */
     await sendMail({
-      to: email,
-      subject: "Verify your FoundIT account",
-      html: `
-        <div style="font-family:Arial,sans-serif;line-height:1.6;max-width:520px">
-          <h2>Welcome to FoundIT</h2>
-          <p>Please verify your email to activate your account.</p>
-          <a href="${verifyUrl}" 
-             style="display:inline-block;padding:12px 22px;background:#2563eb;color:white;
-                    border-radius:6px;text-decoration:none;font-weight:600">
-             Verify Email
-          </a>
-          <p style="margin-top:16px;font-size:12px;color:#666">
-            This link expires in 24 hours. If you did not sign up, ignore this email.
-          </p>
-        </div>
-      `,
-    });
+  to: email,
+  subject: "Verify your FoundIT account",
+  html: `
+    <div style="font-family:Arial,sans-serif">
+      <h2>Welcome to FoundIT</h2>
+      <p>Click below to verify your email:</p>
+      <a href="${verifyUrl}"
+         style="display:inline-block;padding:12px 18px;
+                background:#2563eb;color:white;
+                text-decoration:none;border-radius:6px">
+         Verify Email
+      </a>
+      <p style="font-size:12px;color:#666;margin-top:10px">
+        Link valid for 24 hours.
+      </p>
+    </div>
+  `
+});
+
 
     /* =========================
        9️⃣ RESPONSE
