@@ -1,5 +1,5 @@
 const User = require("../models/User");
-const Item = require("../models/Item"); // 🔥 REQUIRED for reported items
+const Item = require("../models/Item");
 
 /* ======================================================
    UPDATE MY PROFILE
@@ -11,7 +11,10 @@ exports.updateMyProfile = async (req, res) => {
        1️⃣ AUTH CHECK
     ========================= */
     if (!req.user || !req.user._id) {
-      return res.status(401).json({ success: false, message: "Unauthorized" });
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized"
+      });
     }
 
     /* =========================
@@ -19,19 +22,31 @@ exports.updateMyProfile = async (req, res) => {
     ========================= */
     const user = await User.findById(req.user._id);
     if (!user) {
-      return res.status(404).json({ success: false, message: "User not found" });
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
+      });
     }
 
     /* =========================
        3️⃣ SAFE FIELD UPDATES
-       (PARTIAL UPDATE SYSTEM)
+       (TRUE PARTIAL UPDATE)
     ========================= */
+
     if (req.body.name !== undefined) {
-      user.name = req.body.name.trim();
+      const name = req.body.name.trim();
+      if (name.length < 2 || name.length > 50) {
+        return res.status(400).json({
+          success: false,
+          message: "Name must be between 2 and 50 characters"
+        });
+      }
+      user.name = name;
     }
 
     if (req.body.address !== undefined) {
-      user.address = req.body.address.trim();
+      const address = req.body.address.trim();
+      user.address = address === "" ? null : address;
     }
 
     if (req.body.phoneNumber !== undefined) {
@@ -41,17 +56,18 @@ exports.updateMyProfile = async (req, res) => {
         user.phoneNumber = null;
         user.isPhoneVerified = false;
       } else {
-        // ✅ strict Indian mobile validation
         const phoneRegex = /^[6-9]\d{9}$/;
         if (!phoneRegex.test(phone)) {
           return res.status(400).json({
             success: false,
-            message: "Please provide a valid 10-digit Indian mobile number",
+            message: "Please provide a valid 10-digit Indian mobile number"
           });
         }
 
-        user.phoneNumber = phone;
-        user.isPhoneVerified = false; // reset if changed
+        if (phone !== user.phoneNumber) {
+          user.phoneNumber = phone;
+          user.isPhoneVerified = false;
+        }
       }
     }
 
@@ -72,7 +88,7 @@ exports.updateMyProfile = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      user: userResponse,
+      user: userResponse
     });
 
   } catch (error) {
@@ -81,20 +97,20 @@ exports.updateMyProfile = async (req, res) => {
     if (error.name === "ValidationError") {
       return res.status(400).json({
         success: false,
-        message: Object.values(error.errors)[0].message,
+        message: Object.values(error.errors)[0].message
       });
     }
 
     if (error.code === 11000) {
       return res.status(400).json({
         success: false,
-        message: "Duplicate value detected.",
+        message: "Duplicate value detected"
       });
     }
 
     res.status(500).json({
       success: false,
-      message: "Internal Server Error",
+      message: "Internal server error"
     });
   }
 };
@@ -106,8 +122,14 @@ exports.updateMyProfile = async (req, res) => {
 ====================================================== */
 exports.getMyReportedItems = async (req, res) => {
   try {
-    const items = await Item.find({ reporter: req.user._id })
-      .sort({ createdAt: -1 });
+    const userId = req.user._id;
+
+    const items = await Item.find({
+      $or: [
+        { reporter: userId },                 // ObjectId (new)
+        { reporter: String(userId) }          // String (old data)
+      ]
+    }).sort({ createdAt: -1 });
 
     res.json({ success: true, data: items });
 
@@ -126,13 +148,13 @@ exports.deleteMyReportedItem = async (req, res) => {
   try {
     const item = await Item.findOne({
       _id: req.params.id,
-      reporter: req.user._id,
+      reporter: req.user._id
     });
 
     if (!item) {
       return res.status(404).json({
         success: false,
-        message: "Item not found or unauthorized",
+        message: "Item not found or unauthorized"
       });
     }
 
@@ -140,11 +162,22 @@ exports.deleteMyReportedItem = async (req, res) => {
 
     res.json({
       success: true,
-      message: "Item removed successfully",
+      message: "Item removed successfully"
     });
 
   } catch (err) {
     console.error("DELETE ITEM ERROR:", err);
-    res.status(500).json({ success: false, message: "Server error" });
+
+    if (err.name === "CastError") {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid item ID"
+      });
+    }
+
+    res.status(500).json({
+      success: false,
+      message: "Server error"
+    });
   }
 };
