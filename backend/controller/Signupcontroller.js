@@ -6,18 +6,12 @@ const Newuser = async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
-    /* =========================
-       1️⃣ REQUIRED FIELDS
-    ========================= */
     if (!name || !email || !password) {
       return res.status(400).json({
         message: "Name, email, and password are required",
       });
     }
 
-    /* =========================
-       2️⃣ EMAIL FORMAT
-    ========================= */
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       return res.status(400).json({
@@ -25,18 +19,12 @@ const Newuser = async (req, res) => {
       });
     }
 
-    /* =========================
-       3️⃣ PASSWORD STRENGTH
-    ========================= */
     if (password.length < 6) {
       return res.status(400).json({
         message: "Password must be at least 6 characters",
       });
     }
 
-    /* =========================
-       4️⃣ DUPLICATE USER CHECK
-    ========================= */
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(409).json({
@@ -45,7 +33,7 @@ const Newuser = async (req, res) => {
     }
 
     /* =========================
-       5️⃣ EMAIL VERIFY TOKEN (SECURE)
+       EMAIL VERIFY TOKEN (SECURE)
     ========================= */
     const rawToken = crypto.randomBytes(32).toString("hex");
 
@@ -54,9 +42,6 @@ const Newuser = async (req, res) => {
       .update(rawToken)
       .digest("hex");
 
-    /* =========================
-       6️⃣ CREATE USER
-    ========================= */
     await User.create({
       name,
       email,
@@ -66,9 +51,6 @@ const Newuser = async (req, res) => {
       emailVerifyExpires: Date.now() + 24 * 60 * 60 * 1000,
     });
 
-    /* =========================
-       7️⃣ VERIFICATION LINK
-    ========================= */
     if (!process.env.FRONTEND_URL) {
       throw new Error("FRONTEND_URL is not defined");
     }
@@ -76,31 +58,32 @@ const Newuser = async (req, res) => {
     const verifyUrl = `${process.env.FRONTEND_URL}/verify-email?token=${rawToken}`;
 
     /* =========================
-       8️⃣ SEND EMAIL
+       SEND EMAIL (NON-BLOCKING)
     ========================= */
-    await sendMail({
-  to: email,
-  subject: "Verify your FoundIT account",
-  html: `
-    <div style="font-family:Arial,sans-serif">
-      <h2>Welcome to FoundIT</h2>
-      <p>Click below to verify your email:</p>
-      <a href="${verifyUrl}"
-         style="display:inline-block;padding:12px 18px;
-                background:#2563eb;color:white;
-                text-decoration:none;border-radius:6px">
-         Verify Email
-      </a>
-      <p style="font-size:12px;color:#666;margin-top:10px">
-        Link valid for 24 hours.
-      </p>
-    </div>
-  `
-});
-
+    sendMail({
+      to: email,
+      subject: "Verify your FoundIT account",
+      html: `
+        <div style="font-family:Arial,sans-serif">
+          <h2>Welcome to FoundIT</h2>
+          <p>Click below to verify your email:</p>
+          <a href="${verifyUrl}"
+             style="display:inline-block;padding:12px 18px;
+                    background:#2563eb;color:white;
+                    text-decoration:none;border-radius:6px">
+             Verify Email
+          </a>
+          <p style="font-size:12px;color:#666;margin-top:10px">
+            Link valid for 24 hours.
+          </p>
+        </div>
+      `,
+    }).catch(err => {
+      console.error("❌ Email send failed:", err.message);
+    });
 
     /* =========================
-       9️⃣ RESPONSE
+       RESPONSE (ALWAYS FIRES)
     ========================= */
     res.status(201).json({
       message: "Signup successful. Please verify your email before logging in.",
