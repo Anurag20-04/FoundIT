@@ -330,6 +330,7 @@
 
   background: linear-gradient(90deg, #38bdf8, #818cf8);
   -webkit-background-clip: text;
+   background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
@@ -513,7 +514,7 @@
   background: linear-gradient(90deg, #0e033c, #1d065a);
   -webkit-background-clip: text;
   background-clip: text;
-    -webkit-text-fill-color: #0e033c;
+  -webkit-text-fill-color: #0e033c;
 }
 
 .landing.light .feature-card p {
@@ -563,3 +564,17 @@
   }
 }
 
+@media (max-width: 768px) {
+  .orb-container {
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+
+    width: 110vw;
+    height: 110vw;
+    max-width: 110vw;
+    max-height: 110vw;
+
+    opacity: 0.85;
+  }
+}
