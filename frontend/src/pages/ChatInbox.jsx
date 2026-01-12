@@ -26,9 +26,16 @@ export default function ChatInbox({ theme }) {
           },
         });
 
-        if (res.data?.success) {
-          setThreads(res.data.data);
-        }
+       if (res.data?.success) {
+  const sorted = [...res.data.data].sort((a, b) => {
+    const timeA = a.lastMessage?.createdAt || a.updatedAt || a.createdAt;
+    const timeB = b.lastMessage?.createdAt || b.updatedAt || b.createdAt;
+    return new Date(timeB) - new Date(timeA);
+  });
+
+  setThreads(sorted);
+}
+
       } catch (err) {
         console.error("Fetch chats error:", err);
       } finally {
@@ -105,22 +112,36 @@ export default function ChatInbox({ theme }) {
 }}
 >
                 <div className="thread-avatar">
-                  {chat.otherUser?.name?.[0] || "U"}
-                </div>
+  {chat.otherUser?.profileImage ? (
+    <img
+      src={chat.otherUser.profileImage}
+      alt={chat.otherUser?.name || "User"}
+      className="thread-avatar-img"
+    />
+  ) : (
+    <span className="thread-avatar-fallback">
+      {(chat.otherUser?.name || "U").charAt(0).toUpperCase()}
+    </span>
+  )}
+</div>
 
-                <div className="thread-info">
-                  <h4>{chat.otherUser?.name || "Unknown User"}</h4>
-                  <p className="last-msg">
-                    {chat.lastMessage?.text || "No messages yet"}
-                  </p>
-                </div>
+<div className="thread-info">
+  <h4>{chat.otherUser?.name || "User"}</h4>
 
-                <div className="thread-meta">
-                  <span>
-                    {chat.lastMessage?.createdAt
-                      ? new Date(chat.lastMessage.createdAt).toLocaleDateString()
-                      : ""}
-                  </span>
+  <p className="last-msg">
+    {chat.lastMessage?.text
+      || chat.lastMessage?.image && "📷 Photo"
+      || chat.lastMessage?.file && "📎 Attachment"
+      || "Conversation started"}
+  </p>
+</div>
+
+<div className="thread-meta">
+  <span>
+    {chat.lastMessage?.createdAt
+      ? new Date(chat.lastMessage.createdAt).toLocaleDateString()
+      : ""}
+  </span>
 
                   {chat.unreadCount > 0 && (
                     <div className="unread-badge">

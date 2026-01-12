@@ -35,7 +35,7 @@ export default function SphereBackground() {
           },
           modes: {
             attract: {
-              distance: 200, // Small range: only attracts when cursor is near the ring
+              distance: 150, // Small range: only attracts when cursor is near the ring
               duration: 0.3,
               speed: 15,
             },
