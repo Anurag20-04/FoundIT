@@ -18,13 +18,19 @@ const ChatSchema = new mongoose.Schema(
     },
 
     lastMessage: {
-      type: String,
-      default: "",
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Message",
+      default: null,
     },
 
     lastSender: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
+    },
+
+    lastActivity: {
+      type: Date,
+      default: Date.now,
     },
   },
   { timestamps: true }

@@ -10,11 +10,17 @@ const auth = require("../middleware/auth");
 ========================= */
 router.get("/my", auth, async (req, res) => {
   try {
-    const chats = await Chat.find({
+    let chats = await Chat.find({
       participants: req.user.id
     })
       .populate("participants", "name profileImage")
-      .populate("lastMessage")
+      .populate({
+        path: "lastMessage",
+        populate: {
+          path: "sender",
+          select: "name profileImage"
+        }
+      })
       .sort({ lastActivity: -1 });
 
     const results = await Promise.all(
@@ -25,8 +31,13 @@ router.get("/my", auth, async (req, res) => {
           isRead: false
         });
 
+        const otherUser = chat.participants.find(
+          p => String(p._id) !== req.user.id
+        );
+
         return {
           ...chat.toObject(),
+          otherUser,
           unreadCount: unread
         };
       })
@@ -39,6 +50,7 @@ router.get("/my", auth, async (req, res) => {
     res.status(500).json({ success: false });
   }
 });
+
 
 
 /* =========================
