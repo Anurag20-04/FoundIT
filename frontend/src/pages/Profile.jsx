@@ -46,6 +46,15 @@ export default function Profile() {
   const [itemsLoading, setItemsLoading] = useState(true);
 
   /* =========================
+     PROFESSIONAL UI STATES
+  ========================= */
+  const [toast, setToast] = useState({ type: "", message: "" });
+  const [confirmDelete, setConfirmDelete] = useState({
+    open: false,
+    itemId: null,
+  });
+
+  /* =========================
      INIT FROM AUTH
   ========================= */
   useEffect(() => {
@@ -80,7 +89,6 @@ export default function Profile() {
     const fetchMyItems = async () => {
       try {
         const res = await api.get("/users/me/items");
-
         setMyItems(res.data.data || []);
       } catch (err) {
         console.error("Fetch my items failed", err);
@@ -92,6 +100,19 @@ export default function Profile() {
     fetchMyItems();
   }, [user]);
 
+  /* =========================
+     TOAST AUTO DISMISS
+  ========================= */
+  useEffect(() => {
+    if (!toast.message) return;
+
+    const t = setTimeout(() => {
+      setToast({ type: "", message: "" });
+    }, 3000);
+
+    return () => clearTimeout(t);
+  }, [toast]);
+
   if (!user) return null;
 
   /* =========================
@@ -101,8 +122,8 @@ export default function Profile() {
     const { name, value } = e.target;
 
     if (name === "phoneNumber") {
-      if (!/^\d*$/.test(value)) return; // only numbers
-      if (value.length > 10) return;   // hard limit
+      if (!/^\d*$/.test(value)) return;
+      if (value.length > 10) return;
     }
 
     setForm({ ...form, [name]: value });
@@ -166,18 +187,27 @@ export default function Profile() {
   };
 
   /* =========================
-     DELETE ITEM
+     DELETE ITEM (ENTERPRISE FLOW)
   ========================= */
-  const handleDeleteItem = async (id) => {
-    if (!window.confirm("Mark this item as resolved and remove it?")) return;
+  const handleDeleteItem = (id) => {
+    setConfirmDelete({ open: true, itemId: id });
+  };
 
+  const confirmDeleteItem = async () => {
     try {
-      await api.delete(`/users/me/items/${id}`);
+      await api.delete(`/users/me/items/${confirmDelete.itemId}`);
 
-      setMyItems(prev => prev.filter(i => i._id !== id));
+      setMyItems(prev =>
+        prev.filter(i => i._id !== confirmDelete.itemId)
+      );
+
+      setToast({ type: "success", message: "Item marked as resolved" });
+
     } catch (err) {
       console.error("Delete item failed", err);
-      alert("Unable to remove item");
+      setToast({ type: "error", message: "Unable to remove item" });
+    } finally {
+      setConfirmDelete({ open: false, itemId: null });
     }
   };
 
@@ -284,8 +314,47 @@ export default function Profile() {
             </div>
           )}
         </div>
-
       </div>
+
+      {/* =========================
+         CONFIRM MODAL
+      ========================= */}
+      {confirmDelete.open && (
+        <div className="modal-backdrop">
+          <div className="modal-card">
+            <h3>Mark item as resolved?</h3>
+            <p>
+              This will remove the item from your active reports.
+              This action cannot be undone.
+            </p>
+
+            <div className="modal-actions">
+              <button
+                className="modal-btn ghost"
+                onClick={() => setConfirmDelete({ open: false, itemId: null })}
+              >
+                Cancel
+              </button>
+
+              <button
+                className="modal-btn danger"
+                onClick={confirmDeleteItem}
+              >
+                Yes, remove it
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* =========================
+         TOAST
+      ========================= */}
+      {toast.message && (
+        <div className={`toast ${toast.type}`}>
+          {toast.message}
+        </div>
+      )}
     </div>
   );
 }
