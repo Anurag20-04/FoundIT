@@ -42,6 +42,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  
 }
 
 /* ===============================
@@ -385,14 +386,7 @@
    RESPONSIVE SYSTEM
 ================================ */
 
-/* Tablets */
-@media (max-width: 1024px) {
-  .features {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 22px;
-    padding-bottom: 90px;
-  }
-}
+
 
 /* Phones */
 @media (max-width: 640px) {
@@ -566,7 +560,7 @@
 
 @media (max-width: 768px) {
   .orb-container {
-    top: 0;
+    top:10%;
     left: 50%;
     transform: translateX(-50%);
 
@@ -576,5 +570,18 @@
     max-height: 110vw;
 
     opacity: 0.85;
+    pointer-events: none;
+  }
+}
+@media (min-width: 769px) {
+  .hero-wrapper {
+    align-items: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-wrapper {
+    align-items: flex-start;
+    padding-top: 110px;
   }
 }

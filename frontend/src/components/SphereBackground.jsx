@@ -29,6 +29,7 @@ export default function SphereBackground() {
           events: {
             onHover: {
               enable: true,
+
               mode: "attract", 
             },
           },
@@ -69,7 +70,27 @@ export default function SphereBackground() {
             }
           },
         },
-        detectRetina: true,
+        responsive: [
+  {
+    maxWidth: 768,
+    options: {
+      particles: {
+        number: { value: 90}
+      }
+    }
+  },
+  {
+    maxWidth: 480,
+    options: {
+      particles: {
+        number: { value: 0 }
+      }
+    }
+  }
+],
+
+        detectRetina: window.devicePixelRatio <= 2,
+
       }}
     />
   );

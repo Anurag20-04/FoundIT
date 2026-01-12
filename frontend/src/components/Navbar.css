@@ -66,9 +66,12 @@
   top: 16px;
   z-index: 100;
   padding: 0 24px;
+  isolation: isolate;
 }
 
+
 .nav-shell {
+  
   max-width: 1200px;
   margin: auto;
   padding: 14px 22px;
@@ -102,6 +105,7 @@
 
 .navbar.dark {
   color: #ffffff;
+  
 }
 
 .navbar.dark .nav-center a,
@@ -309,6 +313,7 @@
    HAMBURGER
 ========================================================= */
 .hamburger {
+  
   display: none;
   font-size: 22px;
   background: none;
@@ -377,7 +382,9 @@
   }
 
   .mobile-menu {
+    position: absolute;
     display: flex;
+    top: calc(100% + 10px);
     flex-direction: column;
     gap: 16px;
     margin: 12px auto 0;
@@ -630,4 +637,19 @@
   background: linear-gradient(135deg, #38bdf8, #2563eb);
   color: white;
   box-shadow: 0 10px 26px rgba(37,99,235,0.45);
+}
+/* =========================================================
+   🔒 HARD DESKTOP KILL SWITCH (CRITICAL FIX)
+   Ensures mobile menu NEVER takes layout space on desktop
+========================================================= */
+
+@media (min-width: 769px) {
+  .mobile-menu {
+    display: none !important;
+    position: absolute !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+  }
 }

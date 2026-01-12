@@ -108,10 +108,6 @@ useEffect(() => {
     {unreadChats > 0 && <span className="chat-dot">{unreadChats}</span>}
   </button>
 )}
-
-      
-
-        
             {user ? (
             <ProfileDropdown
               key={user.profileImage}
