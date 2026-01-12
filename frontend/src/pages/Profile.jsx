@@ -79,7 +79,8 @@ export default function Profile() {
 
     const fetchMyItems = async () => {
       try {
-        const res = await api.get("/items/my");
+        const res = await api.get("/users/me/items");
+
         setMyItems(res.data.data || []);
       } catch (err) {
         console.error("Fetch my items failed", err);
@@ -171,7 +172,8 @@ export default function Profile() {
     if (!window.confirm("Mark this item as resolved and remove it?")) return;
 
     try {
-      await api.delete(`/items/${id}`);
+      await api.delete(`/users/me/items/${id}`);
+
       setMyItems(prev => prev.filter(i => i._id !== id));
     } catch (err) {
       console.error("Delete item failed", err);
