@@ -4,14 +4,15 @@ const Chat = require("../models/Chat");
 const Message = require("../models/Message");
 const auth = require("../middleware/auth");
 
+
 /* =========================
    CLOUDINARY + MULTER
 ========================= */
 const multer = require("multer");
 const cloudinary = require("../config/cloudinary");
-const cloudinaryStorage = require("multer-storage-cloudinary");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
 
-const storage =  CloudinaryStorage({
+const storage = new CloudinaryStorage({
   cloudinary,
   params: {
     folder: "foundit/chat",
@@ -20,6 +21,7 @@ const storage =  CloudinaryStorage({
 });
 
 const upload = multer({ storage });
+
 
 /* =========================
    GET MY CHATS (INBOX)
