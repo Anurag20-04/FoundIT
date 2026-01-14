@@ -126,7 +126,7 @@ const io = new Server(server, {
     credentials: true,
     methods: ["GET", "POST"],
   },
-  transports: ["polling", "websocket"],
+  transports: ["websocket", "polling"],
 });
 
 const jwt = require("jsonwebtoken");
@@ -137,20 +137,22 @@ const jwt = require("jsonwebtoken");
 io.use((socket, next) => {
   const token = socket.handshake.auth?.token;
 
+  console.log("🔐 Socket handshake token:", token ? "RECEIVED" : "MISSING");
+
   if (!token) {
     return next(new Error("No token provided"));
   }
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    socket.userId = String(
-      decoded.id || decoded.userId || decoded._id
-    );
+    socket.userId = String(decoded.id || decoded.userId || decoded._id);
     next();
   } catch (err) {
+    console.log("❌ JWT verify failed:", err.message);
     next(new Error("Auth failed"));
   }
 });
+
 
 /* ============================
    SOCKET CORE

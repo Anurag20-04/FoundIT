@@ -16,11 +16,19 @@ export default function Navbar({ theme, onToggleTheme, onLogin, onSignup }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { user, logout } = useAuth();
   const [unreadChats, setUnreadChats] = useState(0);
+  const [socket, setSocket] = useState(null);
+useEffect(() => {
+  if (user) {
+    setSocket(getSocket());
+  } else {
+    setSocket(null);
+    setUnreadChats(0);
+  }
+}, [user]);
+
 
 useEffect(() => {
-  if (!user) return;
-
-  const socket = getSocket();
+  if (!user || !socket) return;
 
   const fetchUnread = async () => {
     try {
@@ -40,20 +48,18 @@ useEffect(() => {
   // initial load
   fetchUnread();
 
-  // realtime refresh
-  if (socket) {
-    socket.on("unread:update", fetchUnread);
-    socket.on("message:new", fetchUnread);
-  }
+  socket.off("unread:update");
+  socket.off("message:new");
+
+  socket.on("unread:update", fetchUnread);
+  socket.on("message:new", fetchUnread);
 
   return () => {
-    if (socket) {
-      socket.off("unread:update", fetchUnread);
-      socket.off("message:new", fetchUnread);
-    }
+    socket.off("unread:update", fetchUnread);
+    socket.off("message:new", fetchUnread);
   };
 
-}, [user]);
+}, [user, socket]);
 
   const navigate = useNavigate();
 
