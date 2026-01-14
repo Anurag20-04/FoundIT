@@ -203,3 +203,91 @@
   }
 }
 
+/* =========================================================
+   CHAT SCROLL ENGINE — LOCK LAYOUT
+========================================================= */
+
+.chatroom-shell {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.chatroom-header {
+  flex-shrink: 0;
+}
+
+.chatroom-input {
+  flex-shrink: 0;
+}
+
+.chatroom-body {
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scroll-behavior: smooth;
+  padding: 16px 14px 24px;
+}
+
+/* =========================================================
+   MESSAGE SAFETY
+========================================================= */
+
+.bubble {
+  max-width: 78%;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  hyphens: auto;
+}
+
+/* =========================================================
+   IMAGE & FILE SUPPORT
+========================================================= */
+
+.chat-image {
+  max-width: 220px;
+  border-radius: 12px;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.chat-file {
+  display: inline-block;
+  margin-bottom: 6px;
+  font-size: 14px;
+  color: #60a5fa;
+  text-decoration: none;
+}
+
+/* =========================================================
+   FILE BUTTON
+========================================================= */
+
+.file-btn {
+  font-size: 22px;
+  padding: 0 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  color: var(--text-muted);
+}
+
+/* =========================================================
+   MOBILE FIXES
+========================================================= */
+
+@media (max-width: 520px) {
+  .bubble {
+    max-width: 90%;
+  }
+
+  .chat-image {
+    max-width: 180px;
+  }
+
+  .file-btn {
+    font-size: 20px;
+    padding: 0 10px;
+  }
+}
