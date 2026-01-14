@@ -5,6 +5,23 @@ const Message = require("../models/Message");
 const auth = require("../middleware/auth");
 
 /* =========================
+   CLOUDINARY + MULTER
+========================= */
+const multer = require("multer");
+const cloudinary = require("../config/cloudinary");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
+
+const storage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: "foundit/chat",
+    allowed_formats: ["jpg", "jpeg", "png", "webp"],
+  },
+});
+
+const upload = multer({ storage });
+
+/* =========================
    GET MY CHATS (INBOX)
    GET /api/chats/my
 ========================= */
@@ -28,7 +45,7 @@ router.get("/my", auth, async (req, res) => {
         const unread = await Message.countDocuments({
           chat: chat._id,
           sender: { $ne: req.user.id },
-          isRead: false
+          status: { $ne: "read" }
         });
 
         const otherUser = chat.participants.find(
@@ -84,15 +101,16 @@ router.get("/:id", auth, async (req, res) => {
 
 
 /* =========================
-   SEND MESSAGE
+   SEND MESSAGE (TEXT + IMAGE)
    POST /api/chats/:id/message
 ========================= */
-router.post("/:id/message", auth, async (req, res) => {
+router.post("/:id/message", auth, upload.single("image"), async (req, res) => {
   try {
     const { text } = req.body;
+    const file = req.file;
 
-    if (!text?.trim()) {
-      return res.status(400).json({ success: false });
+    if (!text?.trim() && !file) {
+      return res.status(400).json({ success: false, message: "Empty message" });
     }
 
     const chat = await Chat.findById(req.params.id);
@@ -102,11 +120,21 @@ router.post("/:id/message", auth, async (req, res) => {
       return res.status(403).json({ success: false });
     }
 
+    const attachments = [];
+
+    if (file) {
+      attachments.push({
+        type: "image",
+        url: file.path, // cloudinary secure url
+      });
+    }
+
     let message = await Message.create({
       chat: chat._id,
       sender: req.user.id,
-      text,
-      isRead: false
+      text: text || "",
+      attachments,
+      status: "sent"
     });
 
     message = await message.populate("sender", "name profileImage");
@@ -115,16 +143,15 @@ router.post("/:id/message", auth, async (req, res) => {
     chat.lastActivity = new Date();
     await chat.save();
 
-    // 🔥 SOCKET PUSH
+    /* ================= SOCKET PUSH ================= */
+
     const io = req.app.get("io");
 
-    // 1️⃣ Chat room (ChatRoom realtime)
     io.to(chat._id.toString()).emit("message:new", {
       chatId: chat._id,
       message
     });
 
-    // 2️⃣ Inbox (ChatInbox realtime)
     io.emit("inbox:update", {
       chatId: chat._id,
       message
@@ -147,7 +174,7 @@ router.patch("/:id/read", auth, async (req, res) => {
   try {
     await Message.updateMany(
       { chat: req.params.id, sender: { $ne: req.user.id } },
-      { isRead: true }
+      { status: "read" }
     );
 
     res.json({ success: true });

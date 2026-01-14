@@ -127,6 +127,8 @@ const io = new Server(server, {
     methods: ["GET", "POST"],
   },
   transports: ["websocket", "polling"],
+  pingInterval: 25000,   // ⬅ send pings less aggressively
+  pingTimeout: 60000,
 });
 
 const jwt = require("jsonwebtoken");
@@ -193,9 +195,10 @@ io.on("connection", (socket) => {
     }
   });
 
-  socket.on("disconnect", (reason) => {
-    console.log("🔴 User offline:", userId, "|", reason);
-  });
+ socket.on("disconnect", (reason) => {
+  console.log("🔴 Socket disconnected:", userId, "| reason:", reason);
+});
+
 });
 
 app.set("io", io);

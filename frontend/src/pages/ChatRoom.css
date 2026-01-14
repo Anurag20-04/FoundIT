@@ -302,3 +302,18 @@
     border-radius: 18px;
   }
 }
+.chat-image {
+  max-width: 240px;
+  border-radius: 12px;
+  display: block;
+  margin-top: 6px;
+}
+
+.file-btn {
+  font-size: 22px;
+  padding: 0 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  color: var(--text-muted);
+}

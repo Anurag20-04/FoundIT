@@ -16,6 +16,9 @@ export default function ChatRoom() {
   const [chat, setChat] = useState(null);
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState("");
+  const [image, setImage] = useState(null);
+  const [preview, setPreview] = useState(null);
+
   const [loading, setLoading] = useState(true);
   const [typingUser, setTypingUser] = useState(null);
 
@@ -72,10 +75,7 @@ export default function ChatRoom() {
     );
 
     socket.emit("chat:join", { chatId });
-
-    socket.emit("unread:update", {
-      targetUserId: myId,
-    });
+    socket.emit("unread:update", { targetUserId: myId });
 
     return () => {
       socket.emit("chat:leave", { chatId });
@@ -123,17 +123,21 @@ export default function ChatRoom() {
   }, [messages, typingUser]);
 
   /* =========================
-     SEND MESSAGE
+     SEND MESSAGE (TEXT + IMAGE)
   ========================= */
   const sendMessage = async () => {
-    if (!text.trim() || !socket) return;
+    if ((!text.trim() && !image) || !socket) return;
 
     socket.emit("typing:stop", { chatId });
 
     try {
+      const form = new FormData();
+      form.append("text", text);
+      if (image) form.append("image", image);
+
       const res = await axios.post(
         `${API}/api/chats/${chatId}/message`,
-        { text },
+        form,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
@@ -142,9 +146,13 @@ export default function ChatRoom() {
       );
 
       setMessages((prev) => [...prev, res.data.data]);
-      setText("");
-
       socket.emit("message:send", res.data.data);
+
+      setText("");
+      setImage(null);
+      setPreview(null);
+      document.getElementById("chat-image-input").value = "";
+
     } catch (err) {
       console.error("Send message failed:", err);
     }
@@ -163,11 +171,7 @@ export default function ChatRoom() {
   const resolveAvatar = (img) => {
     if (!img) return null;
     if (img.startsWith("http")) return img;
-    if (img.includes("uploads")) {
-      const cleaned = img.substring(img.indexOf("uploads")).replace(/\\/g, "/");
-      return `${API}/${cleaned}`;
-    }
-    return null;
+    return `${API}/${img}`;
   };
 
   return (
@@ -207,7 +211,14 @@ export default function ChatRoom() {
           return (
             <div key={m._id} className={`msg ${isMe ? "me" : "them"}`}>
               <div className="bubble">
-                {m.text}
+                {m.text && <div>{m.text}</div>}
+
+                {m.attachments?.map((a, i) =>
+                  a.type === "image" ? (
+                    <img key={i} src={a.url} className="chat-image" alt="" />
+                  ) : null
+                )}
+
                 <span className="time">
                   {new Date(m.createdAt).toLocaleTimeString([], {
                     hour: "2-digit",
@@ -218,6 +229,14 @@ export default function ChatRoom() {
             </div>
           );
         })}
+
+        {preview && (
+          <div className="msg me">
+            <div className="bubble">
+              <img src={preview} className="chat-image" alt="" />
+            </div>
+          </div>
+        )}
 
         {typingUser && (
           <div className="typing-indicator">
@@ -238,6 +257,22 @@ export default function ChatRoom() {
 
       {/* ================= INPUT ================= */}
       <div className="chatroom-input">
+
+        <input
+          type="file"
+          id="chat-image-input"
+          hidden
+          accept="image/*"
+          onChange={(e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            setImage(file);
+            setPreview(URL.createObjectURL(file));
+          }}
+        />
+
+        <label htmlFor="chat-image-input" className="file-btn">📎</label>
+
         <input
           value={text}
           onChange={(e) => {
