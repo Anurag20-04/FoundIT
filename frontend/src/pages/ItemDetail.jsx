@@ -300,7 +300,10 @@ export default function ItemDetail() {
             </div>
           </header>
 
-          <div className="description-box">{item.description}</div>
+          <div className="description-box">
+  {item.description || "No description provided."}
+</div>
+
 
           <div className="contact-card-premium">
             <div className="card-header">Protected Contact</div>
