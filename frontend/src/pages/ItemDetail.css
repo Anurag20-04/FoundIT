@@ -540,6 +540,7 @@
   line-clamp: 3;                /* standard property for compatibility */
   -webkit-box-orient: vertical;
   overflow: hidden;
+  padding: 10px;
 }
 
 /* Description safe scroll if extreme */
@@ -585,6 +586,7 @@
 
   .info-header h1 {
     font-size: 1.9rem;
+    padding: 10px;
   }
 
   .meta-row {
@@ -641,6 +643,7 @@
 
   .info-header h1 {
     font-size: 1.5rem;
+    padding: 8px;
   }
 
   .description-box,
@@ -663,6 +666,7 @@
 @media (max-width: 380px) {
   .info-header h1 {
     font-size: 1.35rem;
+    padding: 8px;
   }
 
   .thumb-btn {
