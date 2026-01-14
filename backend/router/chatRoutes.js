@@ -9,7 +9,8 @@ const auth = require("../middleware/auth");
 ========================= */
 const multer = require("multer");
 const cloudinary = require("../config/cloudinary");
-const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const cloudinaryStorage = require("multer-storage-cloudinary");
+const CloudinaryStorage = cloudinaryStorage.CloudinaryStorage;
 
 const storage = new CloudinaryStorage({
   cloudinary,
