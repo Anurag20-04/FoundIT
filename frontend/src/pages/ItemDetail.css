@@ -517,3 +517,172 @@
     0 20px 48px rgba(37, 99, 235, 0.35),
     0 0 32px rgba(56, 189, 248, 0.45);
 }
+/* =========================================================
+   RESPONSIVE EXTENSION — MOBILE FIRST
+   (Non-destructive, premium safe)
+========================================================= */
+
+/* ---------- LARGE TABLETS (≤ 900px) ---------- */
+@media (max-width: 900px) {
+  .detail-page-wrapper {
+    padding: 48px 18px;
+  }
+
+  .detail-container-premium {
+    gap: 36px;
+  }
+
+  .info-header h1 {
+    font-size: 2.1rem;
+  }
+
+  .main-image-frame {
+    border-radius: 24px;
+  }
+
+  .description-box,
+  .contact-card-premium {
+    padding: 24px;
+  }
+}
+
+/* ---------- TABLETS & SMALL LAPTOPS (≤ 768px) ---------- */
+@media (max-width: 768px) {
+  .detail-page-wrapper {
+    padding: 36px 14px;
+  }
+
+  .detail-container-premium {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  .main-image-frame {
+    aspect-ratio: 4 / 3;
+  }
+
+  .info-header h1 {
+    font-size: 1.9rem;
+  }
+
+  .meta-row {
+    flex-wrap: wrap;
+    row-gap: 8px;
+  }
+
+  .utility-bar {
+    flex-direction: column;
+  }
+
+  .btn-main-action {
+    padding: 16px;
+    font-size: 15px;
+  }
+}
+
+/* ---------- PHONES (≤ 520px) ---------- */
+@media (max-width: 520px) {
+  .detail-page-wrapper {
+    padding: 28px 12px 40px;
+  }
+
+  .detail-visuals {
+    gap: 14px;
+  }
+
+  .main-image-frame {
+    border-radius: 20px;
+    aspect-ratio: 1 / 1;
+  }
+
+  .status-badge {
+    top: 12px;
+    left: 12px;
+    font-size: 10px;
+    padding: 5px 10px;
+  }
+
+  .reward-tag {
+    top: 12px;
+    right: 12px;
+    padding: 7px 14px;
+    font-size: 13px;
+  }
+
+  .claimed-overlay {
+    font-size: 1.6rem;
+  }
+
+  .thumbnail-strip {
+    gap: 10px;
+    padding-bottom: 10px;
+  }
+
+  .thumb-btn {
+    width: 78px;
+    height: 54px;
+    border-radius: 12px;
+  }
+
+  .thumb-btn img {
+    padding: 4px;
+  }
+
+  .detail-info-panel {
+    gap: 18px;
+  }
+
+  .category-pill {
+    font-size: 10px;
+    padding: 5px 12px;
+  }
+
+  .info-header h1 {
+    font-size: 1.55rem;
+    line-height: 1.2;
+  }
+
+  .description-box,
+  .contact-card-premium {
+    padding: 18px;
+    border-radius: 18px;
+  }
+
+  .masked-data {
+    font-size: 13px;
+    padding: 12px;
+  }
+
+  .status-info {
+    font-size: 0.85rem;
+    padding: 13px 14px;
+  }
+
+  .btn-main-action {
+    padding: 14px;
+    font-size: 14px;
+    border-radius: 16px;
+  }
+
+  .util-btn {
+    padding: 12px;
+    border-radius: 12px;
+    font-size: 14px;
+  }
+}
+
+/* ---------- VERY SMALL PHONES (≤ 380px) ---------- */
+@media (max-width: 380px) {
+  .info-header h1 {
+    font-size: 1.35rem;
+  }
+
+  .thumb-btn {
+    width: 70px;
+    height: 48px;
+  }
+
+  .reward-tag {
+    font-size: 12px;
+  }
+}
