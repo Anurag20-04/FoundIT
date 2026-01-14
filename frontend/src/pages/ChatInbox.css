@@ -186,3 +186,26 @@
   color: var(--text-secondary);
   opacity: 0.8;
 }
+/* =========================================================
+   INBOX MESSAGE PREVIEW — PROFESSIONAL CLAMP
+========================================================= */
+
+.last-msg {
+  max-width: 100%;
+  color: var(--text-muted);
+  line-height: 1.4;
+
+  /* 🔒 hard safety */
+  overflow-wrap: anywhere;
+  word-break: break-word;
+
+  /* ✂️ multiline clamp */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;        /* show only 2 lines */
+  line-clamp: 2;                /* standard property for compatibility */
+  overflow: hidden;
+
+  /* visual */
+  text-overflow: ellipsis;
+}

@@ -15,13 +15,10 @@ export default function ChatRoom() {
   const [chat, setChat] = useState(null);
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState("");
-  const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [typingUser, setTypingUser] = useState(null);
 
   const bottomRef = useRef(null);
-  const chatBodyRef = useRef(null);
-  const shouldAutoScroll = useRef(true);
 
   const myId = user?._id || user?.id;
 
@@ -55,7 +52,10 @@ export default function ChatRoom() {
 
     if (socket && myId) {
       socket.emit("chat:join", { chatId });
-      socket.emit("unread:update", { targetUserId: myId });
+
+      socket.emit("unread:update", {
+        targetUserId: myId,
+      });
     }
 
     return () => {
@@ -70,10 +70,10 @@ export default function ChatRoom() {
     if (!socket || !myId) return;
 
     socket.on("message:new", ({ chatId: incomingChatId, message }) => {
-      if (String(incomingChatId) === String(chatId)) {
-        setMessages((prev) => [...prev, message]);
-      }
-    });
+  if (String(incomingChatId) === String(chatId)) {
+    setMessages(prev => [...prev, message]);
+  }
+});
 
     socket.on("typing:start", ({ userId }) => {
       if (String(userId) !== String(myId)) {
@@ -93,42 +93,36 @@ export default function ChatRoom() {
   }, [chatId, myId]);
 
   /* =========================
-     SMART AUTO SCROLL
+     AUTO SCROLL
   ========================= */
   useEffect(() => {
-    if (shouldAutoScroll.current) {
-      bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-    }
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, typingUser]);
 
   /* =========================
-     SEND MESSAGE (TEXT + FILE)
+     SEND MESSAGE
   ========================= */
   const sendMessage = async () => {
-    if (!text.trim() && !file) return;
+    if (!text.trim()) return;
 
     if (socket) socket.emit("typing:stop", { chatId });
 
-    const form = new FormData();
-    form.append("text", text);
-    if (file) form.append("file", file);
-
     const res = await axios.post(
       `${API}/api/chats/${chatId}/message`,
-      form,
+      { text },
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
-          "Content-Type": "multipart/form-data",
         },
       }
     );
 
     setMessages((prev) => [...prev, res.data.data]);
     setText("");
-    setFile(null);
 
-    if (socket) socket.emit("message:send", res.data.data);
+    if (socket) {
+      socket.emit("message:send", res.data.data);
+    }
   };
 
   if (loading) return <div className="chatroom-shell">Loading…</div>;
@@ -139,11 +133,11 @@ export default function ChatRoom() {
   );
 
   /* =========================
-     IMAGE RESOLVER
+     IMAGE RESOLVER (FINAL)
   ========================= */
   const resolveAvatar = (img) => {
     if (!img) return null;
-    if (img.startsWith("http")) return img;
+    if (img.startsWith("http")) return img; // Cloudinary
     if (img.includes("uploads")) {
       const cleaned = img.substring(img.indexOf("uploads")).replace(/\\/g, "/");
       return `${API}/${cleaned}`;
@@ -158,7 +152,10 @@ export default function ChatRoom() {
         <div className="chatroom-user">
           <div className="chat-avatar">
             {otherUser?.profileImage ? (
-              <img src={resolveAvatar(otherUser.profileImage)} alt="" />
+              <img
+                src={resolveAvatar(otherUser.profileImage)}
+                alt=""
+              />
             ) : (
               <span>{otherUser?.name?.[0] || "U"}</span>
             )}
@@ -174,19 +171,7 @@ export default function ChatRoom() {
       </header>
 
       {/* ================= BODY ================= */}
-      <div
-        className="chatroom-body"
-        ref={chatBodyRef}
-        onScroll={() => {
-          const el = chatBodyRef.current;
-          if (!el) return;
-
-          const nearBottom =
-            el.scrollHeight - el.scrollTop - el.clientHeight < 120;
-
-          shouldAutoScroll.current = nearBottom;
-        }}
-      >
+      <div className="chatroom-body">
         {messages.length === 0 && (
           <div className="chatroom-empty">No messages yet. Say hello.</div>
         )}
@@ -200,27 +185,7 @@ export default function ChatRoom() {
           return (
             <div key={m._id} className={`msg ${isMe ? "me" : "them"}`}>
               <div className="bubble">
-                {m.file && m.file.type?.startsWith("image") && (
-                  <img
-                    src={m.file.url}
-                    alt=""
-                    className="chat-image"
-                  />
-                )}
-
-                {m.file && !m.file.type?.startsWith("image") && (
-                  <a
-                    href={m.file.url}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="chat-file"
-                  >
-                    📎 {m.file.originalName || "Download file"}
-                  </a>
-                )}
-
-                {m.text && <div>{m.text}</div>}
-
+                {m.text}
                 <span className="time">
                   {new Date(m.createdAt).toLocaleTimeString([], {
                     hour: "2-digit",
@@ -251,16 +216,6 @@ export default function ChatRoom() {
 
       {/* ================= INPUT ================= */}
       <div className="chatroom-input">
-        <label className="file-btn">
-          +
-          <input
-            type="file"
-            hidden
-            accept="image/*,.pdf,.doc,.docx,.zip"
-            onChange={(e) => setFile(e.target.files[0])}
-          />
-        </label>
-
         <input
           value={text}
           onChange={(e) => {

@@ -1,8 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import axios from "axios";
 import { connectSocket, disconnectSocket } from "../services/socket";
-
-const API = import.meta.env.VITE_API_URL;
 
 const AuthContext = createContext(null);
 
@@ -12,54 +9,38 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   /* =======================
-     RESTORE SESSION (SAFE)
+     RESTORE SESSION
   ======================= */
   useEffect(() => {
-    const storedUser = localStorage.getItem("auth_user");
-    const storedToken = localStorage.getItem("auth_token");
+  const storedUser = localStorage.getItem("auth_user");
+  const storedToken = localStorage.getItem("auth_token");
 
-    if (!storedToken) {
-      setLoading(false);
-      return;
-    }
+  if (storedUser && storedToken) {
+    setUser(JSON.parse(storedUser));
+    setToken(storedToken);
+    connectSocket(storedToken);
+  }
 
-    axios.defaults.headers.common["Authorization"] = `Bearer ${storedToken}`;
-
-    // 🔥 verify token instead of trusting localStorage
-    axios
-      .get(`${API}/api/users/me`)
-      .then((res) => {
-        setUser(res.data.data);
-        setToken(storedToken);
-        localStorage.setItem("auth_user", JSON.stringify(res.data.data));
-        connectSocket(storedToken);
-      })
-      .catch(() => {
-        localStorage.removeItem("auth_user");
-        localStorage.removeItem("auth_token");
-        delete axios.defaults.headers.common["Authorization"];
-        disconnectSocket();
-      })
-      .finally(() => setLoading(false));
-  }, []);
+  setLoading(false);
+}, []);
 
   /* =======================
-     LOGIN (SAFE)
+     LOGIN
   ======================= */
-  const login = async (userData, authToken) => {
-    setUser(userData);
-    setToken(authToken);
+  const login = (userData, authToken) => {
+  setUser(userData);
+  setToken(authToken);
 
-    localStorage.setItem("auth_user", JSON.stringify(userData));
-    localStorage.setItem("auth_token", authToken);
+  localStorage.setItem("auth_user", JSON.stringify(userData));
+  localStorage.setItem("auth_token", authToken);
 
-    axios.defaults.headers.common["Authorization"] = `Bearer ${authToken}`;
+  connectSocket(authToken);
+};
 
-    connectSocket(authToken);
-  };
 
   /* =======================
-     UPDATE USER
+     🔑 UPDATE USER (NEW)
+     Used by Profile page
   ======================= */
   const updateUser = (updatedUser) => {
     setUser(updatedUser);
@@ -69,42 +50,16 @@ export function AuthProvider({ children }) {
   /* =======================
      LOGOUT
   ======================= */
-  const logout = () => {
-    setUser(null);
-    setToken(null);
+ const logout = () => {
+  setUser(null);
+  setToken(null);
 
-    localStorage.removeItem("auth_user");
-    localStorage.removeItem("auth_token");
+  localStorage.removeItem("auth_user");
+  localStorage.removeItem("auth_token");
 
-    delete axios.defaults.headers.common["Authorization"];
+  disconnectSocket();
+};
 
-    disconnectSocket();
-  };
-
-  /* =======================
-     GLOBAL 401 GUARD
-  ======================= */
-  useEffect(() => {
-    const interceptor = axios.interceptors.response.use(
-      (res) => res,
-      (err) => {
-        if (err.response?.status === 401) {
-          console.warn("🔐 Session expired. Logging out.");
-
-          localStorage.removeItem("auth_user");
-          localStorage.removeItem("auth_token");
-          delete axios.defaults.headers.common["Authorization"];
-
-          setUser(null);
-          setToken(null);
-          disconnectSocket();
-        }
-        return Promise.reject(err);
-      }
-    );
-
-    return () => axios.interceptors.response.eject(interceptor);
-  }, []);
 
   return (
     <AuthContext.Provider
@@ -113,12 +68,12 @@ export function AuthProvider({ children }) {
         token,
         isAuthenticated: !!user,
         login,
-        updateUser,
+        updateUser, // 🔑 exposed
         logout,
         loading,
       }}
     >
-      {!loading && children}
+      {children}
     </AuthContext.Provider>
   );
 }

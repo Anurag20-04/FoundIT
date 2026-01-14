@@ -41,8 +41,12 @@ export const connectSocket = (token) => {
 /* =========================
    SAFE GETTER
 ========================= */
-export const getSocket = () => socket;
-
+export const getSocket = () => {
+  if (!socket) {
+    console.warn("⚠️ Socket not connected yet");
+  }
+  return socket;
+};
 
 /* =========================
    CLEAN DISCONNECT
