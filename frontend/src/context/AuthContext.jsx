@@ -12,35 +12,52 @@ export function AuthProvider({ children }) {
      RESTORE SESSION
   ======================= */
   useEffect(() => {
-  const storedUser = localStorage.getItem("auth_user");
-  const storedToken = localStorage.getItem("auth_token");
+    try {
+      const storedUser = localStorage.getItem("auth_user");
+      const storedToken = localStorage.getItem("auth_token");
 
-  if (storedUser && storedToken) {
-    setUser(JSON.parse(storedUser));
-    setToken(storedToken);
-    connectSocket(storedToken);
-  }
+      if (storedUser && storedToken) {
+        setUser(JSON.parse(storedUser));
+        setToken(storedToken);
+      }
+    } catch (err) {
+      console.error("Auth restore failed. Clearing storage.");
+      localStorage.removeItem("auth_user");
+      localStorage.removeItem("auth_token");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
-  setLoading(false);
-}, []);
+  /* =======================
+     SOCKET LIFECYCLE
+  ======================= */
+  useEffect(() => {
+    if (!token) {
+      disconnectSocket();
+      return;
+    }
+
+    connectSocket(token);
+
+    return () => {
+      disconnectSocket();
+    };
+  }, [token]);
 
   /* =======================
      LOGIN
   ======================= */
   const login = (userData, authToken) => {
-  setUser(userData);
-  setToken(authToken);
+    setUser(userData);
+    setToken(authToken);
 
-  localStorage.setItem("auth_user", JSON.stringify(userData));
-  localStorage.setItem("auth_token", authToken);
-
-  connectSocket(authToken);
-};
-
+    localStorage.setItem("auth_user", JSON.stringify(userData));
+    localStorage.setItem("auth_token", authToken);
+  };
 
   /* =======================
-     🔑 UPDATE USER (NEW)
-     Used by Profile page
+     UPDATE USER
   ======================= */
   const updateUser = (updatedUser) => {
     setUser(updatedUser);
@@ -50,16 +67,13 @@ export function AuthProvider({ children }) {
   /* =======================
      LOGOUT
   ======================= */
- const logout = () => {
-  setUser(null);
-  setToken(null);
+  const logout = () => {
+    setUser(null);
+    setToken(null);
 
-  localStorage.removeItem("auth_user");
-  localStorage.removeItem("auth_token");
-
-  disconnectSocket();
-};
-
+    localStorage.removeItem("auth_user");
+    localStorage.removeItem("auth_token");
+  };
 
   return (
     <AuthContext.Provider
@@ -68,7 +82,7 @@ export function AuthProvider({ children }) {
         token,
         isAuthenticated: !!user,
         login,
-        updateUser, // 🔑 exposed
+        updateUser,
         logout,
         loading,
       }}

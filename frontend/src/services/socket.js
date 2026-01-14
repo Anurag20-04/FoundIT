@@ -2,21 +2,26 @@ import { io } from "socket.io-client";
 
 const API = import.meta.env.VITE_API_URL;
 
+if (!API) {
+  throw new Error("VITE_API_URL is not defined");
+}
+
 let socket = null;
 
 /* =========================
    CONNECT SOCKET
 ========================= */
 export const connectSocket = (token) => {
-  if (socket) return socket;
+  if (socket?.connected) return socket;
+
+  if (socket) {
+    socket.disconnect();
+    socket = null;
+  }
 
   socket = io(API, {
     auth: { token },
-    withCredentials: true,
-
-    // Keep both for Render stability
-    transports: ["polling", "websocket"],
-
+    transports: ["websocket", "polling"],
     reconnection: true,
     reconnectionAttempts: 10,
     reconnectionDelay: 1000,
@@ -24,15 +29,15 @@ export const connectSocket = (token) => {
   });
 
   socket.on("connect", () => {
-    console.log("🟢 Socket connected:", socket.id);
+    console.log("Socket connected:", socket.id);
   });
 
   socket.on("disconnect", (reason) => {
-    console.log("🔴 Socket disconnected:", reason);
+    console.log("Socket disconnected:", reason);
   });
 
   socket.on("connect_error", (err) => {
-    console.error("❌ Socket connect error:", err.message);
+    console.error("Socket connect error:", err.message);
   });
 
   return socket;
@@ -43,7 +48,7 @@ export const connectSocket = (token) => {
 ========================= */
 export const getSocket = () => {
   if (!socket) {
-    console.warn("⚠️ Socket not connected yet");
+    console.warn("Socket not connected yet");
   }
   return socket;
 };
@@ -53,7 +58,6 @@ export const getSocket = () => {
 ========================= */
 export const disconnectSocket = () => {
   if (socket) {
-    console.log("🟠 Socket disconnected manually");
     socket.disconnect();
     socket = null;
   }

@@ -10,20 +10,35 @@ const BACKEND_URL = import.meta.env.VITE_API_URL;
 export default function ChatInbox({ theme }) {
   const navigate = useNavigate();
   const { user } = useAuth();
+
   const myId = user?._id || user?.id;
 
+  const [socket, setSocket] = useState(null);
   const [threads, setThreads] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  /* =========================
+     THEME BIND
+  ========================= */
   useEffect(() => {
-    document.body.className =
-      theme === "dark" ? "dark-mode" : "light-mode";
+    document.body.className = theme === "dark" ? "dark-mode" : "light-mode";
   }, [theme]);
+
+  /* =========================
+     SOCKET BIND
+  ========================= */
+  useEffect(() => {
+    if (user) {
+      setSocket(getSocket());
+    }
+  }, [user]);
 
   /* =========================
      FETCH CHATS (INITIAL)
   ========================= */
   useEffect(() => {
+    if (!myId) return;
+
     const fetchChats = async () => {
       try {
         const res = await axios.get(`${BACKEND_URL}/api/chats/my`, {
@@ -34,8 +49,10 @@ export default function ChatInbox({ theme }) {
 
         if (res.data?.success) {
           const sorted = [...res.data.data].sort((a, b) => {
-            const timeA = a.lastMessage?.createdAt || a.updatedAt || a.createdAt;
-            const timeB = b.lastMessage?.createdAt || b.updatedAt || b.createdAt;
+            const timeA =
+              a.lastMessage?.createdAt || a.updatedAt || a.createdAt;
+            const timeB =
+              b.lastMessage?.createdAt || b.updatedAt || b.createdAt;
             return new Date(timeB) - new Date(timeA);
           });
 
@@ -49,13 +66,12 @@ export default function ChatInbox({ theme }) {
     };
 
     fetchChats();
-  }, []);
+  }, [myId]);
 
   /* =========================
      REALTIME INBOX UPDATE
   ========================= */
   useEffect(() => {
-    const socket = getSocket();
     if (!socket || !myId) return;
 
     const handleInboxUpdate = ({ chatId, message }) => {
@@ -64,7 +80,7 @@ export default function ChatInbox({ theme }) {
           ? message.sender._id
           : message.sender;
 
-      // ✅ ignore messages sent by me
+      // ignore messages sent by me
       if (String(senderId) === String(myId)) return;
 
       setThreads((prev) => {
@@ -95,12 +111,13 @@ export default function ChatInbox({ theme }) {
       });
     };
 
+    socket.off("inbox:update");
     socket.on("inbox:update", handleInboxUpdate);
 
     return () => {
       socket.off("inbox:update", handleInboxUpdate);
     };
-  }, [myId]);
+  }, [socket, myId]);
 
   if (loading) {
     return (
@@ -153,15 +170,21 @@ export default function ChatInbox({ theme }) {
                 key={chat._id}
                 className="chat-thread-card"
                 onClick={async () => {
-                  await axios.patch(
-                    `${BACKEND_URL}/api/chats/${chat._id}/read`,
-                    {},
-                    {
-                      headers: {
-                        Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
-                      },
-                    }
-                  );
+                  try {
+                    await axios.patch(
+                      `${BACKEND_URL}/api/chats/${chat._id}/read`,
+                      {},
+                      {
+                        headers: {
+                          Authorization: `Bearer ${localStorage.getItem(
+                            "auth_token"
+                          )}`,
+                        },
+                      }
+                    );
+                  } catch (err) {
+                    console.error("Read sync failed:", err);
+                  }
 
                   navigate(`/chat/${chat._id}`);
                 }}
@@ -175,7 +198,9 @@ export default function ChatInbox({ theme }) {
                     />
                   ) : (
                     <span className="thread-avatar-fallback">
-                      {(chat.otherUser?.name || "U").charAt(0).toUpperCase()}
+                      {(chat.otherUser?.name || "U")
+                        .charAt(0)
+                        .toUpperCase()}
                     </span>
                   )}
                 </div>
@@ -190,7 +215,9 @@ export default function ChatInbox({ theme }) {
                 <div className="thread-meta">
                   <span>
                     {chat.lastMessage?.createdAt
-                      ? new Date(chat.lastMessage.createdAt).toLocaleDateString()
+                      ? new Date(
+                          chat.lastMessage.createdAt
+                        ).toLocaleDateString()
                       : ""}
                   </span>
 

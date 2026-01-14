@@ -6,6 +6,7 @@ const MessageSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Chat",
       required: true,
+      index: true,
     },
 
     sender: {
@@ -20,12 +21,27 @@ const MessageSchema = new mongoose.Schema(
       required: true,
     },
 
-    isRead: {
+    status: {
+      type: String,
+      enum: ["sent", "delivered", "read"],
+      default: "sent",
+    },
+
+    isDeleted: {
       type: Boolean,
       default: false,
-    }
+    },
+
+    attachments: [
+      {
+        type: { type: String },
+        url: String,
+      },
+    ],
   },
   { timestamps: true }
 );
+
+MessageSchema.index({ chat: 1, createdAt: -1 });
 
 module.exports = mongoose.model("Message", MessageSchema);

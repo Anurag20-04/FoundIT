@@ -58,14 +58,7 @@
   font-size: 1rem;
 }
 
-.last-msg {
-  margin: 0;
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
+
 
 .thread-meta {
   display: flex;
@@ -208,4 +201,77 @@
 
   /* visual */
   text-overflow: ellipsis;
+}
+/* =========================================================
+   MOBILE RESPONSIVE — CHAT INBOX
+========================================================= */
+
+@media (max-width: 600px) {
+
+  .chat-thread-list {
+    gap: 10px;
+    margin-top: 14px;
+  }
+
+  .chat-thread-card {
+    padding: 12px 12px;
+    border-radius: 14px;
+    gap: 10px;
+  }
+
+  .thread-avatar {
+    width: 42px;
+    height: 42px;
+    font-size: 1rem;
+  }
+
+  .thread-info h4 {
+    font-size: 0.95rem;
+  }
+
+  .last-msg {
+    font-size: 0.8rem;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+  }
+
+  .thread-meta {
+    font-size: 0.7rem;
+    gap: 4px;
+  }
+
+  .unread-badge {
+    padding: 2px 7px;
+    font-size: 0.65rem;
+  }
+
+  /* EMPTY STATE */
+
+  .chat-empty-card {
+    padding: 28px 18px;
+    border-radius: 20px;
+  }
+
+  .chat-empty-icon {
+    width: 60px;
+    height: 60px;
+    font-size: 1.6rem;
+  }
+
+  .chat-empty-card h2 {
+    font-size: 1.2rem;
+  }
+
+  .chat-empty-card p {
+    font-size: 0.85rem;
+  }
+
+  .chat-primary-btn {
+    padding: 11px 14px;
+    font-size: 0.85rem;
+  }
+
+  .chat-empty-hint {
+    font-size: 0.7rem;
+  }
 }

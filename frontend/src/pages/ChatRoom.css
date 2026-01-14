@@ -1,11 +1,13 @@
 .chatroom-shell {
-  min-height: calc(100vh - 140px);
+  height: 100vh;
   padding: 28px;
   display: flex;
   flex-direction: column;
   background: var(--bg-main);
   color: var(--text-main);
+  overflow: hidden;
 }
+
 
 /* ================= HEADER ================= */
 
@@ -89,15 +91,18 @@
 }
 
 .bubble {
-  max-width: 65%;
+  max-width: 78%;
   padding: 12px 16px;
   border-radius: 16px;
   font-size: 0.95rem;
   display: flex;
   flex-direction: column;
   gap: 6px;
-  word-wrap: break-word;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  hyphens: auto;
 }
+
 
 .msg.me .bubble {
   background: linear-gradient(135deg, #2563eb, #38bdf8);
@@ -207,12 +212,6 @@
    CHAT SCROLL ENGINE — LOCK LAYOUT
 ========================================================= */
 
-.chatroom-shell {
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
 
 .chatroom-header {
   flex-shrink: 0;
@@ -234,12 +233,6 @@
    MESSAGE SAFETY
 ========================================================= */
 
-.bubble {
-  max-width: 78%;
-  overflow-wrap: anywhere;
-  word-break: break-word;
-  hyphens: auto;
-}
 
 /* =========================================================
    IMAGE & FILE SUPPORT
@@ -289,5 +282,23 @@
   .file-btn {
     font-size: 20px;
     padding: 0 10px;
+  }
+}
+/* =========================================================
+   DESKTOP PREMIUM LAYOUT (NOT FULLSCREEN)
+========================================================= */
+
+@media (min-width: 900px) {
+  .chatroom-shell {
+    height: calc(100vh - 120px);   /* no longer aggressive fullscreen */
+    max-width: 1100px;
+    margin: 40px auto;
+    border-radius: 26px;
+    box-shadow: var(--shadow-strong);
+    border: 1px solid var(--glass-border);
+  }
+
+  .chatroom-body {
+    border-radius: 18px;
   }
 }

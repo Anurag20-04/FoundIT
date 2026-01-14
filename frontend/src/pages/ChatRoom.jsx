@@ -10,7 +10,8 @@ const API = import.meta.env.VITE_API_URL;
 export default function ChatRoom() {
   const { chatId } = useParams();
   const { user } = useAuth();
-  const socket = getSocket();
+
+  const [socket, setSocket] = useState(null);
 
   const [chat, setChat] = useState(null);
   const [messages, setMessages] = useState([]);
@@ -19,25 +20,45 @@ export default function ChatRoom() {
   const [typingUser, setTypingUser] = useState(null);
 
   const bottomRef = useRef(null);
+  const typingTimer = useRef(null);
 
   const myId = user?._id || user?.id;
+
+  /* =========================
+     SOCKET BIND
+  ========================= */
+  useEffect(() => {
+    if (user) {
+      setSocket(getSocket());
+    }
+  }, [user]);
 
   /* =========================
      FETCH CHAT
   ========================= */
   const fetchChat = async () => {
-    const res = await axios.get(`${API}/api/chats/${chatId}`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
-      },
-    });
+    try {
+      const res = await axios.get(`${API}/api/chats/${chatId}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
+        },
+      });
 
-    setChat(res.data.data.chat);
-    setMessages(res.data.data.messages);
-    setLoading(false);
+      setChat(res.data.data.chat);
+      setMessages(res.data.data.messages);
+    } catch (err) {
+      console.error("Failed to fetch chat:", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
+  /* =========================
+     JOIN / LEAVE CHAT
+  ========================= */
   useEffect(() => {
+    if (!socket || !myId || !chatId) return;
+
     fetchChat();
 
     axios.patch(
@@ -50,18 +71,16 @@ export default function ChatRoom() {
       }
     );
 
-    if (socket && myId) {
-      socket.emit("chat:join", { chatId });
+    socket.emit("chat:join", { chatId });
 
-      socket.emit("unread:update", {
-        targetUserId: myId,
-      });
-    }
+    socket.emit("unread:update", {
+      targetUserId: myId,
+    });
 
     return () => {
-      if (socket) socket.emit("chat:leave", { chatId });
+      socket.emit("chat:leave", { chatId });
     };
-  }, [chatId]);
+  }, [chatId, socket, myId]);
 
   /* =========================
      REALTIME RECEIVE
@@ -69,11 +88,15 @@ export default function ChatRoom() {
   useEffect(() => {
     if (!socket || !myId) return;
 
+    socket.off("message:new");
+    socket.off("typing:start");
+    socket.off("typing:stop");
+
     socket.on("message:new", ({ chatId: incomingChatId, message }) => {
-  if (String(incomingChatId) === String(chatId)) {
-    setMessages(prev => [...prev, message]);
-  }
-});
+      if (String(incomingChatId) === String(chatId)) {
+        setMessages((prev) => [...prev, message]);
+      }
+    });
 
     socket.on("typing:start", ({ userId }) => {
       if (String(userId) !== String(myId)) {
@@ -90,7 +113,7 @@ export default function ChatRoom() {
       socket.off("typing:start");
       socket.off("typing:stop");
     };
-  }, [chatId, myId]);
+  }, [chatId, socket, myId]);
 
   /* =========================
      AUTO SCROLL
@@ -103,25 +126,27 @@ export default function ChatRoom() {
      SEND MESSAGE
   ========================= */
   const sendMessage = async () => {
-    if (!text.trim()) return;
+    if (!text.trim() || !socket) return;
 
-    if (socket) socket.emit("typing:stop", { chatId });
+    socket.emit("typing:stop", { chatId });
 
-    const res = await axios.post(
-      `${API}/api/chats/${chatId}/message`,
-      { text },
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
-        },
-      }
-    );
+    try {
+      const res = await axios.post(
+        `${API}/api/chats/${chatId}/message`,
+        { text },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
+          },
+        }
+      );
 
-    setMessages((prev) => [...prev, res.data.data]);
-    setText("");
+      setMessages((prev) => [...prev, res.data.data]);
+      setText("");
 
-    if (socket) {
       socket.emit("message:send", res.data.data);
+    } catch (err) {
+      console.error("Send message failed:", err);
     }
   };
 
@@ -133,11 +158,11 @@ export default function ChatRoom() {
   );
 
   /* =========================
-     IMAGE RESOLVER (FINAL)
+     IMAGE RESOLVER
   ========================= */
   const resolveAvatar = (img) => {
     if (!img) return null;
-    if (img.startsWith("http")) return img; // Cloudinary
+    if (img.startsWith("http")) return img;
     if (img.includes("uploads")) {
       const cleaned = img.substring(img.indexOf("uploads")).replace(/\\/g, "/");
       return `${API}/${cleaned}`;
@@ -152,10 +177,7 @@ export default function ChatRoom() {
         <div className="chatroom-user">
           <div className="chat-avatar">
             {otherUser?.profileImage ? (
-              <img
-                src={resolveAvatar(otherUser.profileImage)}
-                alt=""
-              />
+              <img src={resolveAvatar(otherUser.profileImage)} alt="" />
             ) : (
               <span>{otherUser?.name?.[0] || "U"}</span>
             )}
@@ -202,7 +224,7 @@ export default function ChatRoom() {
             <span className="typing-name">
               {otherUser?.name || "Someone"}
             </span>
-            <span>is typing</span>
+            <span> is typing</span>
             <div className="typing-dots">
               <span></span>
               <span></span>
@@ -224,8 +246,8 @@ export default function ChatRoom() {
             if (socket) {
               socket.emit("typing:start", { chatId });
 
-              clearTimeout(window.__typingTimer);
-              window.__typingTimer = setTimeout(() => {
+              clearTimeout(typingTimer.current);
+              typingTimer.current = setTimeout(() => {
                 socket.emit("typing:stop", { chatId });
               }, 1200);
             }
