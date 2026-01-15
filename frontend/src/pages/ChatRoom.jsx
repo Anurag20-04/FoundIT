@@ -145,8 +145,8 @@ export default function ChatRoom() {
         }
       );
 
-      setMessages((prev) => [...prev, res.data.data]);
-      socket.emit("message:send", res.data.data);
+      
+      
 
       setText("");
       setImage(null);
