@@ -111,18 +111,9 @@ router.get("/:id", auth, async (req, res) => {
 router.post(
   "/:id/message",
   auth,
-  (req, res, next) => {
-    upload.single("image")(req, res, function (err) {
-      if (err) {
-        console.error("MULTER / CLOUDINARY ERROR:", err);
-        return res.status(400).json({
-          success: false,
-          message: err.message || "Image upload failed"
-        });
-      }
-      next();
-    });
-  },
+  
+    upload.single("image"),
+  
   async (req, res) => {
     try {
       const { text } = req.body;
