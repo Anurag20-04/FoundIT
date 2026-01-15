@@ -133,11 +133,12 @@ router.post(
       const attachments = [];
 
       if (file) {
-        attachments.push({
-          type: "image",
-          url: file.path
-        });
-      }
+  attachments.push({
+    type: "image",
+    url: file.secure_url || file.path || file.url
+  });
+}
+
 
       let message = await Message.create({
         chat: chat._id,
