@@ -22,7 +22,6 @@ const storage = new CloudinaryStorage({
 
 const upload = multer({
   storage,
-  
 });
 
 
@@ -115,7 +114,7 @@ router.post(
   (req, res, next) => {
     upload.single("image")(req, res, function (err) {
       if (err) {
-        console.error(" MULTER / CLOUDINARY ERROR:", err);
+        console.error("MULTER / CLOUDINARY ERROR:", err);
         return res.status(400).json({
           success: false,
           message: err.message || "Image upload failed"
@@ -185,27 +184,6 @@ router.post(
     }
   }
 );
-    /* ================= SOCKET PUSH ================= */
-
-    const io = req.app.get("io");
-
-    io.to(chat._id.toString()).emit("message:new", {
-      chatId: chat._id,
-      message
-    });
-
-    io.emit("inbox:update", {
-      chatId: chat._id,
-      message
-    });
-
-    res.status(201).json({ success: true, data: message });
-
-  } catch (err) {
-    console.error("Send message error:", err);
-    res.status(500).json({ success: false });
-  }
-});
 
 
 /* =========================

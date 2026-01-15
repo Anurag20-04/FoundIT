@@ -22,7 +22,7 @@ export default function Landing({ theme = "dark" }) {
           </h1>
 
           <p>
-            FindIT helps people reunite with their lost belongings using a
+            FoundIT helps people reunite with their lost belongings using a
             secure, community-driven platform.
           </p>
 
