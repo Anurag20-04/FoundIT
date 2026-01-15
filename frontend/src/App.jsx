@@ -108,7 +108,7 @@ function App() {
               }
             />
 
-            {/* 🔐 PROTECTED PROFILE ROUTE */}
+            {/* PROTECTED PROFILE ROUTE */}
             <Route
               path="/profile"
               element={

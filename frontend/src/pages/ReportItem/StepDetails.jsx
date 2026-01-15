@@ -97,7 +97,7 @@ export default function StepDetails({ formData, setFormData, onNext, onBack }) {
           )}
         </div>
 
-        {/* 💰 REWARD — ONLY FOR LOST ITEMS */}
+        {/*  REWARD — ONLY FOR LOST ITEMS */}
         {isLost && (
           <div className="reward-card-premium">
             <div className="reward-info">

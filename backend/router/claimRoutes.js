@@ -96,17 +96,17 @@ router.patch("/:id/approve", auth, async (req, res) => {
       return res.json({ success: true, data: claim });
     }
 
-    // 🔹 Create chat
+    //  Create chat
     const chat = await Chat.create({
       participants: [claim.owner, claim.claimant],
       claim: claim._id,
     });
 
-    // 🔹 Update claim
+    //  Update claim
     claim.status = "approved";
     claim.chat = chat._id;
     await claim.save();
-// 🔔 Notify claimant
+//  Notify claimant
 await Notification.create({
   user: claim.claimant,
   message: "Your claim has been approved. You can now chat.",
@@ -117,7 +117,7 @@ await Notification.create({
 });
 
 /* =========================
-   🔥 REALTIME EMIT
+   REALTIME EMIT
 ========================= */
 const io = req.app.get("io");
 

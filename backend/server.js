@@ -40,7 +40,7 @@ uploadDirs.forEach((dir) => {
 });
 
 /* =======================
-   🔥 STATIC UPLOADS (FIX)
+    STATIC UPLOADS (FIX)
 ======================= */
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
@@ -69,7 +69,7 @@ app.use(
         return callback(null, true);
       }
 
-      console.log("❌ Blocked by CORS:", origin);
+      console.log(" Blocked by CORS:", origin);
       return callback(new Error("Not allowed by CORS"));
     },
     credentials: true,
@@ -101,7 +101,7 @@ app.use("/api/chats", chatRoutes);
 /* =======================
    HEALTH CHECK
 ======================= */
-app.get("/", (req, res) => res.send("🚀 Lost & Found API running"));
+app.get("/", (req, res) => res.send(" Lost & Found API running"));
 
 /* =======================
    SOCKET SERVER
@@ -139,7 +139,7 @@ const jwt = require("jsonwebtoken");
 io.use((socket, next) => {
   const token = socket.handshake.auth?.token;
 
-  console.log("🔐 Socket handshake token:", token ? "RECEIVED" : "MISSING");
+  console.log(" Socket handshake token:", token ? "RECEIVED" : "MISSING");
 
   if (!token) {
     return next(new Error("No token provided"));
@@ -150,7 +150,7 @@ io.use((socket, next) => {
     socket.userId = String(decoded.id || decoded.userId || decoded._id);
     next();
   } catch (err) {
-    console.log("❌ JWT verify failed:", err.message);
+    console.log(" JWT verify failed:", err.message);
     next(new Error("Auth failed"));
   }
 });
@@ -161,7 +161,7 @@ io.use((socket, next) => {
 ============================ */
 io.on("connection", (socket) => {
   const userId = socket.userId;
-  console.log("🟢 User online:", userId);
+  console.log(" User online:", userId);
 
   socket.on("chat:join", ({ chatId }) => {
     if (chatId) socket.join(chatId);
@@ -196,7 +196,7 @@ io.on("connection", (socket) => {
   });
 
  socket.on("disconnect", (reason) => {
-  console.log("🔴 Socket disconnected:", userId, "| reason:", reason);
+  console.log("Socket disconnected:", userId, "| reason:", reason);
 });
 
 });
@@ -204,7 +204,7 @@ io.on("connection", (socket) => {
 app.set("io", io);
 
 app.use((err, req, res, next) => {
-  console.error("🔥 SERVER ERROR:");
+  console.error(" SERVER ERROR:");
   console.error(err.stack || err);
 
   res.status(500).json({
@@ -215,5 +215,5 @@ app.use((err, req, res, next) => {
 
 
 server.listen(PORT, () => {
-  console.log(`🚀 Server running on ${PORT}`);
+  console.log(` Server running on ${PORT}`);
 });

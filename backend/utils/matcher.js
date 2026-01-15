@@ -1,7 +1,4 @@
-/**
- * Smart Matcher Utility
- * Compares two items to see if they are a potential match.
- */
+
 const matchItems = (item1, item2) => {
   // 1. Categories MUST match
   if (item1.category.toLowerCase() !== item2.category.toLowerCase()) {

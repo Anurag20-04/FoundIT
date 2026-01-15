@@ -15,7 +15,7 @@ const MessageSchema = new mongoose.Schema(
       required: true,
     },
 
-    // ✅ text is no longer mandatory (so image-only messages work)
+    // text is no longer mandatory (so image-only messages work)
     text: {
       type: String,
       trim: true,
@@ -33,7 +33,7 @@ const MessageSchema = new mongoose.Schema(
       default: false,
     },
 
-    // ✅ Cloudinary attachments (image now, expandable later)
+    //  Cloudinary attachments (image now, expandable later)
     attachments: [
       {
         type: {

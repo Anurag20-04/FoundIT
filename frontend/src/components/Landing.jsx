@@ -27,7 +27,7 @@ export default function Landing({ theme = "dark" }) {
           </p>
 
           <div className="hero-actions">
-            {/* ✅ REPORT ITEM → FULL MULTI-STEP FLOW */}
+            {/*  REPORT ITEM → FULL MULTI-STEP FLOW */}
             <Link to="/report" className="primary-btn">
               Report Item
             </Link>

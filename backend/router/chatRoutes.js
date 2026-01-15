@@ -109,45 +109,82 @@ router.get("/:id", auth, async (req, res) => {
    SEND MESSAGE (TEXT + IMAGE)
    POST /api/chats/:id/message
 ========================= */
-router.post("/:id/message", auth, upload.single("image"), async (req, res) => {
-  try {
-    const { text } = req.body;
-    const file = req.file;
-
-    if (!text?.trim() && !file) {
-      return res.status(400).json({ success: false, message: "Empty message" });
-    }
-
-    const chat = await Chat.findById(req.params.id);
-    if (!chat) return res.status(404).json({ success: false });
-
-    if (!chat.participants.some(p => String(p) === req.user.id)) {
-      return res.status(403).json({ success: false });
-    }
-
-    const attachments = [];
-
-    if (file) {
-      attachments.push({
-        type: "image",
-        url: file.path, // cloudinary secure url
-      });
-    }
-
-    let message = await Message.create({
-      chat: chat._id,
-      sender: req.user.id,
-      text: text || "",
-      attachments,
-      status: "sent"
+router.post(
+  "/:id/message",
+  auth,
+  (req, res, next) => {
+    upload.single("image")(req, res, function (err) {
+      if (err) {
+        console.error(" MULTER / CLOUDINARY ERROR:", err);
+        return res.status(400).json({
+          success: false,
+          message: err.message || "Image upload failed"
+        });
+      }
+      next();
     });
+  },
+  async (req, res) => {
+    try {
+      const { text } = req.body;
+      const file = req.file;
 
-    message = await message.populate("sender", "name profileImage");
+      if (!text?.trim() && !file) {
+        return res.status(400).json({ success: false, message: "Empty message" });
+      }
 
-    chat.lastMessage = message._id;
-    chat.lastActivity = new Date();
-    await chat.save();
+      const chat = await Chat.findById(req.params.id);
+      if (!chat) return res.status(404).json({ success: false });
 
+      if (!chat.participants.some(p => String(p) === req.user.id)) {
+        return res.status(403).json({ success: false });
+      }
+
+      const attachments = [];
+
+      if (file) {
+        attachments.push({
+          type: "image",
+          url: file.path
+        });
+      }
+
+      let message = await Message.create({
+        chat: chat._id,
+        sender: req.user.id,
+        text: text || "",
+        attachments,
+        status: "sent"
+      });
+
+      message = await message.populate("sender", "name profileImage");
+
+      chat.lastMessage = message._id;
+      chat.lastActivity = new Date();
+      await chat.save();
+
+      const io = req.app.get("io");
+
+      if (io) {
+        io.to(chat._id.toString()).emit("message:new", {
+          chatId: chat._id,
+          message
+        });
+
+        io.emit("inbox:update", {
+          chatId: chat._id,
+          message
+        });
+      }
+
+      res.status(201).json({ success: true, data: message });
+
+    } catch (err) {
+      console.error("SEND MESSAGE ERROR:", err);
+      res.status(500).json({ success: false, message: err.message });
+    }
+  }
+);
     /* ================= SOCKET PUSH ================= */
 
     const io = req.app.get("io");

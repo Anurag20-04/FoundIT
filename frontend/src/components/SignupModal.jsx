@@ -35,7 +35,7 @@ export default function SignupModal({ theme = "light", onClose, switchToLogin })
         password: form.password,
       });
 
-      // ✅ show success screen instead of redirect
+      //  show success screen instead of redirect
       setSuccess(true);
 
     } catch (err) {

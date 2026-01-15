@@ -46,7 +46,7 @@ export default function ItemDetail() {
   };
 
   /* ===============================
-     🔥 REALTIME CLAIM UPDATE
+      REALTIME CLAIM UPDATE
   =============================== */
   useEffect(() => {
     const socket = getSocket();
@@ -72,7 +72,7 @@ export default function ItemDetail() {
   }, [id, user]);
 
   /* ===============================
-     🔓 FETCH CONTACT AFTER APPROVAL
+     FETCH CONTACT AFTER APPROVAL
   =============================== */
   useEffect(() => {
     const fetchContact = async () => {

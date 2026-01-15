@@ -17,7 +17,7 @@ export default function SphereBackground() {
     <Particles
       id="tsparticles"
        style={{
-      pointerEvents: "auto",   // 🔑 CRITICAL FIX
+      pointerEvents: "auto",   //  CRITICAL FIX
       position: "absolute",
       inset: 0,
       zIndex: 0,

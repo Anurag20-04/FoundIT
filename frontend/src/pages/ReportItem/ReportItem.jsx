@@ -35,7 +35,7 @@ export default function ReportItem({ theme, requireLogin }) {
   });
 
   /* =========================================================
-     🛠️ REMOVE REWARD FOR FOUND ITEMS
+      REMOVE REWARD FOR FOUND ITEMS
   ========================================================= */
   useEffect(() => {
     if (formData.type === "found" && formData.reward) {
@@ -44,7 +44,7 @@ export default function ReportItem({ theme, requireLogin }) {
   }, [formData.type]);
 
   /* =========================================================
-     🔐 LOGIN GUARD
+      LOGIN GUARD
   ========================================================= */
   useEffect(() => {
     if (!loading && !user) {

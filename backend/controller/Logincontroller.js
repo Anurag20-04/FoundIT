@@ -7,14 +7,14 @@ const Login = async (req, res) => {
     const { email, password } = req.body;
 
     /* =========================
-       1️⃣ Validation
+       Validation
     ========================= */
     if (!email || !password) {
       return res.status(400).json({ error: "Email and password are required" });
     }
 
-    /* =========================
-       2️⃣ Find user (include password)
+    /* ========================
+      Find user (include password)
     ========================= */
     const user = await User.findOne({ email: email.toLowerCase() }).select("+password");
 
@@ -23,7 +23,7 @@ const Login = async (req, res) => {
     }
 
     /* =========================
-       🔒 EMAIL VERIFICATION CHECK (NEW - CRITICAL)
+        EMAIL VERIFICATION CHECK (NEW - CRITICAL)
     ========================= */
     if (!user.isEmailVerified) {
       return res.status(403).json({
@@ -33,7 +33,7 @@ const Login = async (req, res) => {
     }
 
     /* =========================
-       3️⃣ Compare password
+        Compare password
     ========================= */
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
@@ -41,7 +41,7 @@ const Login = async (req, res) => {
     }
 
     /* =========================
-       4️⃣ Create JWT
+        Create JWT
     ========================= */
     const token = jwt.sign(
       { userId: user._id },
@@ -50,12 +50,12 @@ const Login = async (req, res) => {
     );
 
     /* =========================
-       5️⃣ Remove password
+        Remove password
     ========================= */
     user.password = undefined;
 
     /* =========================
-       6️⃣ Response
+        Response
     ========================= */
     res.status(200).json({
       message: "Login Successful",

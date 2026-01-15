@@ -19,7 +19,7 @@ const {
 ========================================================= */
 router.post(
   "/report",
-  upload.array("images", 5),   // ✅ field name MUST be "images"
+  upload.array("images", 5),  
   addItem
 );
 

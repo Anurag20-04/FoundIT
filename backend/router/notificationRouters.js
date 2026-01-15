@@ -86,7 +86,7 @@ router.patch("/:id/accept", async (req, res) => {
       });
     }
 
-    // ✅ Already approved
+    // Already approved
     if (claim.status === "approved" && claim.chat) {
       notif.isRead = true;
       notif.type = "claim-approved";
@@ -99,24 +99,24 @@ router.patch("/:id/accept", async (req, res) => {
       });
     }
 
-    // 🧠 Create chat
+    //  Create chat
     const chat = await Chat.create({
       participants: [claim.owner, claim.claimant],
       claim: claim._id,
       lastActivity: new Date(),
     });
 
-    // 🧠 Update claim
+    // Update claim
     claim.status = "approved";
     claim.chat = chat._id;
     await claim.save();
 
-    // 🧠 Close owner notif
+    // Close owner notif
     notif.isRead = true;
     notif.type = "claim-approved";
     await notif.save();
 
-    // 🔔 Notify claimant
+    //  Notify claimant
     await Notification.create({
       user: claim.claimant,
       message: "Your claim was approved. You can now chat.",

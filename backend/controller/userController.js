@@ -8,7 +8,7 @@ const Item = require("../models/Item");
 exports.updateMyProfile = async (req, res) => {
   try {
     /* =========================
-       1️⃣ AUTH CHECK
+        AUTH CHECK
     ========================= */
     if (!req.user || !req.user._id) {
       return res.status(401).json({
@@ -18,7 +18,7 @@ exports.updateMyProfile = async (req, res) => {
     }
 
     /* =========================
-       2️⃣ FETCH USER
+        FETCH USER
     ========================= */
     const user = await User.findById(req.user._id);
     if (!user) {
@@ -29,7 +29,7 @@ exports.updateMyProfile = async (req, res) => {
     }
 
     /* =========================
-       3️⃣ SAFE FIELD UPDATES
+        SAFE FIELD UPDATES
        (TRUE PARTIAL UPDATE)
     ========================= */
 
@@ -72,15 +72,15 @@ exports.updateMyProfile = async (req, res) => {
     }
 
     /* =========================
-       4️⃣ PROFILE IMAGE
+        PROFILE IMAGE
     ========================= */
     if (req.file && req.file.secure_url) {
       user.profileImage = req.file.secure_url;
     }
 
     /* =========================
-       5️⃣ SAVE
-    ========================= */
+        SAVE
+    ======================== */
     await user.save();
 
     const userResponse = user.toObject();

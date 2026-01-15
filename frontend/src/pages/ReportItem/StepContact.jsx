@@ -104,7 +104,7 @@ export default function StepContact({ formData, setFormData, onBack }) {
       }
 
     } catch (err) {
-      console.error("❌ Item submit error:", err);
+      console.error(" Item submit error:", err);
       setIsSubmitting(false);
       setError(err.response?.data?.error || "Failed to submit report. Please try again.");
     }

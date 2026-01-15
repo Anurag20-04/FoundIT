@@ -4,7 +4,7 @@ const User = require("../models/User");
 const authMiddleware = async (req, res, next) => {
   try {
     /* =========================
-       1️⃣ READ AUTH HEADER
+       READ AUTH HEADER
     ========================= */
     const authHeader = req.headers.authorization;
 
@@ -19,12 +19,12 @@ const authMiddleware = async (req, res, next) => {
     }
 
     /* =========================
-       2️⃣ VERIFY TOKEN
+        VERIFY TOKEN
     ========================= */
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     /* =========================
-       3️⃣ EXTRACT USER ID
+       EXTRACT USER ID
     ========================= */
     const userId =
       decoded.id ||
@@ -36,7 +36,7 @@ const authMiddleware = async (req, res, next) => {
     }
 
     /* =========================
-       4️⃣ FETCH USER FROM DB
+       FETCH USER FROM DB
     ========================= */
     const user = await User.findById(userId).select("-password");
 
@@ -45,7 +45,7 @@ const authMiddleware = async (req, res, next) => {
     }
 
     /* =========================
-       5️⃣ ATTACH USER
+       ATTACH USER
     ========================= */
     req.user = user;
     next();

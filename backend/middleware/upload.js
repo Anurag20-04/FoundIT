@@ -15,4 +15,4 @@ const upload = multer({
   limits: { fileSize: 10 * 1024 * 1024 },
 });
 
-module.exports = upload; // ⚠️ DO NOT .single or .any here
+module.exports = upload; 

@@ -10,7 +10,7 @@ const verifyEmail = async (req, res) => {
     }
 
     /* =========================
-       1️⃣ HASH TOKEN (SECURITY)
+       HASH TOKEN (SECURITY)
     ========================= */
     const hashedToken = crypto
       .createHash("sha256")
@@ -18,7 +18,7 @@ const verifyEmail = async (req, res) => {
       .digest("hex");
 
     /* =========================
-       2️⃣ FIND VALID USER
+       FIND VALID USER
     ========================= */
     const user = await User.findOne({
       emailVerifyToken: hashedToken,
@@ -32,7 +32,7 @@ const verifyEmail = async (req, res) => {
     }
 
     /* =========================
-       3️⃣ MARK VERIFIED
+        MARK VERIFIED
     ========================= */
     user.isEmailVerified = true;
     user.emailVerifyToken = undefined;

@@ -25,7 +25,7 @@ export default function LoginModal({ theme = "light", onClose, switchToSignup })
         password,
       });
 
-      // ✅ SINGLE SOURCE OF TRUTH
+      //  SINGLE SOURCE OF TRUTH
       login(res.data.user, res.data.token);
 
       onClose(); // closes modal cleanly

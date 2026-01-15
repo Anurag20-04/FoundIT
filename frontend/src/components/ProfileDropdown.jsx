@@ -12,8 +12,8 @@ const BACKEND_URL = import.meta.env.VITE_API_URL || "";
 ========================= */
 const resolveImage = (img) => {
   if (!img) return avatarDefault;
-  if (img.startsWith("http")) return img;      // ✅ Cloudinary
-  return `${BACKEND_URL}${img}`;               // ✅ Old local uploads
+  if (img.startsWith("http")) return img;      // Cloudinary
+  return `${BACKEND_URL}${img}`;               // Old local uploads
 };
 
 export default function ProfileDropdown() {
