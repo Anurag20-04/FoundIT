@@ -1,32 +1,26 @@
 const nodemailer = require("nodemailer");
 
-/* =========================
-   CREATE TRANSPORTER
-========================= */
 const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: Number(process.env.SMTP_PORT),
-  secure: false, // true for 465, false for 587
+  host: "smtp.gmail.com",
+  port: 465,
+  secure: true, // ✅ MUST be true for 465
   auth: {
     user: process.env.SMTP_EMAIL,
     pass: process.env.SMTP_PASSWORD,
   },
+  connectionTimeout: 10000,
+  greetingTimeout: 10000,
+  socketTimeout: 10000,
 });
 
-/* =========================
-   OPTIONAL: VERIFY SMTP
-========================= */
 transporter.verify((err) => {
   if (err) {
-    console.error("❌ SMTP CONFIG ERROR:", err.message);
+    console.error("❌ SMTP CONFIG ERROR:", err);
   } else {
     console.log("✅ SMTP server ready");
   }
 });
 
-/* =========================
-   GENERIC SEND MAIL FUNCTION
-========================= */
 const sendMail = async ({ to, subject, html }) => {
   return transporter.sendMail({
     from: `"FoundIT" <${process.env.SMTP_EMAIL}>`,
