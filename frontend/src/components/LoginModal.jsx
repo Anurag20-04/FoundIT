@@ -13,25 +13,47 @@ export default function LoginModal({ theme = "light", onClose, switchToSignup })
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const API = import.meta.env.VITE_API_URL;
 
   const submit = async (e) => {
     e.preventDefault();
     setError("");
+    setLoading(true);
 
     try {
-      // const res = axios.post(`${import.meta.env.VITE_API_URL}/api/login`
-      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/login`, {
+      const res = await axios.post(`${API}/api/login`, {
         email,
         password,
       });
 
-      //  SINGLE SOURCE OF TRUTH
       login(res.data.user, res.data.token);
+      onClose();
 
-      onClose(); // closes modal cleanly
     } catch (err) {
       console.error(err);
-      setError("User does not exist or password is incorrect.");
+
+      /* =========================
+         EMAIL NOT VERIFIED
+      ========================= */
+      if (err?.response?.data?.code === "EMAIL_NOT_VERIFIED") {
+        alert("Please verify your email first. OTP has been sent.");
+
+        // Save email so OTP modal/page can use it
+        localStorage.setItem("verifyEmail", email);
+
+        // Switch user to signup modal (OTP screen lives there)
+        switchToSignup();
+        return;
+      }
+
+      setError(
+        err?.response?.data?.message ||
+        "User does not exist or password is incorrect."
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -41,13 +63,11 @@ export default function LoginModal({ theme = "light", onClose, switchToSignup })
         className={`login-modal ${theme}`}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* LEFT IMAGE */}
         <div
           className="login-left"
           style={{ backgroundImage: `url(${loginBg})` }}
         />
 
-        {/* RIGHT FORM */}
         <div className="login-right">
           <button className="close-btn" onClick={onClose}>×</button>
 
@@ -82,8 +102,8 @@ export default function LoginModal({ theme = "light", onClose, switchToSignup })
 
             {error && <p className="error-text">{error}</p>}
 
-            <button type="submit" className="login-btn">
-              Log in
+            <button type="submit" className="login-btn" disabled={loading}>
+              {loading ? "Logging in..." : "Log in"}
             </button>
           </form>
 

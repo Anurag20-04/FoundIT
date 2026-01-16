@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import "./SignupModal.css";
 import signupBg from "../assets/signup-bg.png";
@@ -12,31 +12,50 @@ export default function SignupModal({ theme = "light", onClose, switchToLogin })
     password: "",
   });
 
+  const [otp, setOtp] = useState("");
+  const [step, setStep] = useState("signup"); // signup | otp
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
+  const [emailForOTP, setEmailForOTP] = useState("");
+  const [resendLoading, setResendLoading] = useState(false);
+
+  const API = import.meta.env.VITE_API_URL;
+
+  /* =========================
+     AUTO LOAD OTP MODE
+  ========================= */
+  useEffect(() => {
+    const savedEmail = localStorage.getItem("verifyEmail");
+    if (savedEmail) {
+      setEmailForOTP(savedEmail);
+      setStep("otp");
+    }
+  }, []);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
     setError("");
   };
 
+  /* =========================
+     SIGNUP → PendingUser
+  ========================= */
   const submit = async (e) => {
     e.preventDefault();
     setError("");
     setLoading(true);
 
     try {
-    
-      await axios.post(`${import.meta.env.VITE_API_URL}/api/signup`, {  
+      const res = await axios.post(`${API}/api/signup`, {
         name: form.name.trim(),
         email: form.email.trim(),
         password: form.password,
       });
 
-      //  show success screen instead of redirect
-      setSuccess(true);
+      setEmailForOTP(res.data.email);
+      localStorage.setItem("verifyEmail", res.data.email);
+      setStep("otp");
 
     } catch (err) {
       console.error("SIGNUP ERROR:", err.response || err);
@@ -49,23 +68,76 @@ export default function SignupModal({ theme = "light", onClose, switchToLogin })
     }
   };
 
+  /* =========================
+     VERIFY OTP → Create User
+  ========================= */
+  const verifyOtp = async () => {
+    if (otp.length !== 6) {
+      setError("Please enter a valid 6-digit code");
+      return;
+    }
+
+    setLoading(true);
+    setError("");
+
+    try {
+      await axios.post(`${API}/api/verify-email-otp`, {
+        email: emailForOTP,
+        otp,
+      });
+
+      localStorage.removeItem("verifyEmail");
+      alert("Email verified successfully. You can now login.");
+      switchToLogin();
+
+    } catch (err) {
+      console.error("OTP ERROR:", err.response || err);
+      setError(
+        err?.response?.data?.message ||
+        "Invalid or expired OTP"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /* =========================
+     RESEND OTP
+  ========================= */
+  const resendOtp = async () => {
+    setResendLoading(true);
+    setError("");
+
+    try {
+      await axios.post(`${API}/api/resend-email-otp`, {
+        email: emailForOTP,
+      });
+
+      alert("New OTP sent to your email.");
+
+    } catch (err) {
+      console.error("RESEND OTP ERROR:", err.response || err);
+      setError("Could not resend OTP. Try again.");
+    } finally {
+      setResendLoading(false);
+    }
+  };
+
   return (
     <div className="signup-overlay" onClick={onClose}>
       <div
         className={`signup-modal ${theme}`}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* LEFT IMAGE */}
         <div
           className="signup-left"
           style={{ backgroundImage: `url(${signupBg})` }}
         />
 
-        {/* RIGHT */}
         <div className="signup-right">
           <button className="close-btn" onClick={onClose}>×</button>
 
-          {!success ? (
+          {step === "signup" && (
             <>
               <h2>Create account</h2>
 
@@ -88,7 +160,6 @@ export default function SignupModal({ theme = "light", onClose, switchToLogin })
                   onChange={handleChange}
                 />
 
-                {/* PASSWORD */}
                 <div className="password-field">
                   <input
                     type={showPassword ? "text" : "password"}
@@ -123,33 +194,47 @@ export default function SignupModal({ theme = "light", onClose, switchToLogin })
                 <span onClick={switchToLogin}> Log in</span>
               </p>
             </>
-          ) : (
+          )}
+
+          {step === "otp" && (
             <>
               <h2>Verify your email</h2>
 
-              <p style={{ marginTop: "14px", lineHeight: "1.6" }}>
-                We’ve sent a verification link to your email address.
+              <p style={{ marginTop: "10px", fontSize: "0.9rem" }}>
+                We’ve sent a 6-digit code to:
                 <br />
-                Please check your inbox and click the link to activate your account.
+                <b>{emailForOTP}</b>
               </p>
 
-              <p
-                style={{
-                  marginTop: "10px",
-                  fontSize: "0.85rem",
-                  color: "var(--text-secondary)",
-                }}
-              >
-                You won’t be able to log in until your email is verified.
-              </p>
+              <input
+                className="otp-input"
+                type="text"
+                placeholder="Enter 6 digit OTP"
+                value={otp}
+                onChange={(e) =>
+                  setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))
+                }
+              />
+
+              <p className="otp-hint">Code expires in 1 hour</p>
+
+              {error && <p className="error-text">{error}</p>}
 
               <button
                 className="signup-btn"
-                style={{ marginTop: "24px" }}
-                onClick={switchToLogin}
+                style={{ marginTop: "16px" }}
+                onClick={verifyOtp}
+                disabled={loading}
               >
-                Go to Login
+                {loading ? "Verifying..." : "Verify OTP"}
               </button>
+
+              <p
+                className="resend-text"
+                onClick={!resendLoading ? resendOtp : undefined}
+              >
+                {resendLoading ? "Sending..." : "Resend code"}
+              </p>
             </>
           )}
         </div>
