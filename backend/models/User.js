@@ -16,7 +16,7 @@ const userSchema = new mongoose.Schema(
       unique: true,
       lowercase: true,
       trim: true,
-      index: true, // ✅ FAST LOOKUPS (LOGIN + VERIFY)
+      index: true,
       match: [
         /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
         "Please provide a valid email address",
@@ -33,7 +33,7 @@ const userSchema = new mongoose.Schema(
       default: null,
       validate: {
         validator: function (v) {
-          if (v === null || v === undefined || v === "") return true;
+          if (!v) return true;
           return /^[6-9]\d{9}$/.test(v);
         },
         message: "Please provide a valid Indian mobile number",
@@ -76,20 +76,13 @@ const userSchema = new mongoose.Schema(
     },
 
     /* =========================
-       EMAIL VERIFICATION (CRITICAL)
+       EMAIL VERIFICATION (FINAL)
     ========================= */
     isEmailVerified: {
       type: Boolean,
-      default: false,
-      index: true, // ✅ fast auth filtering
+      default: true, // always true because only verified users are created
+      index: true,
     },
-
-    emailVerifyToken: {
-      type: String,
-      index: true, // ✅ fast verification
-    },
-
-    emailVerifyExpires: Date,
   },
   {
     timestamps: true,

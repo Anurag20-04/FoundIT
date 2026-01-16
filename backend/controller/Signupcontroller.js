@@ -1,11 +1,23 @@
 const User = require("../models/User");
+const PendingUser = require("../models/PendingUser");
 const crypto = require("crypto");
+const bcrypt = require("bcrypt");
 const sendMail = require("../utils/mailer");
+
+/* =========================
+   OTP GENERATOR
+========================= */
+const generateOTP = () => {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+};
 
 const Newuser = async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
+    /* =========================
+       BASIC VALIDATION
+    ========================= */
     if (!name || !email || !password) {
       return res.status(400).json({
         message: "Name, email, and password are required",
@@ -25,6 +37,9 @@ const Newuser = async (req, res) => {
       });
     }
 
+    /* =========================
+       CHECK REAL USERS
+    ========================= */
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(409).json({
@@ -33,48 +48,47 @@ const Newuser = async (req, res) => {
     }
 
     /* =========================
-       EMAIL VERIFY TOKEN (SECURE)
+       REMOVE OLD PENDING USER
     ========================= */
-    const rawToken = crypto.randomBytes(32).toString("hex");
-
-    const emailVerifyToken = crypto
-      .createHash("sha256")
-      .update(rawToken)
-      .digest("hex");
-
-    await User.create({
-      name,
-      email,
-      password,
-      isEmailVerified: false,
-      emailVerifyToken,
-      emailVerifyExpires: Date.now() + 24 * 60 * 60 * 1000,
-    });
-
-    if (!process.env.FRONTEND_URL) {
-      throw new Error("FRONTEND_URL is not defined");
-    }
-
-    const verifyUrl = `${process.env.FRONTEND_URL}/verify-email?token=${rawToken}`;
+    await PendingUser.deleteOne({ email });
 
     /* =========================
-       SEND EMAIL (NON-BLOCKING)
+       GENERATE OTP
+    ========================= */
+    const otp = generateOTP();
+
+    const hashedOTP = crypto
+      .createHash("sha256")
+      .update(otp)
+      .digest("hex");
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    /* =========================
+       CREATE PENDING USER (1 HR)
+    ========================= */
+    await PendingUser.create({
+      name,
+      email,
+      password: hashedPassword,
+      emailOTP: hashedOTP,
+      emailOTPExpires: Date.now() + 60 * 60 * 1000, // ✅ 1 hour
+    });
+
+    /* =========================
+       SEND OTP EMAIL
     ========================= */
     sendMail({
       to: email,
-      subject: "Verify your FoundIT account",
+      subject: "Your FoundIT verification code",
       html: `
         <div style="font-family:Arial,sans-serif">
           <h2>Welcome to FoundIT</h2>
-          <p>Click below to verify your email:</p>
-          <a href="${verifyUrl}"
-             style="display:inline-block;padding:12px 18px;
-                    background:#2563eb;color:white;
-                    text-decoration:none;border-radius:6px">
-             Verify Email
-          </a>
-          <p style="font-size:12px;color:#666;margin-top:10px">
-            Link valid for 24 hours.
+          <p>Your email verification code is:</p>
+          <h1 style="letter-spacing:4px">${otp}</h1>
+          <p>This code is valid for <b>1 hour</b>.</p>
+          <p style="font-size:12px;color:#666">
+            If you did not sign up, please ignore this email.
           </p>
         </div>
       `,
@@ -83,10 +97,11 @@ const Newuser = async (req, res) => {
     });
 
     /* =========================
-       RESPONSE (ALWAYS FIRES)
+       RESPONSE
     ========================= */
     res.status(201).json({
-      message: "Signup successful. Please verify your email before logging in.",
+      message: "OTP sent to your email.",
+      email,
     });
 
   } catch (error) {
