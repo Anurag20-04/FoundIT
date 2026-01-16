@@ -13,7 +13,7 @@ export default function SignupModal({ theme = "light", onClose, switchToLogin })
   });
 
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
-  const [step, setStep] = useState("signup"); // signup | otp
+  const [step, setStep] = useState("signup");
   const [verified, setVerified] = useState(false);
 
   const [showPassword, setShowPassword] = useState(false);
@@ -41,6 +41,19 @@ export default function SignupModal({ theme = "light", onClose, switchToLogin })
   };
 
   /* =========================
+     FULL RESET + CLOSE
+  ========================= */
+  const handleClose = () => {
+    localStorage.removeItem("verifyEmail");
+    setStep("signup");
+    setOtp(["", "", "", "", "", ""]);
+    setEmailForOTP("");
+    setError("");
+    setVerified(false);
+    onClose();
+  };
+
+  /* =========================
      OTP HANDLERS
   ========================= */
   const handleOtpChange = (value, index) => {
@@ -62,7 +75,7 @@ export default function SignupModal({ theme = "light", onClose, switchToLogin })
   };
 
   /* =========================
-     SIGNUP → PendingUser
+     SIGNUP
   ========================= */
   const submit = async (e) => {
     e.preventDefault();
@@ -81,18 +94,14 @@ export default function SignupModal({ theme = "light", onClose, switchToLogin })
       setStep("otp");
 
     } catch (err) {
-      console.error("SIGNUP ERROR:", err.response || err);
-      setError(
-        err?.response?.data?.message ||
-        "Signup failed. Please try again."
-      );
+      setError(err?.response?.data?.message || "Signup failed.");
     } finally {
       setLoading(false);
     }
   };
 
   /* =========================
-     VERIFY OTP → Create User
+     VERIFY OTP
   ========================= */
   const verifyOtp = async () => {
     const finalOtp = otp.join("");
@@ -118,11 +127,7 @@ export default function SignupModal({ theme = "light", onClose, switchToLogin })
       }, 1600);
 
     } catch (err) {
-      console.error("OTP ERROR:", err.response || err);
-      setError(
-        err?.response?.data?.message ||
-        "Invalid or expired OTP"
-      );
+      setError(err?.response?.data?.message || "Invalid or expired OTP");
     } finally {
       setLoading(false);
     }
@@ -139,39 +144,23 @@ export default function SignupModal({ theme = "light", onClose, switchToLogin })
       await axios.post(`${API}/api/resend-email-otp`, {
         email: emailForOTP,
       });
-    } catch (err) {
-      console.error("RESEND OTP ERROR:", err);
-      setError("Could not resend OTP. Try again.");
+    } catch {
+      setError("Could not resend OTP.");
     } finally {
       setResendLoading(false);
     }
   };
 
   return (
-    <div
-      className="signup-overlay"
-      onClick={() => {
-        if (step === "signup") onClose();
-      }}
-    >
-      <div
-        className={`signup-modal ${theme}`}
-        onClick={(e) => e.stopPropagation()}
-      >
+    <div className="signup-overlay" onClick={handleClose}>
+      <div className={`signup-modal ${theme}`} onClick={(e) => e.stopPropagation()}>
         <div
           className="signup-left"
           style={{ backgroundImage: `url(${signupBg})` }}
         />
 
         <div className="signup-right">
-          <button
-            className="close-btn"
-            onClick={() => {
-              if (step === "signup") onClose();
-            }}
-          >
-            ×
-          </button>
+          <button className="close-btn" onClick={handleClose}>×</button>
 
           {step === "signup" && (
             <>
@@ -216,11 +205,7 @@ export default function SignupModal({ theme = "light", onClose, switchToLogin })
 
                 {error && <p className="error-text">{error}</p>}
 
-                <button
-                  type="submit"
-                  className="signup-btn"
-                  disabled={loading}
-                >
+                <button type="submit" className="signup-btn" disabled={loading}>
                   {loading ? "Creating account..." : "Create account"}
                 </button>
               </form>
@@ -237,8 +222,7 @@ export default function SignupModal({ theme = "light", onClose, switchToLogin })
               <h2>Verify your email</h2>
 
               <p style={{ marginTop: "10px", fontSize: "0.9rem" }}>
-                We’ve sent a 6-digit code to:
-                <br />
+                We’ve sent a 6-digit code to:<br />
                 <b>{emailForOTP}</b>
               </p>
 
@@ -248,6 +232,9 @@ export default function SignupModal({ theme = "light", onClose, switchToLogin })
                     key={i}
                     id={`otp-${i}`}
                     className="otp-box"
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
                     maxLength="1"
                     value={digit}
                     onChange={(e) => handleOtpChange(e.target.value, i)}
@@ -261,19 +248,11 @@ export default function SignupModal({ theme = "light", onClose, switchToLogin })
 
               {error && <p className="error-text">{error}</p>}
 
-              <button
-                className="signup-btn"
-                style={{ marginTop: "16px" }}
-                onClick={verifyOtp}
-                disabled={loading}
-              >
+              <button className="signup-btn" style={{ marginTop: "16px" }} onClick={verifyOtp} disabled={loading}>
                 {loading ? "Verifying..." : "Verify OTP"}
               </button>
 
-              <p
-                className="resend-text"
-                onClick={!resendLoading ? resendOtp : undefined}
-              >
+              <p className="resend-text" onClick={!resendLoading ? resendOtp : undefined}>
                 {resendLoading ? "Sending..." : "Resend code"}
               </p>
             </>
