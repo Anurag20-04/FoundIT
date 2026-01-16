@@ -1,18 +1,39 @@
-const SibApiV3Sdk = require("sib-api-v3-sdk");
+const nodemailer = require("nodemailer");
 
-const client = SibApiV3Sdk.ApiClient.instance;
-client.authentications["api-key"].apiKey = process.env.BREVO_API_KEY;
+/* =========================
+   CREATE TRANSPORTER
+========================= */
+const transporter = nodemailer.createTransport({
+  host: process.env.SMTP_HOST,
+  port: Number(process.env.SMTP_PORT),
+  secure: false, // true for 465, false for 587
+  auth: {
+    user: process.env.SMTP_EMAIL,
+    pass: process.env.SMTP_PASSWORD,
+  },
+});
 
-const api = new SibApiV3Sdk.TransactionalEmailsApi();
+/* =========================
+   OPTIONAL: VERIFY SMTP
+========================= */
+transporter.verify((err) => {
+  if (err) {
+    console.error("❌ SMTP CONFIG ERROR:", err.message);
+  } else {
+    console.log("✅ SMTP server ready");
+  }
+});
 
-module.exports = async function sendMail({ to, subject, html }) {
-  return api.sendTransacEmail({
-    sender: {
-      email: process.env.EMAIL_FROM,
-      name: "FoundIT"
-    },
-    to: [{ email: to }],
+/* =========================
+   GENERIC SEND MAIL FUNCTION
+========================= */
+const sendMail = async ({ to, subject, html }) => {
+  return transporter.sendMail({
+    from: `"FoundIT" <${process.env.SMTP_EMAIL}>`,
+    to,
     subject,
-    htmlContent: html
+    html,
   });
 };
+
+module.exports = sendMail;
