@@ -23,9 +23,6 @@ const userSchema = new mongoose.Schema(
       ],
     },
 
-    /* =========================
-       PHONE (OPTIONAL INITIALLY)
-    ========================= */
     phoneNumber: {
       type: String,
       trim: true,
@@ -45,9 +42,6 @@ const userSchema = new mongoose.Schema(
       default: false,
     },
 
-    /* =========================
-       ADDRESS & ID (KYC LATER)
-    ========================= */
     address: {
       type: String,
       default: null,
@@ -75,12 +69,9 @@ const userSchema = new mongoose.Schema(
       select: false,
     },
 
-    /* =========================
-       EMAIL VERIFICATION (FINAL)
-    ========================= */
     isEmailVerified: {
       type: Boolean,
-      default: true, // always true because only verified users are created
+      default: true, // only verified users exist here
       index: true,
     },
   },
@@ -90,10 +81,15 @@ const userSchema = new mongoose.Schema(
 );
 
 /* =========================
-   PASSWORD HASHING
+   PASSWORD HASHING (FINAL)
 ========================= */
 userSchema.pre("save", async function () {
   if (!this.isModified("password")) return;
+
+  // ✅ prevent double hashing (PendingUser → User)
+  if (this.password.startsWith("$2a$") || this.password.startsWith("$2b$")) {
+    return;
+  }
 
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);

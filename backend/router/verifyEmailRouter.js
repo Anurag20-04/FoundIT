@@ -13,7 +13,7 @@ const router = express.Router();
 ========================= */
 router.post("/verify-email-otp", async (req, res) => {
   try {
-    const { email, otp } = req.body;
+    let { email, otp } = req.body;
 
     if (!email || !otp) {
       return res.status(400).json({
@@ -21,16 +21,18 @@ router.post("/verify-email-otp", async (req, res) => {
       });
     }
 
+    email = email.toLowerCase().trim();
+
     const hashedOTP = crypto
       .createHash("sha256")
-      .update(otp)
+      .update(String(otp))
       .digest("hex");
 
     /* =========================
        FIND PENDING USER
     ========================= */
     const pendingUser = await PendingUser.findOne({
-      email: email.toLowerCase(),
+      email,
       emailOTP: hashedOTP,
       emailOTPExpires: { $gt: Date.now() },
     });
@@ -42,7 +44,19 @@ router.post("/verify-email-otp", async (req, res) => {
     }
 
     /* =========================
+       SAFETY: PREVENT DUPLICATE USER
+    ========================= */
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      await PendingUser.deleteOne({ email });
+      return res.status(409).json({
+        message: "Account already verified. Please login.",
+      });
+    }
+
+    /* =========================
        CREATE REAL USER
+       (password is already hashed)
     ========================= */
     await User.create({
       name: pendingUser.name,
@@ -56,13 +70,13 @@ router.post("/verify-email-otp", async (req, res) => {
     ========================= */
     await PendingUser.deleteOne({ email });
 
-    res.status(200).json({
+    return res.status(200).json({
       message: "Email verified successfully. You can now login.",
     });
 
   } catch (err) {
     console.error("OTP VERIFY ERROR:", err);
-    res.status(500).json({ message: "Verification failed" });
+    return res.status(500).json({ message: "Verification failed" });
   }
 });
 
@@ -71,15 +85,15 @@ router.post("/verify-email-otp", async (req, res) => {
 ========================= */
 router.post("/resend-email-otp", async (req, res) => {
   try {
-    const { email } = req.body;
+    let { email } = req.body;
 
     if (!email) {
       return res.status(400).json({ message: "Email is required" });
     }
 
-    const pendingUser = await PendingUser.findOne({
-      email: email.toLowerCase(),
-    });
+    email = email.toLowerCase().trim();
+
+    const pendingUser = await PendingUser.findOne({ email });
 
     if (!pendingUser) {
       return res.status(400).json({
@@ -111,13 +125,13 @@ router.post("/resend-email-otp", async (req, res) => {
       `,
     });
 
-    res.status(200).json({
+    return res.status(200).json({
       message: "New OTP sent to your email",
     });
 
   } catch (err) {
     console.error("RESEND OTP ERROR:", err);
-    res.status(500).json({ message: "Could not resend OTP" });
+    return res.status(500).json({ message: "Could not resend OTP" });
   }
 });
 
