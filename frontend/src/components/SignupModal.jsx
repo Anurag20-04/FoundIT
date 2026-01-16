@@ -12,8 +12,10 @@ export default function SignupModal({ theme = "light", onClose, switchToLogin })
     password: "",
   });
 
-  const [otp, setOtp] = useState("");
+  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [step, setStep] = useState("signup"); // signup | otp
+  const [verified, setVerified] = useState(false);
+
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -36,6 +38,27 @@ export default function SignupModal({ theme = "light", onClose, switchToLogin })
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
     setError("");
+  };
+
+  /* =========================
+     OTP HANDLERS
+  ========================= */
+  const handleOtpChange = (value, index) => {
+    if (!/^\d?$/.test(value)) return;
+
+    const newOtp = [...otp];
+    newOtp[index] = value;
+    setOtp(newOtp);
+
+    if (value && index < 5) {
+      document.getElementById(`otp-${index + 1}`).focus();
+    }
+  };
+
+  const handleOtpKeyDown = (e, index) => {
+    if (e.key === "Backspace" && !otp[index] && index > 0) {
+      document.getElementById(`otp-${index - 1}`).focus();
+    }
   };
 
   /* =========================
@@ -72,8 +95,9 @@ export default function SignupModal({ theme = "light", onClose, switchToLogin })
      VERIFY OTP → Create User
   ========================= */
   const verifyOtp = async () => {
-    if (otp.length !== 6) {
-      setError("Please enter a valid 6-digit code");
+    const finalOtp = otp.join("");
+    if (finalOtp.length !== 6) {
+      setError("Please enter the complete 6-digit code");
       return;
     }
 
@@ -83,12 +107,15 @@ export default function SignupModal({ theme = "light", onClose, switchToLogin })
     try {
       await axios.post(`${API}/api/verify-email-otp`, {
         email: emailForOTP,
-        otp,
+        otp: finalOtp,
       });
 
-      localStorage.removeItem("verifyEmail");
-      alert("Email verified successfully. You can now login.");
-      switchToLogin();
+      setVerified(true);
+
+      setTimeout(() => {
+        localStorage.removeItem("verifyEmail");
+        switchToLogin();
+      }, 1600);
 
     } catch (err) {
       console.error("OTP ERROR:", err.response || err);
@@ -112,11 +139,8 @@ export default function SignupModal({ theme = "light", onClose, switchToLogin })
       await axios.post(`${API}/api/resend-email-otp`, {
         email: emailForOTP,
       });
-
-      alert("New OTP sent to your email.");
-
     } catch (err) {
-      console.error("RESEND OTP ERROR:", err.response || err);
+      console.error("RESEND OTP ERROR:", err);
       setError("Could not resend OTP. Try again.");
     } finally {
       setResendLoading(false);
@@ -124,7 +148,12 @@ export default function SignupModal({ theme = "light", onClose, switchToLogin })
   };
 
   return (
-    <div className="signup-overlay" onClick={onClose}>
+    <div
+      className="signup-overlay"
+      onClick={() => {
+        if (step === "signup") onClose();
+      }}
+    >
       <div
         className={`signup-modal ${theme}`}
         onClick={(e) => e.stopPropagation()}
@@ -135,7 +164,14 @@ export default function SignupModal({ theme = "light", onClose, switchToLogin })
         />
 
         <div className="signup-right">
-          <button className="close-btn" onClick={onClose}>×</button>
+          <button
+            className="close-btn"
+            onClick={() => {
+              if (step === "signup") onClose();
+            }}
+          >
+            ×
+          </button>
 
           {step === "signup" && (
             <>
@@ -196,7 +232,7 @@ export default function SignupModal({ theme = "light", onClose, switchToLogin })
             </>
           )}
 
-          {step === "otp" && (
+          {step === "otp" && !verified && (
             <>
               <h2>Verify your email</h2>
 
@@ -206,15 +242,20 @@ export default function SignupModal({ theme = "light", onClose, switchToLogin })
                 <b>{emailForOTP}</b>
               </p>
 
-              <input
-                className="otp-input"
-                type="text"
-                placeholder="Enter 6 digit OTP"
-                value={otp}
-                onChange={(e) =>
-                  setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))
-                }
-              />
+              <div className="otp-box-wrapper">
+                {otp.map((digit, i) => (
+                  <input
+                    key={i}
+                    id={`otp-${i}`}
+                    className="otp-box"
+                    maxLength="1"
+                    value={digit}
+                    onChange={(e) => handleOtpChange(e.target.value, i)}
+                    onKeyDown={(e) => handleOtpKeyDown(e, i)}
+                    autoFocus={i === 0}
+                  />
+                ))}
+              </div>
 
               <p className="otp-hint">Code expires in 1 hour</p>
 
@@ -236,6 +277,14 @@ export default function SignupModal({ theme = "light", onClose, switchToLogin })
                 {resendLoading ? "Sending..." : "Resend code"}
               </p>
             </>
+          )}
+
+          {verified && (
+            <div className="verify-success">
+              <div className="checkmark">✓</div>
+              <h2>Email verified</h2>
+              <p>Your account has been activated successfully.</p>
+            </div>
           )}
         </div>
       </div>
