@@ -6,7 +6,6 @@ const feedbackSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       default: null,
-      index: true,
     },
 
     rating: {
@@ -28,24 +27,19 @@ const feedbackSchema = new mongoose.Schema(
     },
 
     /*
-      Weight represents feedback strength for analytics:
-      - stars only        → 1.0
-      - text only         → 1.5
-      - stars + text      → 2.0
-      - logged-in bonus   → +0.5
+      Weight calculation:
+      - stars only      → 1
+      - text only       → 1.5
+      - stars + text    → 2
+      - logged-in user  → +0.5
     */
     weight: {
       type: Number,
       default: 1,
     },
 
-    userAgent: {
-      type: String,
-    },
-
-    ip: {
-      type: String,
-    },
+    userAgent: String,
+    ip: String,
   },
   {
     timestamps: true,
@@ -53,7 +47,7 @@ const feedbackSchema = new mongoose.Schema(
 );
 
 /*
-  Automatically calculate feedback weight before saving
+  Pre-save hook (callback style — DO NOT make async)
 */
 feedbackSchema.pre("save", function (next) {
   let weight = 1;
