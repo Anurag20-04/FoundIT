@@ -2,38 +2,48 @@ const Feedback = require("../models/Feedback");
 
 exports.createFeedback = async (req, res) => {
   try {
-    const { rating, message, page } = req.body;
+    let { rating, message, page } = req.body;
 
-    if (
-      (!message || message.trim().length < 3) &&
-      (rating === undefined || rating === null)
-    ) {
+    // Normalize message early
+    message = typeof message === "string" ? message.trim() : null;
+
+    // Normalize rating early
+    if (rating !== undefined && rating !== null) {
+      rating = Number(rating);
+    }
+
+    // HARD validation: at least one valid input
+    const isMessageValid = message && message.length >= 3;
+    const isRatingValid =
+      typeof rating === "number" && !Number.isNaN(rating);
+
+    if (!isMessageValid && !isRatingValid) {
       return res.status(400).json({
         success: false,
-        message: "Please provide a message or a rating",
+        message: "Please provide a valid message or rating",
       });
     }
 
-    let safeRating = null;
-    if (rating !== undefined && rating !== null) {
-      const parsed = Number(rating);
-      if (parsed < 1 || parsed > 5) {
-        return res.status(400).json({
-          success: false,
-          message: "Rating must be between 1 and 5",
-        });
-      }
-      safeRating = parsed;
+    // Rating range validation
+    if (isRatingValid && (rating < 1 || rating > 5)) {
+      return res.status(400).json({
+        success: false,
+        message: "Rating must be between 1 and 5",
+      });
     }
 
+    // Extract IP safely (proxy + IPv6 safe)
     const rawIp =
-      req.headers["x-forwarded-for"] || req.socket.remoteAddress;
-    const ip = rawIp?.split(",")[0]?.trim() || null;
+      req.headers["x-forwarded-for"] || req.socket.remoteAddress || null;
+
+    const ip = rawIp
+      ? rawIp.split(",")[0].replace("::ffff:", "").trim()
+      : null;
 
     const feedback = await Feedback.create({
       user: req.user?._id || null,
-      rating: safeRating,
-      message: message?.trim() || null,
+      message: isMessageValid ? message : null,
+      rating: isRatingValid ? rating : null,
       page: page || null,
       userAgent: req.headers["user-agent"] || null,
       ip,
@@ -64,6 +74,7 @@ exports.getAllFeedback = async (req, res) => {
       data: feedback,
     });
   } catch (error) {
+    console.error("❌ Fetch feedback error:", error);
     return res.status(500).json({
       success: false,
       message: "Failed to fetch feedback",
