@@ -5,63 +5,114 @@
 /* DARK */
 .feedback-modal.dark,
 .feedback-fab.dark {
-  --bg: #0f172a;
-  --card: #020617;
-  --border: rgba(255, 255, 255, 0.12);
+  --bg: #0b1220;
+  --card: rgba(2, 6, 23, 0.92);
+  --border: rgba(255, 255, 255, 0.14);
   --text: #f8fafc;
   --text-muted: #94a3b8;
   --accent: #6366f1;
-  --shadow: rgba(0, 0, 0, 0.6);
+  --accent-soft: rgba(99, 102, 241, 0.35);
+  --shadow: rgba(0, 0, 0, 0.7);
 }
 
 /* LIGHT */
 .feedback-modal.light,
 .feedback-fab.light {
-  --bg: #f8fafc;
+  --bg: #eef2ff;
   --card: #ffffff;
   --border: #e5e7eb;
   --text: #0f172a;
   --text-muted: #475569;
   --accent: #4f46e5;
-  --shadow: rgba(0, 0, 0, 0.1);
+  --accent-soft: rgba(79, 70, 229, 0.25);
+  --shadow: rgba(15, 23, 42, 0.15);
 }
 
 /* =========================================================
-   FLOATING BUTTON
+   FLOATING ACTION BUTTON (ICON-ONLY, PREMIUM)
 ========================================================= */
+
 .feedback-fab {
   position: fixed;
-  bottom: 24px;
-  right: 24px;
+  bottom: 26px;
+  right: 26px;
   z-index: 999;
 
-  background: var(--accent);
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+
+  display: grid;
+  place-items: center;
+
+  background:
+    radial-gradient(
+      circle at 30% 30%,
+      rgba(255, 255, 255, 0.35),
+      transparent 40%
+    ),
+    linear-gradient(135deg, var(--accent), #4338ca);
+
   color: white;
-  border: none;
-  border-radius: 999px;
-  padding: 14px 22px;
 
-  font-weight: 700;
-  font-size: 0.95rem;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(14px);
+
+  box-shadow:
+    0 18px 45px var(--accent-soft),
+    0 8px 18px var(--shadow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+
   cursor: pointer;
-
-  box-shadow: 0 10px 30px var(--shadow);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.25s cubic-bezier(.22,.61,.36,1),
+    box-shadow 0.25s ease,
+    filter 0.25s ease;
 }
 
 .feedback-fab:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 14px 40px var(--shadow);
+  transform: translateY(-5px) scale(1.06);
+  box-shadow:
+    0 28px 80px var(--accent-soft),
+    0 12px 25px var(--shadow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.45);
+  filter: brightness(1.06);
+}
+
+.feedback-fab:active {
+  transform: translateY(-2px) scale(0.97);
+}
+
+/* Ambient pulse */
+.feedback-fab::after {
+  content: "";
+  position: absolute;
+  inset: -10px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    var(--accent-soft),
+    transparent 60%
+  );
+  opacity: 0.6;
+  animation: fabPulse 2.8s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes fabPulse {
+  0%, 100% { transform: scale(0.85); opacity: 0.45; }
+  50% { transform: scale(1.1); opacity: 0.75; }
 }
 
 /* =========================================================
    OVERLAY
 ========================================================= */
+
 .feedback-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(6px);
+  background: rgba(2, 6, 23, 0.55);
+  backdrop-filter: blur(8px);
   z-index: 1000;
 
   display: flex;
@@ -72,23 +123,28 @@
 /* =========================================================
    MODAL
 ========================================================= */
+
 .feedback-modal {
   width: 100%;
   max-width: 420px;
+
   background: var(--card);
   color: var(--text);
 
-  border-radius: 18px;
+  border-radius: 20px;
   border: 1px solid var(--border);
-  box-shadow: 0 30px 80px var(--shadow);
 
-  padding: 28px;
-  animation: popIn 0.25s ease;
+  box-shadow:
+    0 40px 120px var(--shadow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+
+  padding: 30px;
+  animation: modalIn 0.28s cubic-bezier(.22,.61,.36,1);
 }
 
-@keyframes popIn {
+@keyframes modalIn {
   from {
-    transform: scale(0.96) translateY(10px);
+    transform: scale(0.94) translateY(12px);
     opacity: 0;
   }
   to {
@@ -98,25 +154,25 @@
 }
 
 .feedback-title {
-  font-size: 1.3rem;
+  font-size: 1.35rem;
   font-weight: 800;
   margin-bottom: 10px;
 }
 
 .feedback-modal textarea {
   width: 100%;
-  min-height: 90px;
+  min-height: 96px;
 
   background: var(--bg);
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: 12px;
 
-  padding: 12px;
+  padding: 14px;
   color: var(--text);
   resize: none;
 
   font-size: 0.95rem;
-  margin-bottom: 16px;
+  margin-bottom: 18px;
 }
 
 .feedback-modal textarea::placeholder {
@@ -126,23 +182,28 @@
 /* =========================================================
    STARS
 ========================================================= */
+
 .rating-row {
   display: flex;
-  gap: 8px;
-  margin: 12px 0 18px;
+  gap: 10px;
+  margin: 14px 0 18px;
 }
 
 .star {
-  font-size: 1.8rem;
+  font-size: 1.9rem;
   background: none;
   border: none;
   cursor: pointer;
   color: #64748b;
-  transition: transform 0.15s ease, color 0.15s ease;
+  transition:
+    transform 0.15s ease,
+    color 0.15s ease,
+    filter 0.15s ease;
 }
 
 .star:hover {
-  transform: scale(1.15);
+  transform: scale(1.18);
+  filter: drop-shadow(0 0 6px rgba(250, 204, 21, 0.4));
 }
 
 .star.active {
@@ -152,21 +213,36 @@
 /* =========================================================
    SUBMIT BUTTON
 ========================================================= */
+
 .submit-btn {
   width: 100%;
-  background: var(--accent);
+  background: linear-gradient(
+    135deg,
+    var(--accent),
+    #4338ca
+  );
   color: white;
-  border: none;
-  border-radius: 10px;
-  padding: 12px;
 
-  font-weight: 700;
+  border: none;
+  border-radius: 12px;
+  padding: 13px;
+
+  font-weight: 800;
   cursor: pointer;
-  transition: background 0.2s ease, transform 0.15s ease;
+
+  box-shadow:
+    0 10px 25px var(--accent-soft),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.2s ease,
+    filter 0.2s ease;
 }
 
 .submit-btn:hover {
   transform: translateY(-2px);
+  filter: brightness(1.05);
 }
 
 .submit-btn:disabled {
@@ -177,25 +253,37 @@
 /* =========================================================
    SUCCESS STATE
 ========================================================= */
+
 .feedback-success {
   text-align: center;
-  padding: 30px 10px;
+  padding: 32px 12px;
 }
 
-.checkmark {
-  font-size: 3rem;
-  color: #22c55e;
-  margin-bottom: 10px;
-  animation: popCheck 0.4s ease;
+.success-ring {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  border: 3px solid #22c55e;
+  margin: 0 auto 14px;
+
+  display: grid;
+  place-items: center;
+
+  animation: ringPop 0.45s ease;
 }
 
-@keyframes popCheck {
+@keyframes ringPop {
   0% { transform: scale(0.6); opacity: 0; }
   100% { transform: scale(1); opacity: 1; }
 }
 
+.checkmark {
+  font-size: 2.2rem;
+  color: #22c55e;
+}
+
 .feedback-success h3 {
-  font-size: 1.4rem;
+  font-size: 1.45rem;
   margin-bottom: 6px;
 }
 
@@ -206,6 +294,7 @@
 /* =========================================================
    ERROR
 ========================================================= */
+
 .feedback-error {
   color: #ef4444;
   font-size: 0.85rem;
