@@ -44,9 +44,7 @@ export default function LoginModal({ theme = "light", onClose, switchToSignup })
         localStorage.setItem("verifyEmail", email);
 
         // Switch user to signup modal (OTP screen lives there)
-        setTimeout(() => {
-  switchToSignup();
-}, 0);
+        switchToSignup();
 return;
 
       }
@@ -61,7 +59,15 @@ return;
   };
 
   return (
-    <div className="login-overlay" onClick={onClose}>
+      <div
+  className="login-overlay"
+  onClick={(e) => {
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  }}
+>
+
       <div
         className={`login-modal ${theme}`}
         onClick={(e) => e.stopPropagation()}
@@ -112,15 +118,13 @@ return;
 
           <p className="switch-text">
             Don’t have an account?
-            <span
-  onClick={() => {
-    setTimeout(() => {
-      switchToSignup();
-    }, 0);
+           <span
+  onClick={(e) => {
+    e.stopPropagation(); // extra safety
+    switchToSignup();
   }}
 >
-  {" "}Sign up
-</span>
+
 
           </p>
         </div>
