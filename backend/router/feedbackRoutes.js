@@ -7,18 +7,23 @@ const {
   getAllFeedback,
 } = require("../controller/feedbackController");
 
-/* 
+/*
    SOFT AUTH MIDDLEWARE
-   (Attach user if token exists, else continue)
+   - Attach user if token is valid
+   - Ignore invalid/missing token
  */
-const optionalAuth = (req, res, next) => {
+const optionalAuth = async (req, res, next) => {
   const authHeader = req.headers.authorization;
 
-  if (authHeader && authHeader.startsWith("Bearer ")) {
-    return authMiddleware(req, res, next);
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return next();
   }
 
-  next();
+  try {
+    await authMiddleware(req, res, next);
+  } catch {
+    return next();
+  }
 };
 
 /*
@@ -28,9 +33,9 @@ const optionalAuth = (req, res, next) => {
  */
 router.post("/", optionalAuth, createFeedback);
 
-/* 
+/*
    GET ALL FEEDBACK
-   - Protected (admin/internal use)
+   - Protected (admin/internal)
  */
 router.get("/", authMiddleware, getAllFeedback);
 
