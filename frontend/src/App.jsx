@@ -55,12 +55,18 @@ function App() {
     setShowSignup(false);
   };
 
-  const handleCloseAuth = () => {
-    closeAuthModals();
-    if (location.pathname === "/report") {
-      navigate("/");
-    }
-  };
+  // Used when user cancels auth entirely
+const handleCancelAuth = () => {
+  closeAuthModals();
+  if (location.pathname === "/report") {
+    navigate("/");
+  }
+};
+
+// Used for internal modal switching ONLY
+const handleCloseModalOnly = () => {
+  closeAuthModals();
+};
 
   return (
     <AuthProvider>
@@ -139,7 +145,7 @@ function App() {
         {showSignup && (
           <SignupModal
             theme={theme}
-            onClose={handleCloseAuth}
+            onClose={handleCancelAuth}
             switchToLogin={openLogin}
           />
         )}
@@ -147,7 +153,7 @@ function App() {
         {showLogin && (
           <LoginModal
             theme={theme}
-            onClose={handleCloseAuth}
+            onClose={handleCancelAuth}
             switchToSignup={openSignup}
           />
         )}
