@@ -49,7 +49,19 @@ export default function FeedbackWidget({ theme }) {
   type="button"
 >
   <span className="pill-text">Give Feedback</span>
-  <span className="pill-icon">💬</span>
+   <span className="pill-icon" aria-hidden="true">
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M4 22V4" />
+      <path d="M4 4h13l-1.5 4L17 12H4" />
+    </svg>
+  </span>
 </button>
 
 

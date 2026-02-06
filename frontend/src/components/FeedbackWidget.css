@@ -353,3 +353,37 @@
   border-radius: 8px;
   font-size: 0.95rem;
 }
+/* =========================================================
+   MOBILE MODE 
+========================================================= */
+
+@media (max-width: 640px) {
+  .feedback-pill {
+    height: 44px;
+    width: 44px;
+    padding: 0;
+
+    border-radius: 12px;
+
+    justify-content: center;
+  }
+
+  /* Hide text completely on mobile */
+  .feedback-pill .pill-text {
+    display: none;
+  }
+
+  /* Icon-only button */
+  .feedback-pill .pill-icon {
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    background: transparent; /* cleaner on mobile */
+    color: white;
+  }
+
+  .feedback-pill .pill-icon svg {
+    width: 18px;
+    height: 18px;
+  }
+}
