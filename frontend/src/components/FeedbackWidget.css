@@ -281,88 +281,75 @@
   margin-bottom: 10px;
 }
 /* =========================================================
-   PILL FEEDBACK BUTTON (LOGO STYLE)
+   FEEDBACK PILL (IMAGE-MATCHED)
 ========================================================= */
 
 .feedback-pill {
   position: fixed;
-  bottom: 26px;
-  right: 26px;
+  bottom: 24px;
+  right: 24px;
   z-index: 999;
 
   display: inline-flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
 
-  padding: 18px 36px;
+  height: 52px;
+  padding: 0 26px;
+
   border-radius: 999px;
 
   background: linear-gradient(
     135deg,
     #2f80ed,
-    #1c6fe8
+    #1f6fe5
   );
 
   color: #ffffff;
-  font-size: 1.55rem;
-  font-weight: 800;
-  letter-spacing: 0.2px;
+  font-size: 1rem;
+  font-weight: 700;
 
-  border: none;
+  border: 3px solid rgba(255, 255, 255, 0.75); /* thick white outline */
+
   cursor: pointer;
 
   box-shadow:
-    0 22px 50px rgba(30, 100, 220, 0.45),
-    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+    0 12px 28px rgba(47, 128, 237, 0.35); /* soft ambient shadow */
 
   transition:
     transform 0.2s ease,
     box-shadow 0.2s ease;
-
-  isolation: isolate;
 }
 
-/* Inner white outline */
-.feedback-pill::before {
-  content: "";
-  position: absolute;
-  inset: 4px;
-  border-radius: inherit;
-  border: 2px solid rgba(255, 255, 255, 0.55);
-  pointer-events: none;
-}
-
-/* Hover */
+/* Hover (very subtle) */
 .feedback-pill:hover {
-  transform: translateY(-3px);
+  transform: translateY(-1px);
   box-shadow:
-    0 30px 70px rgba(30, 100, 220, 0.55),
-    inset 0 1px 0 rgba(255, 255, 255, 0.45);
+    0 16px 36px rgba(47, 128, 237, 0.4);
 }
 
 /* Active */
 .feedback-pill:active {
-  transform: translateY(-1px) scale(0.98);
+  transform: translateY(0);
 }
 
 /* Text */
 .feedback-pill .pill-text {
   white-space: nowrap;
+  line-height: 1;
 }
 
-/* Icon bubble */
+/* Icon — embedded, not floating */
 .feedback-pill .pill-icon {
   display: grid;
   place-items: center;
 
-  width: 36px;
-  height: 36px;
+  width: 28px;
+  height: 28px;
 
   background: rgba(255, 255, 255, 0.95);
   color: #2f80ed;
 
-  border-radius: 10px;
-  font-size: 1.2rem;
-
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+  font-size: 0.95rem;
 }
