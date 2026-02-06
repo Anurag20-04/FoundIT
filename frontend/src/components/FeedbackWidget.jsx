@@ -42,30 +42,16 @@ export default function FeedbackWidget({ theme }) {
   return (
     <>
       {/* ===== FEEDBACK FAB ===== */}
-      <button
-        className={`feedback-fab ${theme}`}
-        aria-label="Give feedback"
-        onClick={() => setOpen(true)}
-        type="button"
-      >
-        {/* Insight / Signal Icon */}
-      <svg
-  width="20"
-  height="20"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  strokeWidth="2"
-  strokeLinecap="round"
-  strokeLinejoin="round"
+     <button
+  className={`feedback-pill ${theme}`}
+  onClick={() => setOpen(true)}
+  aria-label="Give feedback"
+  type="button"
 >
-  {/* vertical bars = signal / feedback / metrics */}
-  <path d="M6 16v-4" />
-  <path d="M10 16v-8" />
-  <path d="M14 16v-2" />
-  <path d="M18 16v-6" />
-</svg>
-      </button>
+  <span className="pill-text">Give Feedback</span>
+  <span className="pill-icon">💬</span>
+</button>
+
 
       {/* ===== MODAL ===== */}
       {open && (
