@@ -44,8 +44,11 @@ export default function LoginModal({ theme = "light", onClose, switchToSignup })
         localStorage.setItem("verifyEmail", email);
 
         // Switch user to signup modal (OTP screen lives there)
-        switchToSignup();
-        return;
+        setTimeout(() => {
+  switchToSignup();
+}, 0);
+return;
+
       }
 
       setError(
@@ -109,7 +112,16 @@ export default function LoginModal({ theme = "light", onClose, switchToSignup })
 
           <p className="switch-text">
             Don’t have an account?
-            <span onClick={switchToSignup}> Sign up</span>
+            <<span
+  onClick={() => {
+    setTimeout(() => {
+      switchToSignup();
+    }, 0);
+  }}
+>
+  {" "}Sign up
+</span>
+
           </p>
         </div>
       </div>
