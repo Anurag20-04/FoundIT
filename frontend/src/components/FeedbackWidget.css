@@ -65,6 +65,16 @@
     transform 0.2s ease,
     box-shadow 0.2s ease;
 }
+.feedback-fab svg {
+  opacity: 0.9;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.feedback-fab:hover svg {
+  opacity: 1;
+  transform: scale(1.05);
+}
+
 
 .feedback-fab:hover {
   transform: translateY(-3px);

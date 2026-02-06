@@ -48,25 +48,23 @@ export default function FeedbackWidget({ theme }) {
         onClick={() => setOpen(true)}
         type="button"
       >
-        {/* Insight / Signal Icon (NOT chat) */}
-        <svg
-          className="feedback-icon"
-          viewBox="0 0 24 24"
-          aria-hidden="true"
-        >
-          <path
-            d="M3 17l6-6 4 4 7-7"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-          <path
-            d="M14 4l1.5 3L19 8.5l-3.5 1.5L14 13l-1.5-3L9 8.5l3.5-1.5L14 4z"
-            fill="currentColor"
-          />
-        </svg>
+        {/* Insight / Signal Icon */}
+      <svg
+  width="20"
+  height="20"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  strokeWidth="2"
+  strokeLinecap="round"
+  strokeLinejoin="round"
+>
+  {/* vertical bars = signal / feedback / metrics */}
+  <path d="M6 16v-4" />
+  <path d="M10 16v-8" />
+  <path d="M14 16v-2" />
+  <path d="M18 16v-6" />
+</svg>
       </button>
 
       {/* ===== MODAL ===== */}
