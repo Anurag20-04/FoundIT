@@ -2,85 +2,105 @@ import { useState } from "react";
 import api from "../utils/axios";
 import "./FeedbackWidget.css";
 
-export default function FeedbackWidget() {
+export default function FeedbackWidget({ theme }) {
   const [open, setOpen] = useState(false);
-  const [rating, setRating] = useState(null);
+  const [rating, setRating] = useState(0);
+  const [hover, setHover] = useState(0);
   const [message, setMessage] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [done, setDone] = useState(false);
+  const [status, setStatus] = useState("idle"); 
+  // idle | loading | success | error
 
   const submitFeedback = async () => {
-    if (!rating && message.trim().length < 3) return;
+    if (message.trim().length < 3) return;
 
     try {
-      setLoading(true);
+      setStatus("loading");
 
       await api.post("/feedback", {
-        rating,
-        message: message.trim() || null,
+        rating: rating || null,
+        message,
         page: window.location.pathname,
       });
 
-      setDone(true);
+      setStatus("success");
+
       setTimeout(() => {
         setOpen(false);
-        setDone(false);
-        setRating(null);
         setMessage("");
-      }, 1800);
+        setRating(0);
+        setHover(0);
+        setStatus("idle");
+      }, 2000);
 
     } catch (err) {
-      console.error("Feedback failed", err);
-    } finally {
-      setLoading(false);
+      console.error(err);
+      setStatus("error");
     }
   };
 
   return (
     <>
       {/* Floating Button */}
-      <button className="feedback-fab" onClick={() => setOpen(true)}>
+      <button
+        className={`feedback-fab ${theme}`}
+        onClick={() => setOpen(true)}
+      >
         💬 Feedback
       </button>
 
-      {/* Modal */}
       {open && (
         <div className="feedback-overlay" onClick={() => setOpen(false)}>
-          <div className="feedback-modal" onClick={(e) => e.stopPropagation()}>
-            {done ? (
+          <div
+            className={`feedback-modal ${theme}`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {status === "success" ? (
               <div className="feedback-success">
-                ✅ Thanks for your feedback!
+                <div className="checkmark">✓</div>
+                <h3>Thank you!</h3>
+                <p>Your feedback helps us improve FoundIT.</p>
               </div>
             ) : (
               <>
-                <h3>How was your experience?</h3>
+                <h3 className="feedback-title">Share your experience</h3>
 
-                {/* Rating */}
+                {/* STAR RATING */}
                 <div className="rating-row">
-                  {[1, 2, 3, 4, 5].map((n) => (
-                    <span
-                      key={n}
-                      className={rating >= n ? "star active" : "star"}
-                      onClick={() => setRating(n)}
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      className={`star ${
+                        (hover || rating) >= star ? "active" : ""
+                      }`}
+                      onClick={() => setRating(star)}
+                      onMouseEnter={() => setHover(star)}
+                      onMouseLeave={() => setHover(0)}
                     >
                       ★
-                    </span>
+                    </button>
                   ))}
                 </div>
 
-                {/* Message */}
+                {/* TEXT */}
                 <textarea
-                  placeholder="Tell us what worked or what didn’t…"
+                  placeholder="What did you like? What felt broken?"
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                 />
 
+                {/* STATUS */}
+                {status === "error" && (
+                  <p className="feedback-error">
+                    Something went wrong. Try again.
+                  </p>
+                )}
+
                 <button
                   className="submit-btn"
+                  disabled={status === "loading" || message.length < 3}
                   onClick={submitFeedback}
-                  disabled={loading}
                 >
-                  {loading ? "Sending…" : "Submit"}
+                  {status === "loading" ? "Sending..." : "Send Feedback"}
                 </button>
               </>
             )}

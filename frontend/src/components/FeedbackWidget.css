@@ -1,124 +1,172 @@
 /* =========================================================
-   FEEDBACK WIDGET — THEME AWARE (Dark / Light)
-   Uses SAME variables as browse-page-wrapper
+   THEME VARIABLES
 ========================================================= */
 
-/* Floating Action Button */
+/* DARK */
+.feedback-modal.dark,
+.feedback-fab.dark {
+  --bg: #0f172a;
+  --card: #020617;
+  --border: rgba(255, 255, 255, 0.12);
+  --text: #f8fafc;
+  --text-muted: #94a3b8;
+  --accent: #6366f1;
+  --shadow: rgba(0, 0, 0, 0.6);
+}
+
+/* LIGHT */
+.feedback-modal.light,
+.feedback-fab.light {
+  --bg: #f8fafc;
+  --card: #ffffff;
+  --border: #e5e7eb;
+  --text: #0f172a;
+  --text-muted: #475569;
+  --accent: #4f46e5;
+  --shadow: rgba(0, 0, 0, 0.1);
+}
+
+/* =========================================================
+   FLOATING BUTTON
+========================================================= */
 .feedback-fab {
   position: fixed;
-  bottom: 25px;
-  right: 25px;
-  z-index: 1000;
+  bottom: 24px;
+  right: 24px;
+  z-index: 999;
 
-  padding: 12px 18px;
-  border-radius: 999px;
-
-  background: var(--highlight);
+  background: var(--accent);
   color: white;
-  font-weight: 600;
-  font-size: 0.9rem;
-
   border: none;
+  border-radius: 999px;
+  padding: 14px 22px;
+
+  font-weight: 700;
+  font-size: 0.95rem;
   cursor: pointer;
-  box-shadow: 0 8px 25px var(--shadow-color);
+
+  box-shadow: 0 10px 30px var(--shadow);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .feedback-fab:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 30px var(--shadow-color);
+  transform: translateY(-3px);
+  box-shadow: 0 14px 40px var(--shadow);
 }
 
-/* Overlay */
+/* =========================================================
+   OVERLAY
+========================================================= */
 .feedback-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.55);
-  backdrop-filter: blur(4px);
-  z-index: 1100;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(6px);
+  z-index: 1000;
 
   display: flex;
-  align-items: flex-end;
-  justify-content: flex-end;
-  padding: 20px;
+  align-items: center;
+  justify-content: center;
 }
 
-/* Modal */
+/* =========================================================
+   MODAL
+========================================================= */
 .feedback-modal {
   width: 100%;
-  max-width: 360px;
+  max-width: 420px;
+  background: var(--card);
+  color: var(--text);
 
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
   border-radius: 18px;
+  border: 1px solid var(--border);
+  box-shadow: 0 30px 80px var(--shadow);
 
-  padding: 20px;
-  box-shadow: 0 20px 40px var(--shadow-color);
-  color: var(--text-primary);
-
-  animation: slideUp 0.25s ease;
+  padding: 28px;
+  animation: popIn 0.25s ease;
 }
 
-/* Header */
-.feedback-modal h3 {
-  margin: 0 0 12px 0;
-  font-size: 1.1rem;
-  font-weight: 700;
+@keyframes popIn {
+  from {
+    transform: scale(0.96) translateY(10px);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
-/* Rating */
-.rating-row {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 12px;
+.feedback-title {
+  font-size: 1.3rem;
+  font-weight: 800;
+  margin-bottom: 10px;
 }
 
-.star {
-  font-size: 1.4rem;
-  cursor: pointer;
-  color: var(--text-secondary);
-  transition: color 0.2s;
-}
-
-.star.active {
-  color: var(--highlight);
-}
-
-/* Textarea */
 .feedback-modal textarea {
   width: 100%;
   min-height: 90px;
 
-  background: var(--input-bg);
-  border: 1px solid var(--card-border);
+  background: var(--bg);
+  border: 1px solid var(--border);
   border-radius: 10px;
 
-  padding: 10px 12px;
+  padding: 12px;
+  color: var(--text);
   resize: none;
 
-  color: var(--text-primary);
-  font-size: 0.9rem;
-  outline: none;
-  margin-bottom: 12px;
+  font-size: 0.95rem;
+  margin-bottom: 16px;
 }
 
 .feedback-modal textarea::placeholder {
-  color: var(--text-secondary);
+  color: var(--text-muted);
 }
 
-/* Submit Button */
+/* =========================================================
+   STARS
+========================================================= */
+.rating-row {
+  display: flex;
+  gap: 8px;
+  margin: 12px 0 18px;
+}
+
+.star {
+  font-size: 1.8rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #64748b;
+  transition: transform 0.15s ease, color 0.15s ease;
+}
+
+.star:hover {
+  transform: scale(1.15);
+}
+
+.star.active {
+  color: #facc15;
+}
+
+/* =========================================================
+   SUBMIT BUTTON
+========================================================= */
 .submit-btn {
   width: 100%;
-  padding: 10px;
-
-  background: var(--highlight);
+  background: var(--accent);
   color: white;
   border: none;
   border-radius: 10px;
+  padding: 12px;
 
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
-  transition: opacity 0.2s;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.submit-btn:hover {
+  transform: translateY(-2px);
 }
 
 .submit-btn:disabled {
@@ -126,38 +174,40 @@
   cursor: not-allowed;
 }
 
-/* Success */
+/* =========================================================
+   SUCCESS STATE
+========================================================= */
 .feedback-success {
   text-align: center;
   padding: 30px 10px;
-  font-weight: 600;
-  color: var(--highlight);
 }
 
-/* Animation */
-@keyframes slideUp {
-  from {
-    transform: translateY(20px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
+.checkmark {
+  font-size: 3rem;
+  color: #22c55e;
+  margin-bottom: 10px;
+  animation: popCheck 0.4s ease;
+}
+
+@keyframes popCheck {
+  0% { transform: scale(0.6); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.feedback-success h3 {
+  font-size: 1.4rem;
+  margin-bottom: 6px;
+}
+
+.feedback-success p {
+  color: var(--text-muted);
 }
 
 /* =========================================================
-   MOBILE TWEAKS
+   ERROR
 ========================================================= */
-@media (max-width: 480px) {
-  .feedback-fab {
-    bottom: 18px;
-    right: 18px;
-    font-size: 0.85rem;
-  }
-
-  .feedback-modal {
-    max-width: 100%;
-    border-radius: 16px;
-  }
+.feedback-error {
+  color: #ef4444;
+  font-size: 0.85rem;
+  margin-bottom: 10px;
 }

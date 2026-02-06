@@ -134,7 +134,7 @@ function App() {
 
           <Footer />
         </div>
-        <FeedbackWidget />
+        <FeedbackWidget theme={theme}/>
         {/* ================= AUTH MODALS ================= */}
         {showSignup && (
           <SignupModal
