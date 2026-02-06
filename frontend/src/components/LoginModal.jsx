@@ -112,7 +112,7 @@ return;
 
           <p className="switch-text">
             Don’t have an account?
-            <<span
+            <span
   onClick={() => {
     setTimeout(() => {
       switchToSignup();
