@@ -18,6 +18,8 @@ export default function ReportItem({ theme, requireLogin }) {
 
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [loginRequested, setLoginRequested] = useState(false);
+
 
   /* =========================================================
      FORM STATE
@@ -47,12 +49,14 @@ export default function ReportItem({ theme, requireLogin }) {
       LOGIN GUARD
   ========================================================= */
   useEffect(() => {
-    if (!loading && !user) {
-      requireLogin();
-    }
-  }, [loading, user, requireLogin]);
+  if (!loading && !user && !loginRequested) {
+    setLoginRequested(true);
+    requireLogin();
+  }
+}, [loading, user, loginRequested, requireLogin]);
 
-  if (loading || !user) return null;
+
+  if (loading) return null;
 
   const next = () => setStep((s) => Math.min(s + 1, totalSteps));
   const prev = () => setStep((s) => Math.max(s - 1, 1));

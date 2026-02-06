@@ -63,11 +63,6 @@ const handleCancelAuth = () => {
   }
 };
 
-// Used for internal modal switching ONLY
-const handleCloseModalOnly = () => {
-  closeAuthModals();
-};
-
   return (
     <AuthProvider>
       <div className={`app ${theme}`}>
