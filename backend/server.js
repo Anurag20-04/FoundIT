@@ -22,6 +22,8 @@ const claimRoutes = require("./router/claimRoutes");
 const userRoutes = require("./router/userRoutes");
 const chatRoutes = require("./router/chatRoutes");
 const authMiddleware = require("./middleware/auth");
+const feedbackRoutes = require("./router/feedbackRoutes");
+
 
 dotenv.config();
 connectDB();
@@ -97,6 +99,7 @@ app.use("/api/claims", claimRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/notifications", authMiddleware, notificationRoutes); 
 app.use("/api/chats", chatRoutes);
+app.use("/api/feedback", feedbackRoutes);
 
 /* =======================
    HEALTH CHECK

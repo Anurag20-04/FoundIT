@@ -1,0 +1,163 @@
+/* =========================================================
+   FEEDBACK WIDGET — THEME AWARE (Dark / Light)
+   Uses SAME variables as browse-page-wrapper
+========================================================= */
+
+/* Floating Action Button */
+.feedback-fab {
+  position: fixed;
+  bottom: 25px;
+  right: 25px;
+  z-index: 1000;
+
+  padding: 12px 18px;
+  border-radius: 999px;
+
+  background: var(--highlight);
+  color: white;
+  font-weight: 600;
+  font-size: 0.9rem;
+
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 8px 25px var(--shadow-color);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.feedback-fab:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px var(--shadow-color);
+}
+
+/* Overlay */
+.feedback-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+  z-index: 1100;
+
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  padding: 20px;
+}
+
+/* Modal */
+.feedback-modal {
+  width: 100%;
+  max-width: 360px;
+
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 18px;
+
+  padding: 20px;
+  box-shadow: 0 20px 40px var(--shadow-color);
+  color: var(--text-primary);
+
+  animation: slideUp 0.25s ease;
+}
+
+/* Header */
+.feedback-modal h3 {
+  margin: 0 0 12px 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+/* Rating */
+.rating-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.star {
+  font-size: 1.4rem;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: color 0.2s;
+}
+
+.star.active {
+  color: var(--highlight);
+}
+
+/* Textarea */
+.feedback-modal textarea {
+  width: 100%;
+  min-height: 90px;
+
+  background: var(--input-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+
+  padding: 10px 12px;
+  resize: none;
+
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  outline: none;
+  margin-bottom: 12px;
+}
+
+.feedback-modal textarea::placeholder {
+  color: var(--text-secondary);
+}
+
+/* Submit Button */
+.submit-btn {
+  width: 100%;
+  padding: 10px;
+
+  background: var(--highlight);
+  color: white;
+  border: none;
+  border-radius: 10px;
+
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Success */
+.feedback-success {
+  text-align: center;
+  padding: 30px 10px;
+  font-weight: 600;
+  color: var(--highlight);
+}
+
+/* Animation */
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* =========================================================
+   MOBILE TWEAKS
+========================================================= */
+@media (max-width: 480px) {
+  .feedback-fab {
+    bottom: 18px;
+    right: 18px;
+    font-size: 0.85rem;
+  }
+
+  .feedback-modal {
+    max-width: 100%;
+    border-radius: 16px;
+  }
+}

@@ -17,6 +17,7 @@ import VerifyEmail from "./pages/VerifyEmail";
 import ChatInbox from "./pages/ChatInbox";
 import ClaimRequests from "./pages/ClaimRequests";
 import ChatRoom from "./pages/ChatRoom";
+import FeedbackWidget from "./components/FeedbackWidget";
 
 
 
@@ -133,7 +134,7 @@ function App() {
 
           <Footer />
         </div>
-
+        <FeedbackWidget />
         {/* ================= AUTH MODALS ================= */}
         {showSignup && (
           <SignupModal
