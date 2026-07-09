@@ -134,42 +134,26 @@ http://localhost:5173
 - Delete Item
 - View All Items
 - Search Items
-
----
-
-## Future Enhancements
-
 - Image Upload Support
 - Email Notifications
 - Google Maps Integration
 - Real-time Chat
+
+---
+
+## Future Enhancements
 - Admin Dashboard
 - Advanced Search Filters
-
----
-
-## Screenshots
-
-Add screenshots of:
-
-- Home Page
-- Login Page
-- Dashboard
-- Lost Items Page
-- Found Items Page
-
----
 
 ## Author
 
 **Bipin Rajak**
-
 GitHub: https://github.com/bipin-2005
+LinkedIn: https://www.linkedin.com/in/bipin-rajak/
 
-LinkedIn: Add your LinkedIn profile link
+**Anurag Kumar Harijan**
+GitHub: https://github.com/anurag-2005
+LinkedIn: https://www.linkedin.com/in/anurag-45era8349/
 
 ---
 
-## License
-
-This project is licensed under the MIT License.
