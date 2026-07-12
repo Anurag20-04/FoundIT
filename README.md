@@ -213,13 +213,13 @@ npm start
 
 ## 👨‍💻 Contributors
 
-**Bipin Rajak**
-GitHub: https://github.com/bipin-2005 
-LinkedIn: https://www.linkedin.com/in/bipin-rajak/
+### Bipin Rajak
+- **GitHub:** https://github.com/bipin-2005
+- **LinkedIn:** https://www.linkedin.com/in/bipin-rajak/
 
-**Anurag Kumar Harijan**
-GitHub: https://github.com/Anurag20-04 
-LinkedIn: https://www.linkedin.com/in/anurag-45era8349/
+### Anurag Kumar Harijan
+- **GitHub:** https://github.com/Anurag20-04
+- **LinkedIn:** https://www.linkedin.com/in/anurag-45era8349/
 
 ---
 
