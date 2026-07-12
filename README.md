@@ -2,6 +2,11 @@
 
 A full-stack MERN web application that helps users report, search, and recover lost items through a secure and centralized platform. FoundIT replaces traditional manual lost-and-found systems with a modern digital solution featuring authentication, item matching, real-time communication, and claim management.
 
+![React](https://img.shields.io/badge/React-19-blue?logo=react)
+![Node.js](https://img.shields.io/badge/Node.js-Express-green?logo=node.js)
+![MongoDB](https://img.shields.io/badge/MongoDB-Database-green?logo=mongodb)
+![License](https://img.shields.io/badge/License-MIT-blue)
+
 ## 📖 Overview
 
 Losing personal belongings is a common problem, and traditional lost-and-found systems are often slow and unorganized. FoundIT provides a centralized platform where users can report lost or found items, browse listings, communicate securely, and recover belongings efficiently.
@@ -209,11 +214,11 @@ npm start
 ## 👨‍💻 Contributors
 
 **Bipin Rajak**
-
-Bipin Rajak GitHub: https://github.com/bipin-2005 
+GitHub: https://github.com/bipin-2005 
 LinkedIn: https://www.linkedin.com/in/bipin-rajak/
 
-Anurag Kumar Harijan GitHub: https://github.com/Anurag20-04 
+**Anurag Kumar Harijan**
+GitHub: https://github.com/Anurag20-04 
 LinkedIn: https://www.linkedin.com/in/anurag-45era8349/
 
 ---
